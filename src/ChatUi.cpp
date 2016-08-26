@@ -1,7 +1,13 @@
 #include "ChatUi.hpp"
-#include "ChatUi_Impl.hpp"
+
+#include <QTreeWidget>
+#include "ui_client.h"
+
 
 ChatUi::ChatUi()
-    : impl{std::make_shared<ChatUi_Impl>()}
 {
+    Ui::Client{}.setupUi(this);
+
+    QTreeView* tree = findChild<QTreeView*>("users");
+    show();
 }

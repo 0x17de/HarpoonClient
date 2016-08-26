@@ -20,15 +20,10 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTreeWidget" name="channels">
-       <attribute name="headerVisible">
-        <bool>false</bool>
+      <widget class="ChannelListWidget" name="channels">
+       <attribute name="headerDefaultSectionSize">
+        <number>0</number>
        </attribute>
-       <column>
-        <property name="text">
-         <string>Chats</string>
-        </property>
-       </column>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -68,15 +63,10 @@
         </item>
        </layout>
       </widget>
-      <widget class="QTreeWidget" name="users">
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-       <column>
-        <property name="text">
-         <string>Users</string>
-        </property>
-       </column>
+      <widget class="QTreeView" name="users">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
       </widget>
      </widget>
     </item>
@@ -106,6 +96,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ChannelListWidget</class>
+   <extends>QTreeView</extends>
+   <header>channellist/ChannelListWidget.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

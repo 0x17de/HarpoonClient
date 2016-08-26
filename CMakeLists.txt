@@ -9,13 +9,15 @@ find_package(Qt5Widgets)
 set(SRC_CLIENT
     src/main.cpp
     src/ChatUi.cpp src/ChatUi.hpp
-    src/ChatUi_Impl.cpp src/ChatUi_Impl.hpp
+    src/channellist/ChannelListWidget.cpp src/channellist/ChannelListWidget.hpp
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
-qt5_wrap_cpp(CHATUI_SRC src/ChatUi_Impl.hpp)
+qt5_wrap_cpp(CHATUI_SRC
+    src/ChatUi.hpp)
 qt5_wrap_ui(CHATUI_HEADERS
     ui_forms/client.ui)
 
 add_executable(HarpoonClient ${SRC_CLIENT} ${CHATUI_HEADERS} ${CHATUI_SRC} ${ICONS_SRC})
+target_include_directories(HarpoonClient PUBLIC src)
 target_link_libraries(HarpoonClient Qt5::Widgets)
