@@ -10,6 +10,8 @@ set(SRC_CLIENT
     src/main.cpp
     src/ChatUi.cpp src/ChatUi.hpp
     src/channellist/ChannelListWidget.cpp src/channellist/ChannelListWidget.hpp
+    src/channellist/ChannelTreeItem.cpp src/channellist/ChannelTreeItem.hpp
+    src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)

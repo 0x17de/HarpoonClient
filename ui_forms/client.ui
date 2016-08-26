@@ -21,6 +21,9 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="ChannelListWidget" name="channels">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
        <attribute name="headerDefaultSectionSize">
         <number>0</number>
        </attribute>
