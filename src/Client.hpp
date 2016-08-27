@@ -3,6 +3,7 @@
 
 #include <QWebSocket>
 #include <QString>
+#include <QJsonDocument>
 
 
 class Client : public QObject {
@@ -14,7 +15,9 @@ public:
 private Q_SLOTS:
     void onConnected();
     void onDisconnected();
-    void onMessage(QString message);
+    void onTextMessage(const QString& message);
+    void onBinaryMessage(const QByteArray& data);
+    void handleCommand(const QJsonDocument& doc);
 
 private:
     QWebSocket ws_;
