@@ -4,8 +4,9 @@
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    ChatUi ui;
     Client client;
+    ChatUi ui(client);
+    client.run();
 
     return app.exec();
 }

@@ -18,6 +18,9 @@ public:
     QModelIndex parent(const QModelIndex& index) const Q_DECL_OVERRIDE;
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
+
+    ChannelTreeItem* addServer(const QString& name);
+    void addChannel(ChannelTreeItem* server, const QString& name);
 private:
     ChannelTreeItem root_;
 };

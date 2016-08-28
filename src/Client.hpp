@@ -11,6 +11,7 @@ class Client : public QObject {
 
 public:
     Client();
+    void run();
 
 private Q_SLOTS:
     void onConnected();

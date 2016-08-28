@@ -1,9 +1,9 @@
 #include "ChannelTreeItem.hpp"
 
 
-ChannelTreeItem::ChannelTreeItem(ChannelTreeItem* parent)
+ChannelTreeItem::ChannelTreeItem(const QString& name, ChannelTreeItem* parent)
     : parent_{parent}
-    , data_{"TEST"}
+    , data_{name}
 {
 }
 

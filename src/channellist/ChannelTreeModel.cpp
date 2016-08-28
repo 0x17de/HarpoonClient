@@ -5,6 +5,7 @@
 
 ChannelTreeModel::ChannelTreeModel(QObject* parent)
     : QAbstractItemModel(parent)
+    , root_{"root"}
 {
 }
 
@@ -88,3 +89,13 @@ QVariant ChannelTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
+ChannelTreeItem* ChannelTreeModel::addServer(const QString& name) {
+    auto server = std::make_shared<ChannelTreeItem>("test", &root_);
+    root_.appendChild(server);
+    return server.get();
+}
+
+void ChannelTreeModel::addChannel(ChannelTreeItem* server, const QString& name) {
+    auto channel = std::make_shared<ChannelTreeItem>("#test", server);
+    server->appendChild(channel);
+}

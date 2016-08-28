@@ -11,7 +11,7 @@ class ChannelTreeItem : public std::enable_shared_from_this<ChannelTreeItem> {
     QString data_;
     ChannelTreeItem* parent_;
 public:
-    explicit ChannelTreeItem(ChannelTreeItem* parent = 0);
+    explicit ChannelTreeItem(const QString& name, ChannelTreeItem* parent = 0);
 
     void appendChild(std::shared_ptr<ChannelTreeItem> child);
 

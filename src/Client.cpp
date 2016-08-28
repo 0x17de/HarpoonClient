@@ -11,7 +11,9 @@ Client::Client() {
     connect(&ws_, &QWebSocket::disconnected, this, &Client::onDisconnected);
     connect(&ws_, &QWebSocket::textMessageReceived, this, &Client::onTextMessage);
     connect(&ws_, &QWebSocket::binaryMessageReceived, this, &Client::onBinaryMessage);
+}
 
+void Client::run() {
     ws_.open(QUrl("ws://localhost:8080/ws"));
 }
 

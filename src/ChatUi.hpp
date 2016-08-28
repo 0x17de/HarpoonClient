@@ -2,11 +2,12 @@
 #define CHATUI_H
 
 #include <QMainWindow>
+#include "Client.hpp"
 
 
 class ChatUi : public QMainWindow {
 public:
-    ChatUi();
+    ChatUi(Client& client);
 };
 
 
