@@ -41,5 +41,39 @@ void Client::handleCommand(const QJsonDocument& doc) {
     QJsonObject root = doc.object();
     QJsonValue cmdValue = root.value("cmd");
     if (!cmdValue.isString()) return;
-    qDebug() << cmdValue.toString();
+
+    QString cmd = cmdValue.toString();
+    qDebug() << cmd;
+    if (cmd == "chatlist") {
+        QJsonValue serversValue = root.value("servers");
+        if (!serversValue.isObject()) return;
+
+        QJsonObject servers = serversValue.toObject();
+        for (auto sit = servers.begin(); sit != servers.end(); ++sit) {
+            QString serverId = sit.key();
+            QJsonValueRef serverValue = sit.value();
+            if (!serverValue.isObject()) return;
+
+            QJsonObject server = serverValue.toObject();
+            QJsonValue channelsValue = server.value("channels");
+            if (!channelsValue.isObject()) return;
+
+            QJsonObject channels = channelsValue.toObject();
+            for (auto cit = channels.begin(); cit != channels.end(); ++cit) {
+                QString channelName = cit.key();
+                QJsonValueRef channelValue = cit.value();
+                if (!channelValue.isObject()) return;
+
+                QJsonObject channel = channelValue.toObject();
+                QJsonValue usersValue = channel.value("users");
+                if (!usersValue.isObject()) return;
+
+                QJsonObject users = usersValue.toObject();
+                for (auto uit = users.begin(); uit != users.end(); ++uit) {
+                    QString nick = uit.key();
+                    // TODO: continue
+                }
+            }
+        }
+    }
 }
