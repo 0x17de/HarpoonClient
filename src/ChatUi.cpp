@@ -2,6 +2,7 @@
 
 #include <QTreeWidget>
 #include "ui_client.h"
+#include "channellist/ChannelTreeItem.hpp"
 
 
 ChatUi::ChatUi(Client& client)
@@ -10,10 +11,10 @@ ChatUi::ChatUi(Client& client)
 
     ChannelListWidget* channelWidget = findChild<ChannelListWidget*>("channels");
 
-    auto* server1 = channelWidget->addServer("Test1");
-    channelWidget->addChannel(server1, "#test");
-
-    channelWidget->addServer("Test2");
+    auto* server1 = channelWidget->getRoot()->addServer("Test1");
+    server1->addChannel("#test");
+    server1->addChannel("someuser", true);
+    channelWidget->getRoot()->addServer("Test2");
 
     QTreeView* tree = findChild<QTreeView*>("users");
 

@@ -1,11 +1,9 @@
 #include "ChannelTreeModel.hpp"
 
-#include <QIcon>
-
 
 ChannelTreeModel::ChannelTreeModel(QObject* parent)
     : QAbstractItemModel(parent)
-    , root_{"root"}
+    , root_{}
 {
 }
 
@@ -13,13 +11,13 @@ QModelIndex ChannelTreeModel::index(int row, int column, const QModelIndex& pare
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    ChannelTreeItem* parentItem;
+    BasicTreeItem* parentItem;
     if (!parent.isValid())
-        parentItem = const_cast<ChannelTreeItem*>(&root_);
+        parentItem = const_cast<RootTreeItem*>(&root_);
     else
-        parentItem = static_cast<ChannelTreeItem*>(parent.internalPointer());
+        parentItem = static_cast<BasicTreeItem*>(parent.internalPointer());
 
-    ChannelTreeItem* childItem = parentItem->child(row);
+    BasicTreeItem* childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
     else
@@ -30,8 +28,8 @@ QModelIndex ChannelTreeModel::parent(const QModelIndex& index) const {
     if (!index.isValid())
         return QModelIndex();
 
-    ChannelTreeItem* childItem = static_cast<ChannelTreeItem*>(index.internalPointer());
-    ChannelTreeItem* parentItem = childItem->parentItem();
+    BasicTreeItem* childItem = static_cast<BasicTreeItem*>(index.internalPointer());
+    BasicTreeItem* parentItem = childItem->parentItem();
 
     if (parentItem == &root_)
         return QModelIndex();
@@ -40,21 +38,21 @@ QModelIndex ChannelTreeModel::parent(const QModelIndex& index) const {
 }
 
 int ChannelTreeModel::rowCount(const QModelIndex& parent) const {
-    ChannelTreeItem* parentItem;
+    BasicTreeItem* parentItem;
     if (parent.column() > 0)
         return 0;
 
     if (!parent.isValid())
-        parentItem = const_cast<ChannelTreeItem*>(&root_);
+        parentItem = const_cast<RootTreeItem*>(&root_);
     else
-        parentItem = static_cast<ChannelTreeItem*>(parent.internalPointer());
+        parentItem = static_cast<BasicTreeItem*>(parent.internalPointer());
 
     return parentItem->childCount();
 }
 
 int ChannelTreeModel::columnCount(const QModelIndex& parent) const {
     if (parent.isValid())
-        return static_cast<ChannelTreeItem*>(parent.internalPointer())->columnCount();
+        return static_cast<BasicTreeItem*>(parent.internalPointer())->columnCount();
     else
         return root_.columnCount();
 }
@@ -63,10 +61,10 @@ QVariant ChannelTreeModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    ChannelTreeItem* item = static_cast<ChannelTreeItem*>(index.internalPointer());
+    BasicTreeItem* item = static_cast<BasicTreeItem*>(index.internalPointer());
 
     if (role == Qt::DecorationRole)
-        return QIcon(":/icons/channel.png"); // TODO: select icon depending on element
+        return item->decoration(); // TODO: select icon depending on element
 
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -89,13 +87,6 @@ QVariant ChannelTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-ChannelTreeItem* ChannelTreeModel::addServer(const QString& name) {
-    auto server = std::make_shared<ChannelTreeItem>("test", &root_);
-    root_.appendChild(server);
-    return server.get();
-}
-
-void ChannelTreeModel::addChannel(ChannelTreeItem* server, const QString& name) {
-    auto channel = std::make_shared<ChannelTreeItem>("#test", server);
-    server->appendChild(channel);
+RootTreeItem* ChannelTreeModel::root() {
+    return &root_;
 }

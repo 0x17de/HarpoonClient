@@ -4,23 +4,50 @@
 #include <memory>
 #include <QList>
 #include <QString>
+#include <QVariant>
 
-
-class ChannelTreeItem : public std::enable_shared_from_this<ChannelTreeItem> {
-    QList<std::shared_ptr<ChannelTreeItem>> childItems_;
+class ChannelTreeModel; // debug
+class BasicTreeItem : public std::enable_shared_from_this<BasicTreeItem> {
+    QList<std::shared_ptr<BasicTreeItem>> childItems_;
+protected:
     QString data_;
-    ChannelTreeItem* parent_;
+    BasicTreeItem* parent_;
 public:
-    explicit ChannelTreeItem(const QString& name, ChannelTreeItem* parent = 0);
+    explicit BasicTreeItem(const QString& name, BasicTreeItem* parent = 0);
 
-    void appendChild(std::shared_ptr<ChannelTreeItem> child);
+    void appendChild(std::shared_ptr<BasicTreeItem> child);
 
-    ChannelTreeItem* child(int row);
+    BasicTreeItem* child(int row);
     int childCount() const;
     int columnCount() const;
     QString data(int column) const;
     int row() const;
-    ChannelTreeItem* parentItem();
+    BasicTreeItem* parentItem();
+
+    virtual QVariant decoration();
+    friend ChannelTreeModel; // debug
+};
+
+class ServerTreeItem;
+class ChannelTreeItem;
+class RootTreeItem : public BasicTreeItem {
+public:
+    RootTreeItem();
+    ServerTreeItem* addServer(const QString& name);
+};
+
+class ServerTreeItem : public BasicTreeItem {
+public:
+    ServerTreeItem(const QString& name, RootTreeItem* root);
+    ChannelTreeItem* addChannel(const QString& name, bool isUser = false);
+    virtual QVariant decoration() override;
+};
+
+class ChannelTreeItem : public BasicTreeItem {
+    bool isUser;
+public:
+    ChannelTreeItem(const QString& name, bool isUser, ServerTreeItem* root);
+    virtual QVariant decoration() override;
 };
 
 #endif

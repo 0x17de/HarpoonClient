@@ -5,14 +5,13 @@
 #include <QTreeView>
 
 
-class ChannelTreeItem;
+class RootTreeItem;
 class ChannelTreeModel;
 class ChannelListWidget : public QTreeView {
     ChannelTreeModel* model_;
 public:
     ChannelListWidget(QWidget* parent);
-    ChannelTreeItem* addServer(const QString& name);
-    void addChannel(ChannelTreeItem* server, const QString& name);
+    RootTreeItem* getRoot();
 };
 
 

@@ -1,38 +1,79 @@
 #include "ChannelTreeItem.hpp"
 
+#include <QIcon>
 
-ChannelTreeItem::ChannelTreeItem(const QString& name, ChannelTreeItem* parent)
+
+BasicTreeItem::BasicTreeItem(const QString& name, BasicTreeItem* parent)
     : parent_{parent}
     , data_{name}
 {
 }
 
-void ChannelTreeItem::appendChild(std::shared_ptr<ChannelTreeItem> item) {
+void BasicTreeItem::appendChild(std::shared_ptr<BasicTreeItem> item) {
     childItems_.append(item);
 }
 
-ChannelTreeItem* ChannelTreeItem::child(int row) {
+BasicTreeItem* BasicTreeItem::child(int row) {
     return childItems_.value(row).get();
 }
 
-int ChannelTreeItem::childCount() const {
+int BasicTreeItem::childCount() const {
     return childItems_.count();
 }
 
-int ChannelTreeItem::row() const {
+int BasicTreeItem::row() const {
     if (parent_)
-        return parent_->childItems_.indexOf(std::const_pointer_cast<ChannelTreeItem>(shared_from_this()));
+        return parent_->childItems_.indexOf(std::const_pointer_cast<BasicTreeItem>(shared_from_this()));
     return 0;
 }
 
-int ChannelTreeItem::columnCount() const {
+int BasicTreeItem::columnCount() const {
     return 1;
 }
 
-QString ChannelTreeItem::data(int column) const {
+QString BasicTreeItem::data(int column) const {
     return data_;
 }
 
-ChannelTreeItem* ChannelTreeItem::parentItem() {
+BasicTreeItem* BasicTreeItem::parentItem() {
     return parent_;
+}
+
+QVariant BasicTreeItem::decoration() {
+    return QVariant();
+}
+
+RootTreeItem::RootTreeItem()
+    : BasicTreeItem("", 0)
+{
+}
+
+ServerTreeItem::ServerTreeItem(const QString& name, RootTreeItem* root)
+    : BasicTreeItem(name, root)
+{
+}
+
+QVariant ServerTreeItem::decoration() {
+    return QIcon(":/icons/channel.png");
+}
+
+ChannelTreeItem::ChannelTreeItem(const QString& name, bool isUser, ServerTreeItem* server)
+    : BasicTreeItem(name, server)
+    , isUser{isUser}
+{
+}
+
+QVariant ChannelTreeItem::decoration(){
+    return QIcon(isUser ? ":/icons/user.png" : ":/icons/channel.png");
+}
+
+ServerTreeItem* RootTreeItem::addServer(const QString& name) {
+    auto server = std::make_shared<ServerTreeItem>(name, this);
+    appendChild(server);
+    return server.get();
+}
+
+ChannelTreeItem* ServerTreeItem::addChannel(const QString& name, bool isUser) {
+    auto channel = std::make_shared<ChannelTreeItem>(name, isUser, this);
+    appendChild(channel);
 }

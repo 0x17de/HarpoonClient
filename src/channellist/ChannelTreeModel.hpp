@@ -19,10 +19,10 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    ChannelTreeItem* addServer(const QString& name);
-    void addChannel(ChannelTreeItem* server, const QString& name);
+    RootTreeItem* root();
+
 private:
-    ChannelTreeItem root_;
+    RootTreeItem root_;
 };
 
 #endif

@@ -8,10 +8,6 @@ ChannelListWidget::ChannelListWidget(QWidget* parent)
     setModel(model_ = new ChannelTreeModel());
 }
 
-ChannelTreeItem* ChannelListWidget::addServer(const QString& name) {
-    return model_->addServer(name);
-}
-
-void ChannelListWidget::addChannel(ChannelTreeItem* server, const QString& name) {
-    model_->addChannel(server, name);
+RootTreeItem* ChannelListWidget::getRoot() {
+    return model_->root();
 }
