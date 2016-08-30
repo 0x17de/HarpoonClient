@@ -57,8 +57,12 @@ void Client::handleCommand(const QJsonDocument& doc) {
             if (!serverValue.isObject()) return;
 
             QJsonObject server = serverValue.toObject();
+            QJsonValue serverNameValue = server.value("name");
+            if (!serverNameValue.isString()) return;
             QJsonValue channelsValue = server.value("channels");
             if (!channelsValue.isObject()) return;
+
+            emit newServer(serverId, serverNameValue.toString());
 
             QJsonObject channels = channelsValue.toObject();
             for (auto cit = channels.begin(); cit != channels.end(); ++cit) {
@@ -69,6 +73,8 @@ void Client::handleCommand(const QJsonDocument& doc) {
                 QJsonObject channel = channelValue.toObject();
                 QJsonValue usersValue = channel.value("users");
                 if (!usersValue.isObject()) return;
+
+                emit newChannel(serverId, channelName);
 
                 QJsonObject users = usersValue.toObject();
                 for (auto uit = users.begin(); uit != users.end(); ++uit) {

@@ -20,6 +20,10 @@ private Q_SLOTS:
     void onBinaryMessage(const QByteArray& data);
     void handleCommand(const QJsonDocument& doc);
 
+signals:
+    void newServer(const QString& serverId, const QString& name);
+    void newChannel(const QString& serverId, const QString& name);
+
 private:
     QWebSocket ws_;
 };

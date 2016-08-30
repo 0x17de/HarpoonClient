@@ -8,15 +8,20 @@
 ChatUi::ChatUi(Client& client)
 {
     Ui::Client{}.setupUi(this);
+    connect(&client, &Client::newServer, this, &ChatUi::newServer);
+    connect(&client, &Client::newChannel, this, &ChatUi::newChannel);
 
-    ChannelListWidget* channelWidget = findChild<ChannelListWidget*>("channels");
-
-    auto* server1 = channelWidget->getRoot()->addServer("Test1");
-    server1->addChannel("#test");
-    server1->addChannel("someuser", true);
-    channelWidget->getRoot()->addServer("Test2");
+    channelWidget = findChild<ChannelListWidget*>("channels");
 
     QTreeView* tree = findChild<QTreeView*>("users");
 
     show();
+}
+
+void ChatUi::newServer(const QString& serverId, const QString& name) {
+    auto* server1 = channelWidget->getRoot()->addServer(name);
+}
+
+void ChatUi::newChannel(const QString& serverId, const QString& name) {
+    //auto* server1 = channelWidget->getRoot()->addServer(name);
 }
