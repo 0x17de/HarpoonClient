@@ -1,10 +1,10 @@
 #include <QApplication>
 #include "ChatUi.hpp"
-#include "Client.hpp"
+#include "HarpoonClient.hpp"
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    Client client;
+    HarpoonClient client;
     ChatUi ui(client);
     client.run();
 

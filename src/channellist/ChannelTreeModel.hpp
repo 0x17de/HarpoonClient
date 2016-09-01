@@ -2,9 +2,11 @@
 #define CHANNELTREEMODEL_H
 
 #include <QAbstractItemModel>
-#include "ChannelTreeItem.hpp"
+#include <list>
+#include <memory>
 
 
+class Server;
 class ChannelTreeModel : public QAbstractItemModel {
 public:
     explicit ChannelTreeModel(QObject* parent = 0);
@@ -19,10 +21,10 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    RootTreeItem* root();
+    void addServers(const std::list<std::shared_ptr<Server>>& servers);
 
 private:
-    RootTreeItem root_;
+    std::list<std::shared_ptr<Server>> servers_;
 };
 
 #endif

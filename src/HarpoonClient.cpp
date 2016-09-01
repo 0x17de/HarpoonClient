@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include "HarpoonClient.hpp"
 #include <QtCore/QDebug>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -6,39 +6,39 @@
 QT_USE_NAMESPACE
 
 
-Client::Client() {
-    connect(&ws_, &QWebSocket::connected, this, &Client::onConnected);
-    connect(&ws_, &QWebSocket::disconnected, this, &Client::onDisconnected);
-    connect(&ws_, &QWebSocket::textMessageReceived, this, &Client::onTextMessage);
-    connect(&ws_, &QWebSocket::binaryMessageReceived, this, &Client::onBinaryMessage);
+HarpoonClient::HarpoonClient() {
+    connect(&ws_, &QWebSocket::connected, this, &HarpoonClient::onConnected);
+    connect(&ws_, &QWebSocket::disconnected, this, &HarpoonClient::onDisconnected);
+    connect(&ws_, &QWebSocket::textMessageReceived, this, &HarpoonClient::onTextMessage);
+    connect(&ws_, &QWebSocket::binaryMessageReceived, this, &HarpoonClient::onBinaryMessage);
 }
 
-void Client::run() {
+void HarpoonClient::run() {
     ws_.open(QUrl("ws://localhost:8080/ws"));
 }
 
-void Client::onConnected() {
+void HarpoonClient::onConnected() {
     qDebug() << "connected";
     ws_.sendTextMessage("LOGIN user password\n");
 }
 
-void Client::onDisconnected() {
+void HarpoonClient::onDisconnected() {
     qDebug() << "disconnected";
 }
 
-void Client::onTextMessage(const QString& message) {
+void HarpoonClient::onTextMessage(const QString& message) {
     qDebug() << message;
     QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
     handleCommand(doc);
 }
 
-void Client::onBinaryMessage(const QByteArray& data) {
+void HarpoonClient::onBinaryMessage(const QByteArray& data) {
     qDebug() << data;
     QJsonDocument doc = QJsonDocument::fromJson(data);
     handleCommand(doc);
 }
 
-void Client::handleCommand(const QJsonDocument& doc) {
+void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     if (!doc.isObject()) return;
     QJsonObject root = doc.object();
     QJsonValue cmdValue = root.value("cmd");

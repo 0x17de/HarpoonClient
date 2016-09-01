@@ -1,16 +1,16 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef HARPOONCLIENT_H
+#define HARPOONCLIENT_H
 
 #include <QWebSocket>
 #include <QString>
 #include <QJsonDocument>
 
 
-class Client : public QObject {
+class HarpoonClient : public QObject {
     Q_OBJECT
 
 public:
-    Client();
+    HarpoonClient();
     void run();
 
 private Q_SLOTS:

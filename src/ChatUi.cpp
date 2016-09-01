@@ -2,16 +2,24 @@
 
 #include <QTreeWidget>
 #include "ui_client.h"
-#include "channellist/ChannelTreeItem.hpp"
+#include "HarpoonClient.hpp"
+
+#include "Server.hpp"
 
 
-ChatUi::ChatUi(Client& client)
+ChatUi::ChatUi(HarpoonClient& client)
 {
     Ui::Client{}.setupUi(this);
-    connect(&client, &Client::newServer, this, &ChatUi::newServer);
-    connect(&client, &Client::newChannel, this, &ChatUi::newChannel);
+    connect(&client, &HarpoonClient::newServer, this, &ChatUi::newServer);
+    connect(&client, &HarpoonClient::newChannel, this, &ChatUi::newChannel);
 
-    channelWidget = findChild<ChannelListWidget*>("channels");
+    findChild<QTreeView*>("channels")->setModel(&channelTreeModel);
+
+    auto server1 = std::make_shared<Server>("TestServer1");
+
+    channelTreeModel.addServers({
+        server1
+    });
 
     QTreeView* tree = findChild<QTreeView*>("users");
 
@@ -19,9 +27,9 @@ ChatUi::ChatUi(Client& client)
 }
 
 void ChatUi::newServer(const QString& serverId, const QString& name) {
-    auto* server1 = channelWidget->getRoot()->addServer(name);
+
 }
 
 void ChatUi::newChannel(const QString& serverId, const QString& name) {
-    //auto* server1 = channelWidget->getRoot()->addServer(name);
+
 }

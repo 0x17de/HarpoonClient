@@ -2,17 +2,17 @@
 #define CHATUI_H
 
 #include <QMainWindow>
-#include "Client.hpp"
+#include "channellist/ChannelTreeModel.hpp"
 
 
-class ChannelListWidget;
+class HarpoonClient;
 class ChatUi : public QMainWindow {
     Q_OBJECT
 
-    ChannelListWidget* channelWidget;
+    ChannelTreeModel channelTreeModel;
 
 public:
-    ChatUi(Client& client);
+    ChatUi(HarpoonClient& client);
 
 public Q_SLOTS:
     void newServer(const QString& serverId, const QString& name);

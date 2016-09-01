@@ -1,9 +1,10 @@
 #include "ChannelTreeModel.hpp"
+#include "../Server.hpp"
+#include "../Channel.hpp"
 
 
 ChannelTreeModel::ChannelTreeModel(QObject* parent)
     : QAbstractItemModel(parent)
-    , root_{}
 {
 }
 
@@ -11,65 +12,85 @@ QModelIndex ChannelTreeModel::index(int row, int column, const QModelIndex& pare
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    BasicTreeItem* parentItem;
-    if (!parent.isValid())
-        parentItem = const_cast<RootTreeItem*>(&root_);
-    else
-        parentItem = static_cast<BasicTreeItem*>(parent.internalPointer());
-
-    BasicTreeItem* childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
+    if (!parent.isValid()) {
+        if (row >= servers_.size())
+            return QModelIndex();
+        auto it = servers_.begin();
+        std::advance(it, row);
+        return createIndex(row, 0, (*it).get());
+    } else {
+        Server* server = static_cast<Server*>(parent.internalPointer());
+        return createIndex(row, 1, server->getChannel(row));
+    }
 }
 
 QModelIndex ChannelTreeModel::parent(const QModelIndex& index) const {
     if (!index.isValid())
         return QModelIndex();
 
-    BasicTreeItem* childItem = static_cast<BasicTreeItem*>(index.internalPointer());
-    BasicTreeItem* parentItem = childItem->parentItem();
+    if (index.column() == 1) {
+        Channel* channel = static_cast<Channel*>(index.internalPointer());
 
-    if (parentItem == &root_)
-        return QModelIndex();
-
-    return createIndex(parentItem->row(), 0, parentItem);
+        int index = 0;
+        for (auto s : servers_) {
+            if (s.get() == channel->getServer())
+                return createIndex(index, 0, s.get());
+            ++index;
+        }
+    }
+    return QModelIndex();
 }
 
 int ChannelTreeModel::rowCount(const QModelIndex& parent) const {
-    BasicTreeItem* parentItem;
     if (parent.column() > 0)
         return 0;
 
-    if (!parent.isValid())
-        parentItem = const_cast<RootTreeItem*>(&root_);
-    else
-        parentItem = static_cast<BasicTreeItem*>(parent.internalPointer());
+    if (!parent.isValid()) {
+        return servers_.size();
+    } else {
+        auto* ptr = parent.internalPointer();
+        if (ptr == nullptr)
+            return servers_.size();
+        if (parent.column() == 0) {
+            Server* server = static_cast<Server*>(parent.internalPointer());;
+            return server->getChannelCount();
+        }
+    }
 
-    return parentItem->childCount();
+    return 0;
 }
 
 int ChannelTreeModel::columnCount(const QModelIndex& parent) const {
-    if (parent.isValid())
-        return static_cast<BasicTreeItem*>(parent.internalPointer())->columnCount();
-    else
-        return root_.columnCount();
+    return 1; // only one column for all data
 }
 
 QVariant ChannelTreeModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    BasicTreeItem* item = static_cast<BasicTreeItem*>(index.internalPointer());
+    if (index.column() == 0) {
+        Server* server = static_cast<Server*>(index.internalPointer());
 
-    if (role == Qt::DecorationRole)
-        return item->decoration(); // TODO: select icon depending on element
+        if (role == Qt::DecorationRole)
+            return QVariant();
 
-    if (role != Qt::DisplayRole)
-        return QVariant();
+        if (role != Qt::DisplayRole)
+            return QVariant();
 
-    return item->data(index.column());
+        return server->getName();
+    } else if (index.column() == 1) {
+        Channel* channel = static_cast<Channel*>(index.internalPointer());
+
+        if (role == Qt::DecorationRole)
+            return QVariant();
+
+        if (role != Qt::DisplayRole)
+            return QVariant();
+
+        return channel->getName();
+    }
+
+    return QVariant();
 }
 
 Qt::ItemFlags ChannelTreeModel::flags(const QModelIndex& index) const {
@@ -82,11 +103,20 @@ Qt::ItemFlags ChannelTreeModel::flags(const QModelIndex& index) const {
 QVariant ChannelTreeModel::headerData(int section, Qt::Orientation orientation,
                                int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return root_.data(section);
+        return "Chats";
 
     return QVariant();
 }
 
-RootTreeItem* ChannelTreeModel::root() {
-    return &root_;
+void ChannelTreeModel::addServers(const std::list<std::shared_ptr<Server>>& newServers) {
+    int start = servers_.size();
+    int end = newServers.size();
+
+    auto index = createIndex(0, 0, nullptr);
+
+    beginInsertRows(index, start, start+end-1);
+
+    servers_.insert(servers_.end(), newServers.begin(), newServers.end());
+
+    endInsertRows();
 }

@@ -10,9 +10,9 @@ find_package(Qt5WebSockets)
 set(SRC_CLIENT
     src/main.cpp
     src/ChatUi.cpp src/ChatUi.hpp
-    src/Client.cpp src/Client.hpp
-    src/channellist/ChannelListWidget.cpp src/channellist/ChannelListWidget.hpp
-    src/channellist/ChannelTreeItem.cpp src/channellist/ChannelTreeItem.hpp
+    src/Server.cpp src/Server.hpp
+    src/Channel.cpp src/Channel.hpp
+    src/HarpoonClient.cpp src/HarpoonClient.hpp
     src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
     )
 
@@ -20,7 +20,7 @@ qt5_add_resources(ICONS_SRC icons/icons.qrc)
 qt5_wrap_cpp(CHATUI_SRC
     src/ChatUi.hpp)
 qt5_wrap_cpp(CLIENT_SRC
-    src/Client.hpp)
+    src/HarpoonClient.hpp)
 qt5_wrap_ui(CHATUI_HEADERS
     ui_forms/client.ui)
 
