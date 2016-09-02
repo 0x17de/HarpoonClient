@@ -2,9 +2,12 @@
 #define CHATUI_H
 
 #include <QMainWindow>
+#include <list>
+#include <memory>
 #include "channellist/ChannelTreeModel.hpp"
 
 
+class Server;
 class HarpoonClient;
 class ChatUi : public QMainWindow {
     Q_OBJECT
@@ -15,7 +18,7 @@ public:
     ChatUi(HarpoonClient& client);
 
 public Q_SLOTS:
-    void newServer(const QString& serverId, const QString& name);
+    void newServers(const std::list<std::shared_ptr<Server>>& servers);
     void newChannel(const QString& serverId, const QString& name);
 };
 

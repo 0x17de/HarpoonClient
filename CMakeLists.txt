@@ -10,6 +10,7 @@ find_package(Qt5WebSockets)
 set(SRC_CLIENT
     src/main.cpp
     src/ChatUi.cpp src/ChatUi.hpp
+    src/TreeEntry.cpp src/TreeEntry.hpp
     src/Server.cpp src/Server.hpp
     src/Channel.cpp src/Channel.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp

@@ -4,8 +4,11 @@
 #include <QWebSocket>
 #include <QString>
 #include <QJsonDocument>
+#include <list>
+#include <memory>
 
 
+class Server;
 class HarpoonClient : public QObject {
     Q_OBJECT
 
@@ -21,7 +24,7 @@ private Q_SLOTS:
     void handleCommand(const QJsonDocument& doc);
 
 signals:
-    void newServer(const QString& serverId, const QString& name);
+    void newServers(const std::list<std::shared_ptr<Server>>& servers);
     void newChannel(const QString& serverId, const QString& name);
 
 private:

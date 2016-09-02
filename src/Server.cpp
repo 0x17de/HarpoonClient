@@ -1,8 +1,9 @@
 #include "Server.hpp"
 
 
-Server::Server(const QString& name)
+Server::Server(const QString& id, const QString& name)
     : TreeEntry('s')
+    , id_{id}
     , name_{name}
 {
 }

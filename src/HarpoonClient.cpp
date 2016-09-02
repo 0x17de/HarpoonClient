@@ -3,6 +3,9 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
+#include "Server.hpp"
+#include "Channel.hpp"
+
 QT_USE_NAMESPACE
 
 
@@ -47,6 +50,8 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     QString cmd = cmdValue.toString();
     qDebug() << cmd;
     if (cmd == "chatlist") {
+        std::list<std::shared_ptr<Server>> serverList;
+
         QJsonValue serversValue = root.value("servers");
         if (!serversValue.isObject()) return;
 
@@ -59,10 +64,12 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             QJsonObject server = serverValue.toObject();
             QJsonValue serverNameValue = server.value("name");
             if (!serverNameValue.isString()) return;
+            QString serverName = serverNameValue.toString();
             QJsonValue channelsValue = server.value("channels");
             if (!channelsValue.isObject()) return;
 
-            emit newServer(serverId, serverNameValue.toString());
+            auto currentServer = std::make_shared<Server>(serverId, serverName);
+            serverList.push_back(currentServer);
 
             QJsonObject channels = channelsValue.toObject();
             for (auto cit = channels.begin(); cit != channels.end(); ++cit) {
@@ -70,11 +77,12 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
                 QJsonValueRef channelValue = cit.value();
                 if (!channelValue.isObject()) return;
 
+                auto currentChannel = std::make_shared<Channel>(currentServer.get(), channelName);
+                currentServer->addChannel(currentChannel);
+
                 QJsonObject channel = channelValue.toObject();
                 QJsonValue usersValue = channel.value("users");
                 if (!usersValue.isObject()) return;
-
-                emit newChannel(serverId, channelName);
 
                 QJsonObject users = usersValue.toObject();
                 for (auto uit = users.begin(); uit != users.end(); ++uit) {
@@ -83,5 +91,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
                 }
             }
         }
+
+        emit newServers(serverList);
     }
 }

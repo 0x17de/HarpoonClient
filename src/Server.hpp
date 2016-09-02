@@ -12,9 +12,10 @@
 class Channel;
 class Server : public TreeEntry {
     std::list<std::shared_ptr<Channel>> channels_;
+    QString id_;
     QString name_;
 public:
-    Server(const QString& name);
+    Server(const QString& id, const QString& name);
 
     void addChannel(std::shared_ptr<Channel> channel);
     int getChannelCount() const;
