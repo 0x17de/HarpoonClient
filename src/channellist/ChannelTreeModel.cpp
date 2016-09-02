@@ -17,27 +17,32 @@ QModelIndex ChannelTreeModel::index(int row, int column, const QModelIndex& pare
             return QModelIndex();
         auto it = servers_.begin();
         std::advance(it, row);
-        return createIndex(row, 0, (*it).get());
+        return createIndex(row, column, (*it).get());
     } else {
-        Server* server = static_cast<Server*>(parent.internalPointer());
-        return createIndex(row, 1, server->getChannel(row));
+        auto* item = static_cast<TreeEntry*>(parent.internalPointer());
+        if (item->getTreeEntryType() == 's') {
+            Server* server = static_cast<Server*>(parent.internalPointer());
+            return createIndex(row, column, server->getChannel(row));
+        }
     }
+    return QModelIndex();
 }
 
 QModelIndex ChannelTreeModel::parent(const QModelIndex& index) const {
     if (!index.isValid())
         return QModelIndex();
 
-    if (index.column() == 1) {
-        Channel* channel = static_cast<Channel*>(index.internalPointer());
+    auto* ptr = index.internalPointer();
+    auto* item = static_cast<TreeEntry*>(ptr);
+    if (item->getTreeEntryType() == 'c') {
+        Channel* channel = static_cast<Channel*>(ptr);
+        Server* server = channel->getServer();
 
-        int index = 0;
-        for (auto s : servers_) {
-            if (s.get() == channel->getServer())
-                return createIndex(index, 0, s.get());
-            ++index;
-        }
+        int rowIndex = server->getChannelIndex(channel);
+        if (rowIndex >= 0)
+            return createIndex(rowIndex, 0, server);
     }
+
     return QModelIndex();
 }
 
@@ -48,11 +53,9 @@ int ChannelTreeModel::rowCount(const QModelIndex& parent) const {
     if (!parent.isValid()) {
         return servers_.size();
     } else {
-        auto* ptr = parent.internalPointer();
-        if (ptr == nullptr)
-            return servers_.size();
-        if (parent.column() == 0) {
-            Server* server = static_cast<Server*>(parent.internalPointer());;
+        auto* item = static_cast<TreeEntry*>(parent.internalPointer());
+        if (item->getTreeEntryType() == 's') {
+            Server* server = static_cast<Server*>(parent.internalPointer());
             return server->getChannelCount();
         }
     }
@@ -68,7 +71,10 @@ QVariant ChannelTreeModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    if (index.column() == 0) {
+    auto* ptr = index.internalPointer();
+    auto* item = static_cast<TreeEntry*>(ptr);
+
+    if (item->getTreeEntryType() == 's') {
         Server* server = static_cast<Server*>(index.internalPointer());
 
         if (role == Qt::DecorationRole)
@@ -78,7 +84,7 @@ QVariant ChannelTreeModel::data(const QModelIndex& index, int role) const {
             return QVariant();
 
         return server->getName();
-    } else if (index.column() == 1) {
+    } else {
         Channel* channel = static_cast<Channel*>(index.internalPointer());
 
         if (role == Qt::DecorationRole)
@@ -112,7 +118,7 @@ void ChannelTreeModel::addServers(const std::list<std::shared_ptr<Server>>& newS
     int start = servers_.size();
     int end = newServers.size();
 
-    auto index = createIndex(0, 0, nullptr);
+    auto index = QModelIndex();
 
     beginInsertRows(index, start, start+end-1);
 

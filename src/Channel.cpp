@@ -1,8 +1,10 @@
 #include "Channel.hpp"
 
 
-Channel::Channel(const QString& name)
-    : name_{name}
+Channel::Channel(Server* server, const QString& name)
+    : TreeEntry('c')
+    , server_{server}
+    , name_{name}
 {
 }
 

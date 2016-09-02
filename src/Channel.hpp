@@ -4,13 +4,15 @@
 
 #include <QString>
 
+#include "TreeEntry.hpp"
+
 
 class Server;
-class Channel {
+class Channel : public TreeEntry {
     Server* server_;
     QString name_;
 public:
-    Channel(const QString& name);
+    Channel(Server* server, const QString& name);
 
     Server* getServer() const;
     QString getName() const;

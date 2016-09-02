@@ -5,6 +5,7 @@
 #include "HarpoonClient.hpp"
 
 #include "Server.hpp"
+#include "Channel.hpp"
 
 
 ChatUi::ChatUi(HarpoonClient& client)
@@ -16,6 +17,9 @@ ChatUi::ChatUi(HarpoonClient& client)
     findChild<QTreeView*>("channels")->setModel(&channelTreeModel);
 
     auto server1 = std::make_shared<Server>("TestServer1");
+    auto channel1 = std::make_shared<Channel>(server1.get(), "#TestChannel");
+
+    server1->addChannel(channel1);
 
     channelTreeModel.addServers({
         server1
