@@ -9,23 +9,16 @@
 
 
 ChatUi::ChatUi(HarpoonClient& client)
+    : channelTreeModel(client.getServerListReference())
 {
     Ui::Client{}.setupUi(this);
-    connect(&client, &HarpoonClient::newServers, this, &ChatUi::newServers);
-    connect(&client, &HarpoonClient::newChannel, this, &ChatUi::newChannel);
+    connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
+    //connect(&client, &HarpoonClient::newChannel, this, &ChatUi::newChannel);
 
-    findChild<QTreeView*>("channels")->setModel(&channelTreeModel);
+    channelView = findChild<QTreeView*>("channels");
+    channelView->setModel(&channelTreeModel);
 
     QTreeView* tree = findChild<QTreeView*>("users");
 
     show();
-}
-
-void ChatUi::newServers(const std::list<std::shared_ptr<Server>>& servers) {
-    qDebug() << "SERVERS" << servers.size();
-    channelTreeModel.addServers(servers);
-}
-
-void ChatUi::newChannel(const QString& serverId, const QString& name) {
-
 }

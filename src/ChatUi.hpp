@@ -9,17 +9,13 @@
 
 class Server;
 class HarpoonClient;
+class QTreeView;
 class ChatUi : public QMainWindow {
-    Q_OBJECT
-
     ChannelTreeModel channelTreeModel;
+    QTreeView* channelView;
 
 public:
     ChatUi(HarpoonClient& client);
-
-public Q_SLOTS:
-    void newServers(const std::list<std::shared_ptr<Server>>& servers);
-    void newChannel(const QString& serverId, const QString& name);
 };
 
 

@@ -3,8 +3,10 @@
 #include "../Channel.hpp"
 
 
-ChannelTreeModel::ChannelTreeModel(QObject* parent)
+ChannelTreeModel::ChannelTreeModel(const std::list<std::shared_ptr<Server>>& servers,
+                                   QObject* parent)
     : QAbstractItemModel(parent)
+    , servers_{servers}
 {
 }
 
@@ -114,15 +116,32 @@ QVariant ChannelTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-void ChannelTreeModel::addServers(const std::list<std::shared_ptr<Server>>& newServers) {
-    int start = servers_.size();
-    int end = newServers.size();
+int ChannelTreeModel::getServerIndex(Server* server) {
+    int rowIndex = 0;
+    for (auto s : servers_) {
+        if (s.get() == server)
+            return rowIndex;
+        ++rowIndex;
+    }
+    return -1;
+}
 
-    auto index = QModelIndex();
+void ChannelTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
+    beginResetModel();
+    servers_.swap(servers);
+    endResetModel();
+}
 
-    beginInsertRows(index, start, start+end-1);
+void ChannelTreeModel::newServer(std::shared_ptr<Server> server) {
+    int rowIndex = servers_.size();
+    beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
+    servers_.push_back(server);
+}
 
-    servers_.insert(servers_.end(), newServers.begin(), newServers.end());
-
+void ChannelTreeModel::newChannel(std::shared_ptr<Channel> channel) {
+    Server* server = channel->getServer();
+    auto rowIndex = server->getChannelIndex(channel.get());
+    beginInsertRows(index(getServerIndex(server), 0), rowIndex, 0);
+    server->addChannel(channel);
     endInsertRows();
 }

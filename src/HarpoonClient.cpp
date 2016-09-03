@@ -14,19 +14,42 @@ HarpoonClient::HarpoonClient() {
     connect(&ws_, &QWebSocket::disconnected, this, &HarpoonClient::onDisconnected);
     connect(&ws_, &QWebSocket::textMessageReceived, this, &HarpoonClient::onTextMessage);
     connect(&ws_, &QWebSocket::binaryMessageReceived, this, &HarpoonClient::onBinaryMessage);
+    connect(&reconnectTimer, &QTimer::timeout, this, &HarpoonClient::onReconnectTimer);
+    connect(&pingTimer, &QTimer::timeout, this, &HarpoonClient::onPingTimer);
+
+    reconnectTimer.setSingleShot(true);
+    harpoonUrl = "ws://localhost:8080/ws";
 }
 
 void HarpoonClient::run() {
-    ws_.open(QUrl("ws://localhost:8080/ws"));
+    ws_.open(harpoonUrl);
+}
+
+std::list<std::shared_ptr<Server>>& HarpoonClient::getServerListReference() {
+    return servers_;
+}
+
+void HarpoonClient::onReconnectTimer() {
+    ws_.open(harpoonUrl);
+}
+
+void HarpoonClient::onPingTimer() {
+    qDebug() << "ping";
+    ws_.sendTextMessage("{\"cmd\":\"ping\"}");
 }
 
 void HarpoonClient::onConnected() {
     qDebug() << "connected";
     ws_.sendTextMessage("LOGIN user password\n");
+    pingTimer.start(60000);
 }
 
 void HarpoonClient::onDisconnected() {
+    pingTimer.stop();
     qDebug() << "disconnected";
+    std::list<std::shared_ptr<Server>> empty;
+    emit resetServers(empty);
+    reconnectTimer.start(3000);
 }
 
 void HarpoonClient::onTextMessage(const QString& message) {
@@ -92,6 +115,6 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             }
         }
 
-        emit newServers(serverList);
+        emit resetServers(serverList);
     }
 }

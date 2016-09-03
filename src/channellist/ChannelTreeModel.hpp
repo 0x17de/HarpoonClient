@@ -7,9 +7,14 @@
 
 
 class Server;
+class Channel;
+
 class ChannelTreeModel : public QAbstractItemModel {
+    Q_OBJECT
+
 public:
-    explicit ChannelTreeModel(QObject* parent = 0);
+    explicit ChannelTreeModel(const std::list<std::shared_ptr<Server>>& servers,
+                              QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
@@ -21,7 +26,13 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    void addServers(const std::list<std::shared_ptr<Server>>& servers);
+    int getServerIndex(Server* server);
+    void reconnectEvents();
+
+public Q_SLOTS:
+    void resetServers(std::list<std::shared_ptr<Server>>& servers);
+    void newServer(std::shared_ptr<Server> server);
+    void newChannel(std::shared_ptr<Channel> channel);
 
 private:
     std::list<std::shared_ptr<Server>> servers_;
