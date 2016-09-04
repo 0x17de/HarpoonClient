@@ -17,16 +17,19 @@ class Channel;
 class HarpoonClient : public QObject {
     Q_OBJECT
 
-    QWebSocket ws_;
+    bool shutdown;
+
     std::list<std::shared_ptr<Server>> servers_;
+    QUrl harpoonUrl;
+
+    QWebSocket ws_;
 
     QTimer reconnectTimer;
     QTimer pingTimer;
 
-    QUrl harpoonUrl;
-
 public:
     HarpoonClient();
+    ~HarpoonClient();
     void run();
     std::list<std::shared_ptr<Server>>& getServerListReference();
 
@@ -47,9 +50,6 @@ private Q_SLOTS:
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
-    void newMessage(Channel* channel,
-                    const QString& nick,
-                    const QString& message);
 };
 
 #endif

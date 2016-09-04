@@ -8,10 +8,18 @@ Channel::Channel(Server* server, const QString& name)
 {
 }
 
+void Channel::newMessage(const QString& nick,
+                    const QString& message) {
+}
+
 Server* Channel::getServer() const {
     return server_;
 }
 
 QString Channel::getName() const {
     return name_;
+}
+
+BacklogModel* Channel::getBacklogModel() {
+    return &backlogModel_;
 }

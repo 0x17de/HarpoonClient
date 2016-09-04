@@ -11,7 +11,9 @@
 QT_USE_NAMESPACE
 
 
-HarpoonClient::HarpoonClient() {
+HarpoonClient::HarpoonClient()
+    : shutdown{false}
+{
     connect(&ws_, &QWebSocket::connected, this, &HarpoonClient::onConnected);
     connect(&ws_, &QWebSocket::disconnected, this, &HarpoonClient::onDisconnected);
     connect(&ws_, &QWebSocket::textMessageReceived, this, &HarpoonClient::onTextMessage);
@@ -21,6 +23,10 @@ HarpoonClient::HarpoonClient() {
 
     reconnectTimer.setSingleShot(true);
     harpoonUrl = "ws://localhost:8080/ws";
+}
+
+HarpoonClient::~HarpoonClient() {
+    shutdown = true;
 }
 
 void HarpoonClient::run() {
@@ -51,7 +57,8 @@ void HarpoonClient::onDisconnected() {
     qDebug() << "disconnected";
     std::list<std::shared_ptr<Server>> empty;
     emit resetServers(empty);
-    reconnectTimer.start(3000);
+    if (!shutdown)
+        reconnectTimer.start(3000);
 }
 
 void HarpoonClient::onTextMessage(const QString& message) {
@@ -114,7 +121,7 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root) {
     Channel* channel = (*serverIt)->getChannel(channelName);
     if (channel == nullptr) return;
 
-    emit newMessage(channel, nick, message);
+    channel->newMessage(nick, message);
 }
 
 void HarpoonClient::handleChatlist(const QJsonObject& root) {

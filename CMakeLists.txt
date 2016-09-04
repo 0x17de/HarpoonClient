@@ -15,16 +15,19 @@ set(SRC_CLIENT
     src/Channel.cpp src/Channel.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp
     src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
+    src/backlog/BacklogModel.cpp src/backlog/BacklogModel.hpp
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
 qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/channellist/ChannelTreeModel.hpp)
 qt5_wrap_cpp(HARPOONCLIENT_SRC src/HarpoonClient.hpp)
+qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 
 add_executable(HarpoonClient
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
+    ${CHATUI_SRC}
     ${CHANNELTREEMODEL_SRC}
     ${HARPOONCLIENT_SRC}
     ${ICONS_SRC}
