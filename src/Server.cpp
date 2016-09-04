@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Channel.hpp"
 
 
 Server::Server(const QString& id, const QString& name)
@@ -26,10 +27,21 @@ int Server::getChannelIndex(Channel* channel) const {
     return -1;
 }
 
+Channel* Server::getChannel(QString name) {
+    auto it = std::find_if(channels_.begin(), channels_.end(), [&name](const std::shared_ptr<Channel>& channel){
+            return channel->getName() == name;
+        });
+    return (it == channels_.end() ? nullptr : (*it).get());
+}
+
 Channel* Server::getChannel(int position) {
     auto it = channels_.begin();
     std::advance(it, position);
     return (*it).get();
+}
+
+QString Server::getId() const {
+    return id_;
 }
 
 QString Server::getName() const {

@@ -20,7 +20,9 @@ public:
     void addChannel(std::shared_ptr<Channel> channel);
     int getChannelCount() const;
     int getChannelIndex(Channel* channel) const;
+    Channel* getChannel(QString channelName);
     Channel* getChannel(int position);
+    QString getId() const;
     QString getName() const;
 };
 

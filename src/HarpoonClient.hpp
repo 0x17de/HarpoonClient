@@ -3,14 +3,17 @@
 
 #include <QWebSocket>
 #include <QString>
-#include <QJsonDocument>
 #include <QTimer>
 #include <QUrl>
 #include <list>
 #include <memory>
 
 
+class QJsonObject;
+class QJsonDocument;
 class Server;
+class Channel;
+
 class HarpoonClient : public QObject {
     Q_OBJECT
 
@@ -34,12 +37,19 @@ private Q_SLOTS:
     void onBinaryMessage(const QByteArray& data);
     void handleCommand(const QJsonDocument& doc);
 
+    void handleChatlist(const QJsonObject& root);
+
+    void irc_handleChat(const QJsonObject& root);
+
     void onReconnectTimer();
     void onPingTimer();
 
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
+    void newMessage(Channel* channel,
+                    const QString& nick,
+                    const QString& message);
 };
 
 #endif
