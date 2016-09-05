@@ -4,6 +4,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QDateTime>
+#include <QTime>
 
 #include "Server.hpp"
 #include "Channel.hpp"
@@ -90,7 +92,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
         }
     } if (type == "irc") {
         if (cmd == "chatlist") {
-            handleChatlist(root);
+            irc_handleChatlist(root);
         }
         if (cmd == "chat") {
             irc_handleChat(root);
@@ -98,33 +100,42 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     }
 }
 
+QString HarpoonClient::formatTimestamp(double timestamp) {
+    return QTime{QDateTime{QDateTime::fromTime_t(timestamp/1000)}.time()}.toString("[hh:mm:ss]");
+}
+
 void HarpoonClient::irc_handleChat(const QJsonObject& root) {
+    auto timeValue = root.value("time");
     auto nickValue = root.value("nick");
     auto messageValue = root.value("msg");
     auto serverIdValue = root.value("server");
     auto channelNameValue = root.value("channel");
+    if (!timeValue.isDouble()) return;
     if (!nickValue.isString()) return;
     if (!messageValue.isString()) return;
     if (!serverIdValue.isString()) return;
     if (!channelNameValue.isString()) return;
 
+    QString time = formatTimestamp(timeValue.toDouble());
     QString nick = nickValue.toString();
     QString message = messageValue.toString();
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
-    qDebug() << "MSG: <" << nick << "@" << serverId << ":" << channelName << "> " << message;
 
     auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
             return server->getId() == serverId;
         });
     if (serverIt == servers_.end()) return;
+
     Channel* channel = (*serverIt)->getChannel(channelName);
     if (channel == nullptr) return;
 
-    channel->newMessage(nick, message);
+    emit beginNewMessage(channel);
+    channel->newMessage(time, nick, message);
+    emit endNewMessage();
 }
 
-void HarpoonClient::handleChatlist(const QJsonObject& root) {
+void HarpoonClient::irc_handleChatlist(const QJsonObject& root) {
     std::list<std::shared_ptr<Server>> serverList;
 
     QJsonValue serversValue = root.value("servers");

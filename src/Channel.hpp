@@ -16,7 +16,8 @@ class Channel : public TreeEntry {
 public:
     Channel(Server* server, const QString& name);
 
-    void newMessage(const QString& nick,
+    void newMessage(const QString& time,
+                    const QString& nick,
                     const QString& message);
 
     Server* getServer() const;

@@ -8,8 +8,10 @@ Channel::Channel(Server* server, const QString& name)
 {
 }
 
-void Channel::newMessage(const QString& nick,
-                    const QString& message) {
+void Channel::newMessage(const QString& time,
+                         const QString& nick,
+                         const QString& message) {
+    backlogModel_.addMessage(time, nick, message);
 }
 
 Server* Channel::getServer() const {

@@ -2,7 +2,7 @@
 #define BACKLOGMODEL_H
 
 #include <QAbstractItemModel>
-#include <set>
+#include <array>
 
 
 class BacklogModel : public QAbstractItemModel {
@@ -19,6 +19,9 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
+    void addMessage(const QString& time,
+                    const QString& nick,
+                    const QString& message);
 private:
     typedef std::array<QString, 3> ChatLine;
     std::list<ChatLine> messages_;

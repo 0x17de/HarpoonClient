@@ -3,7 +3,7 @@
 #include "../Channel.hpp"
 
 
-ChannelTreeModel::ChannelTreeModel(const std::list<std::shared_ptr<Server>>& servers,
+ChannelTreeModel::ChannelTreeModel(std::list<std::shared_ptr<Server>>& servers,
                                    QObject* parent)
     : QAbstractItemModel(parent)
     , servers_{servers}

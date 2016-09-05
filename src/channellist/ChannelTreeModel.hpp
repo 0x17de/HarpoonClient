@@ -13,7 +13,7 @@ class ChannelTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
-    explicit ChannelTreeModel(const std::list<std::shared_ptr<Server>>& servers,
+    explicit ChannelTreeModel(std::list<std::shared_ptr<Server>>& servers,
                               QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
@@ -35,7 +35,7 @@ public Q_SLOTS:
     void newChannel(std::shared_ptr<Channel> channel);
 
 private:
-    std::list<std::shared_ptr<Server>> servers_;
+    std::list<std::shared_ptr<Server>>& servers_;
 };
 
 #endif

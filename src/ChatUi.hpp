@@ -8,6 +8,7 @@
 
 
 class Server;
+class Channel;
 class HarpoonClient;
 class QTreeView;
 class QTableView;
@@ -18,6 +19,9 @@ class ChatUi : public QMainWindow {
     ChannelTreeModel channelTreeModel;
     QTreeView* channelView;
     QTableView* backlogView;
+    Channel* activeChannel;
+
+    bool backlogScrollToBottom;
 
 public:
     ChatUi(HarpoonClient& client);
@@ -25,6 +29,8 @@ public:
 
 public Q_SLOTS:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
+    void beginNewMessage(Channel* channel);
+    void endNewMessage();
 };
 
 

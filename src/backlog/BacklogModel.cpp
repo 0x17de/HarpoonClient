@@ -5,10 +5,6 @@
 BacklogModel::BacklogModel(QObject* parent)
     : QAbstractItemModel(parent)
 {
-    messages_.push_back({"time", "nick", "Message1"});
-    messages_.push_back({"time", "nick", "Message2"});
-    messages_.push_back({"time", "nick", "Message3"});
-    messages_.push_back({"time", "nick", "Message4"});
 }
 
 QModelIndex BacklogModel::index(int row, int column, const QModelIndex& parent) const {
@@ -76,4 +72,13 @@ QVariant BacklogModel::headerData(int section, Qt::Orientation orientation,
     }
 
     return QVariant();
+}
+
+void BacklogModel::addMessage(const QString& time,
+                              const QString& nick,
+                              const QString& message) {
+    int rowIndex = messages_.size();
+    beginInsertRows(QModelIndex(), rowIndex, rowIndex);
+    messages_.push_back({time, nick, message});
+    endInsertRows();
 }

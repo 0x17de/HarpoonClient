@@ -40,8 +40,9 @@ private Q_SLOTS:
     void onBinaryMessage(const QByteArray& data);
     void handleCommand(const QJsonDocument& doc);
 
-    void handleChatlist(const QJsonObject& root);
+    QString formatTimestamp(double timestamp);
 
+    void irc_handleChatlist(const QJsonObject& root);
     void irc_handleChat(const QJsonObject& root);
 
     void onReconnectTimer();
@@ -50,6 +51,8 @@ private Q_SLOTS:
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
+    void beginNewMessage(Channel* channel);
+    void endNewMessage();
 };
 
 #endif
