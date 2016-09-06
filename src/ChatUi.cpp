@@ -13,19 +13,31 @@ ChatUi::ChatUi(HarpoonClient& client)
     : channelTreeModel(client.getServerListReference())
 {
     Ui::Client{}.setupUi(this);
+
+    channelView = findChild<QTreeView*>("channels");
+    backlogView = findChild<QTableView*>("chat");
+    messageInputView = findChild<QLineEdit*>("message");
+    //QTreeView* tree = findChild<QTreeView*>("users");
+
+    // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
+
+    // recv message
     connect(&client, &HarpoonClient::beginNewMessage, this, &ChatUi::beginNewMessage);
     connect(&client, &HarpoonClient::endNewMessage, this, &ChatUi::endNewMessage);
 
-    channelView = findChild<QTreeView*>("channels");
+    // input event
+    connect(messageInputView, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);
+    connect(this, &ChatUi::sendMessage, &client, &HarpoonClient::sendMessage);
+
+
+    // assign models
     channelView->setModel(&channelTreeModel);
 
-    backlogView = findChild<QTableView*>("chat");
-
-    QTreeView* tree = findChild<QTreeView*>("users");
 
     show();
+    messageInputView->setFocus();
 }
 
 ChatUi::~ChatUi() {
@@ -59,4 +71,11 @@ void ChatUi::beginNewMessage(Channel* channel) {
 void ChatUi::endNewMessage() {
     if (backlogScrollToBottom)
         backlogView->scrollToBottom();
+}
+
+void ChatUi::messageReturnPressed() {
+    if (activeChannel != nullptr) {
+        emit sendMessage(activeChannel, messageInputView->text());
+        messageInputView->clear();
+    }
 }

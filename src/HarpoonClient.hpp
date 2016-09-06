@@ -33,7 +33,7 @@ public:
     void run();
     std::list<std::shared_ptr<Server>>& getServerListReference();
 
-private Q_SLOTS:
+private:
     void onConnected();
     void onDisconnected();
     void onTextMessage(const QString& message);
@@ -47,6 +47,9 @@ private Q_SLOTS:
 
     void onReconnectTimer();
     void onPingTimer();
+
+public Q_SLOTS:
+    void sendMessage(Channel* channel, const QString& message);
 
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);

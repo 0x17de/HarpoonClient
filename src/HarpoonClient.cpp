@@ -75,6 +75,17 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
     handleCommand(doc);
 }
 
+void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
+    // TODO: only irc works yet.
+    QJsonObject root;
+    root["cmd"] = "chat";
+    root["server"] = channel->getServer()->getId();
+    root["channel"] = channel->getName();
+    root["msg"] = message;
+    QString json = QJsonDocument{root}.toJson(QJsonDocument::JsonFormat::Compact);
+    ws_.sendTextMessage(json);
+}
+
 void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     if (!doc.isObject()) return;
     QJsonObject root = doc.object();
