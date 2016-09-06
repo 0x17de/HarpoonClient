@@ -2,10 +2,13 @@
 #include "Channel.hpp"
 
 
-Server::Server(const QString& id, const QString& name)
+Server::Server(const QString& activeNick,
+               const QString& id,
+               const QString& name)
     : TreeEntry('s')
     , id_{id}
     , name_{name}
+    , nick_{activeNick}
 {
 }
 

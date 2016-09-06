@@ -104,15 +104,20 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     } if (type == "irc") {
         if (cmd == "chatlist") {
             irc_handleChatlist(root);
-        }
-        if (cmd == "chat") {
+        } else  if (cmd == "chat") {
             irc_handleChat(root);
+        } else if (cmd == "join") {
+            irc_handleJoin(root);
         }
     }
 }
 
 QString HarpoonClient::formatTimestamp(double timestamp) {
     return QTime{QDateTime{QDateTime::fromTime_t(timestamp/1000)}.time()}.toString("[hh:mm:ss]");
+}
+
+void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
+
 }
 
 void HarpoonClient::irc_handleChat(const QJsonObject& root) {
@@ -159,13 +164,21 @@ void HarpoonClient::irc_handleChatlist(const QJsonObject& root) {
         if (!serverValue.isObject()) return;
 
         QJsonObject server = serverValue.toObject();
+
+
         QJsonValue serverNameValue = server.value("name");
         if (!serverNameValue.isString()) return;
         QString serverName = serverNameValue.toString();
+
+        QJsonValue activeNickValue = server.value("nick");
+        if (!activeNickValue.isString()) return;
+        QString activeNick = activeNickValue.toString();
+
+
         QJsonValue channelsValue = server.value("channels");
         if (!channelsValue.isObject()) return;
 
-        auto currentServer = std::make_shared<Server>(serverId, serverName);
+        auto currentServer = std::make_shared<Server>(activeNick, serverId, serverName);
         serverList.push_back(currentServer);
 
         QJsonObject channels = channelsValue.toObject();

@@ -24,6 +24,7 @@ class HarpoonClient : public QObject {
 
     QWebSocket ws_;
 
+    QString activeNick;
     QTimer reconnectTimer;
     QTimer pingTimer;
 
@@ -44,6 +45,7 @@ private:
 
     void irc_handleChatlist(const QJsonObject& root);
     void irc_handleChat(const QJsonObject& root);
+    void irc_handleJoin(const QJsonObject& root);
 
     void onReconnectTimer();
     void onPingTimer();
