@@ -104,10 +104,26 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     } if (type == "irc") {
         if (cmd == "chatlist") {
             irc_handleChatlist(root);
-        } else  if (cmd == "chat") {
+        } else if (cmd == "chat") {
             irc_handleChat(root);
+        } else if (cmd == "userlist") {
+            // TODO: handle userlist
+        } else if (cmd == "nickchange") {
+            // TODO: handle nickchange
+        } else if (cmd == "topic") {
+            // TODO: handle topic
+        } else if (cmd == "action") {
+            // TODO: handle action
+        } else if (cmd == "kick") {
+            // TODO: handle kick
+        } else if (cmd == "notice") {
+            // TODO: handle notice
         } else if (cmd == "join") {
             irc_handleJoin(root);
+        } else if (cmd == "part") {
+            irc_handlePart(root);
+        } else if (cmd == "quit") {
+            irc_handleQuit(root);
         }
     }
 }
@@ -117,7 +133,48 @@ QString HarpoonClient::formatTimestamp(double timestamp) {
 }
 
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto nickValue = root.value("nick");
+    auto channelNameValue = root.value("channel");
 
+    if (!timeValue.isDouble()) return;
+    if (!nickValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString nick = nickValue.toString();
+    QString channelName = channelNameValue.toString();
+
+    // TODO: handle join
+}
+
+void HarpoonClient::irc_handlePart(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto nickValue = root.value("nick");
+    auto channelNameValue = root.value("channel");
+
+    if (!timeValue.isDouble()) return;
+    if (!nickValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString nick = nickValue.toString();
+    QString channelName = channelNameValue.toString();
+
+    // TODO: handle part
+}
+
+void HarpoonClient::irc_handleQuit(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto nickValue = root.value("nick");
+
+    if (!timeValue.isDouble()) return;
+    if (!nickValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString nick = nickValue.toString();
+
+    // TODO: handle quit
 }
 
 void HarpoonClient::irc_handleChat(const QJsonObject& root) {
@@ -126,6 +183,7 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root) {
     auto messageValue = root.value("msg");
     auto serverIdValue = root.value("server");
     auto channelNameValue = root.value("channel");
+
     if (!timeValue.isDouble()) return;
     if (!nickValue.isString()) return;
     if (!messageValue.isString()) return;
