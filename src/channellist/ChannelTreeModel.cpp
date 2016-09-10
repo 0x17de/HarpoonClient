@@ -136,6 +136,7 @@ void ChannelTreeModel::newServer(std::shared_ptr<Server> server) {
     int rowIndex = servers_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
     servers_.push_back(server);
+    endInsertRows();
 }
 
 void ChannelTreeModel::newChannel(std::shared_ptr<Channel> channel) {
