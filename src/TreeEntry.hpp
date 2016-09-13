@@ -1,8 +1,10 @@
 #ifndef TREEENTRY_H
 #define TREEENTRY_H
 
+#include <QObject>
 
-class TreeEntry {
+
+class TreeEntry : public QObject {
     char entryType;
 public:
     TreeEntry(char entryType);

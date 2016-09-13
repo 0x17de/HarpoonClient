@@ -27,12 +27,14 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
     int getServerIndex(Server* server);
+    void connectServer(Server* server);
     void reconnectEvents();
 
 public Q_SLOTS:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
-    void newChannel(std::shared_ptr<Channel> channel);
+    void beginAddChannel(Channel* channel);
+    void endAddChannel();
 
 private:
     std::list<std::shared_ptr<Server>>& servers_;

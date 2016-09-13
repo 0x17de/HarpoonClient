@@ -11,10 +11,13 @@
 
 class Channel;
 class Server : public TreeEntry {
+    Q_OBJECT
+
     std::list<std::shared_ptr<Channel>> channels_;
     QString id_;
     QString name_;
     QString nick_;
+
 public:
     Server(const QString& activeNick,
            const QString& id,
@@ -27,6 +30,10 @@ public:
     Channel* getChannel(int position);
     QString getId() const;
     QString getName() const;
+
+signals:
+    void beginAddChannel(Channel* channel);
+    void endAddChannel();
 };
 
 

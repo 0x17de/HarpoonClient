@@ -14,10 +14,11 @@ ChatUi::ChatUi(HarpoonClient& client)
 {
     Ui::Client{}.setupUi(this);
 
+    // assign views
     channelView = findChild<QTreeView*>("channels");
+    userView = findChild<QTreeView*>("users");
     backlogView = findChild<QTableView*>("chat");
     messageInputView = findChild<QLineEdit*>("message");
-    //QTreeView* tree = findChild<QTreeView*>("users");
 
     // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
@@ -31,11 +32,11 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(messageInputView, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);
     connect(this, &ChatUi::sendMessage, &client, &HarpoonClient::sendMessage);
 
-
     // assign models
     channelView->setModel(&channelTreeModel);
+    userView->setModel(0);
 
-
+    // run
     show();
     messageInputView->setFocus();
 }

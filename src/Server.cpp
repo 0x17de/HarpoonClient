@@ -13,7 +13,9 @@ Server::Server(const QString& activeNick,
 }
 
 void Server::addChannel(std::shared_ptr<Channel> channel) {
+    emit beginAddChannel(channel.get());
     channels_.push_back(channel);
+    emit endAddChannel();
 }
 
 int Server::getChannelCount() const {

@@ -25,6 +25,8 @@ qt5_add_resources(ICONS_SRC icons/icons.qrc)
 qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/channellist/ChannelTreeModel.hpp)
 qt5_wrap_cpp(USERTREEMODEL_SRC src/userlist/UserTreeModel.hpp)
 qt5_wrap_cpp(HARPOONCLIENT_SRC src/HarpoonClient.hpp)
+qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
+qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 
@@ -35,6 +37,8 @@ add_executable(HarpoonClient
     ${CHANNELTREEMODEL_SRC}
     ${USERTREEMODEL_SRC}
     ${HARPOONCLIENT_SRC}
+    ${SERVER_SRC}
+    ${CHANNEL_SRC}
     ${ICONS_SRC}
     )
 target_include_directories(HarpoonClient PUBLIC src)
