@@ -77,11 +77,48 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
 
 void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
     // TODO: only irc works yet.
+    if (message.count() == 0)
+        return;
     QJsonObject root;
-    root["cmd"] = "chat";
-    root["server"] = channel->getServer()->getId();
-    root["channel"] = channel->getName();
-    root["msg"] = message;
+    if (message.at(0) != '/' || (message.count() > 2 && message.at(1) == '/')) {
+        root["cmd"] = "chat";
+        root["type"] = "irc";
+        root["server"] = channel->getServer()->getId();
+        root["channel"] = channel->getName();
+        root["msg"] = message;
+    } else {
+        auto parts = message.mid(1).split(' ');
+        QString cmd = parts.at(0);
+        if (cmd == "")
+            return;
+
+        if (cmd == "me") {
+            root["cmd"] = "action";
+            root["type"] = "irc";
+            root["server"] = channel->getServer()->getId();
+            root["channel"] = channel->getName();
+            root["msg"] = message.mid(cmd.count()+1);
+        } else if (cmd == "join") {
+            // TODO: join stub
+            if (parts.count() < 2)
+                return;
+            QString channelName = parts.at(1);
+            root["cmd"] = "join";
+            root["type"] = "irc";
+            root["server"] = channel->getServer()->getId();
+            root["channel"] = channelName;
+            root["password"] = parts.count() == 3 ? parts.at(2) : "";
+        } else if (cmd == "part") {
+            // TODO: join stub
+            QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
+            root["cmd"] = "part";
+            root["type"] = "irc";
+            root["server"] = channel->getServer()->getId();
+            root["channel"] = channelName;
+        } else {
+            return;
+        }
+    }
     QString json = QJsonDocument{root}.toJson(QJsonDocument::JsonFormat::Compact);
     ws_.sendTextMessage(json);
 }
