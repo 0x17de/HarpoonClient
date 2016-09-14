@@ -1,11 +1,15 @@
 #include "User.hpp"
 
 
-User::User(UserGroup* userGroup, const QString& name)
+User::User(const QString& name)
     : TreeEntry('u')
-    , userGroup_{userGroup}
+    , userGroup_{0}
     , name_{name}
 {
+}
+
+void User::setUserGroup(UserGroup* userGroup) {
+    userGroup_ = userGroup;
 }
 
 UserGroup* User::getUserGroup() const {

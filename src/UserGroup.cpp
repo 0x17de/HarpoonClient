@@ -10,6 +10,7 @@ UserGroup::UserGroup(const QString& name)
 
 void UserGroup::addUser(std::shared_ptr<User> user) {
     users_.push_back(user);
+    user->setUserGroup(this);
 }
 
 int UserGroup::getUserCount() const {

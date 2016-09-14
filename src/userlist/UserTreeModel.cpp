@@ -126,9 +126,14 @@ int UserTreeModel::getUserGroupIndex(UserGroup* userGroup) {
 
 void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     beginResetModel();
-    // TODO: recreate groups
     groups_.clear();
     users_.swap(users);
+
+    // TODO: create groups depending on access permissions
+    auto groupUsers = std::make_shared<UserGroup>("Users");
+    for (auto u : users)
+        groupUsers->addUser(u);
+
     endResetModel();
 }
 
