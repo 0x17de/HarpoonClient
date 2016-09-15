@@ -20,10 +20,6 @@ ChatUi::ChatUi(HarpoonClient& client)
     backlogView = findChild<QTableView*>("chat");
     messageInputView = findChild<QLineEdit*>("message");
 
-    // channel selection style
-    channelView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    channelView->setSelectionMode(QAbstractItemView::SingleSelection);
-
     // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
