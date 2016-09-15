@@ -20,9 +20,14 @@ ChatUi::ChatUi(HarpoonClient& client)
     backlogView = findChild<QTableView*>("chat");
     messageInputView = findChild<QLineEdit*>("message");
 
+    // channel selection style
+    channelView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    channelView->setSelectionMode(QAbstractItemView::SingleSelection);
+
     // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
+    connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
 
     // recv message
     connect(&client, &HarpoonClient::beginNewMessage, this, &ChatUi::beginNewMessage);
@@ -45,6 +50,15 @@ ChatUi::~ChatUi() {
     hide();
     channelView->setModel(0);
     backlogView->setModel(0);
+}
+
+void ChatUi::onChannelViewSelection(const QModelIndex& index) {
+    auto* item = static_cast<TreeEntry*>(index.internalPointer());
+    if (item->getTreeEntryType() == 'c') { // channel selected
+        Channel* channel = static_cast<Channel*>(item);
+        backlogView->setModel(channel->getBacklogModel());
+        userView->setModel(channel->getUserTreeModel());
+    }
 }
 
 void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {

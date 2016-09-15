@@ -29,6 +29,7 @@ public:
     Server* getServer() const;
     QString getName() const;
     BacklogModel* getBacklogModel();
+    UserTreeModel* getUserTreeModel();
 
 signals:
     void resetUsers(std::list<std::shared_ptr<User>> users);

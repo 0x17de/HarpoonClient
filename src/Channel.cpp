@@ -22,6 +22,10 @@ QString Channel::getName() const {
     return name_;
 }
 
+UserTreeModel* Channel::getUserTreeModel() {
+    return &userTreeModel_;
+}
+
 BacklogModel* Channel::getBacklogModel() {
     return &backlogModel_;
 }
