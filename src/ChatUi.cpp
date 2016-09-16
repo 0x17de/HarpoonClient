@@ -52,6 +52,7 @@ void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
     if (item->getTreeEntryType() == 'c') { // channel selected
         Channel* channel = static_cast<Channel*>(item);
+        activeChannel = channel;
         backlogView->setModel(channel->getBacklogModel());
         userView->setModel(channel->getUserTreeModel());
     }

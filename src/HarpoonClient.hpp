@@ -58,6 +58,7 @@ public Q_SLOTS:
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
+    void joinChannel(Channel* channel);
     void beginNewMessage(Channel* channel);
     void endNewMessage();
 };

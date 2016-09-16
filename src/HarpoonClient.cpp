@@ -172,17 +172,28 @@ QString HarpoonClient::formatTimestamp(double timestamp) {
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
     auto timeValue = root.value("time");
     auto nickValue = root.value("nick");
+    auto serverIdValue = root.value("server");
     auto channelNameValue = root.value("channel");
 
     if (!timeValue.isDouble()) return;
     if (!nickValue.isString()) return;
+    if (!serverIdValue.isString()) return;
     if (!channelNameValue.isString()) return;
 
     QString time = formatTimestamp(timeValue.toDouble());
     QString nick = nickValue.toString();
+    QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    // TODO: handle join
+    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
+            return server->getId() == serverId;
+        });
+    if (serverIt == servers_.end()) return;
+
+    Server& server = *serverIt->get();
+    Channel* channel = server.getChannel(channelName);
+    if (channel == nullptr)
+        server.addChannel(std::make_shared<Channel>(&server, channelName, false));
 }
 
 void HarpoonClient::irc_handlePart(const QJsonObject& root) {
