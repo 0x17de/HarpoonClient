@@ -128,17 +128,31 @@ int ChannelTreeModel::getServerIndex(Server* server) {
     return -1;
 }
 
+void ChannelTreeModel::channelDataChanged(Channel* channel) {
+    Server* server = channel->getServer();
+    auto rowIndex = server->getChannelIndex(channel);
+    auto modelIndex = createIndex(rowIndex, 0, channel);
+    emit dataChanged(modelIndex, modelIndex);
+}
+
 void ChannelTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
     beginResetModel();
     servers_.swap(servers);
-    for (auto& server : servers_)
+    for (auto& server : servers_) {
         connectServer(server.get());
+        for (auto& channel : server->getChannels())
+            connectChannel(channel.get());
+    }
     endResetModel();
 }
 
 void ChannelTreeModel::connectServer(Server* server) {
     connect(server, &Server::beginAddChannel, this, &ChannelTreeModel::beginAddChannel);
     connect(server, &Server::endAddChannel, this, &ChannelTreeModel::endAddChannel);
+}
+
+void ChannelTreeModel::connectChannel(Channel* channel) {
+    connect(channel, &Channel::channelDataChanged, this, &ChannelTreeModel::channelDataChanged);
 }
 
 void ChannelTreeModel::newServer(std::shared_ptr<Server> server) {
@@ -152,6 +166,7 @@ void ChannelTreeModel::beginAddChannel(Channel* channel) {
     Server* server = channel->getServer();
     auto rowIndex = server->getChannelIndex(channel);
     beginInsertRows(index(getServerIndex(server), 0), rowIndex, 0);
+    connectChannel(channel);
 }
 
 void ChannelTreeModel::endAddChannel() {

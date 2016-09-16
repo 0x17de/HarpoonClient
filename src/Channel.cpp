@@ -29,6 +29,13 @@ bool Channel::getDisabled() const {
     return disabled_;
 }
 
+void Channel::setDisabled(bool disabled) {
+    if (disabled_ != disabled) {
+        disabled_ = disabled;
+        emit channelDataChanged(this);
+    }
+}
+
 UserTreeModel* Channel::getUserTreeModel() {
     return &userTreeModel_;
 }

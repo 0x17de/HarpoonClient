@@ -30,6 +30,9 @@ public:
     ChatUi(HarpoonClient& client);
     ~ChatUi();
 
+private:
+    void activateChannel(Channel* channel);
+
 signals:
     void sendMessage(Channel* channel, const QString& message);
 

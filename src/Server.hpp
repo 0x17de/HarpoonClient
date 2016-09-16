@@ -23,6 +23,7 @@ public:
            const QString& id,
            const QString& name);
 
+    decltype((channels_)) getChannels();
     void addChannel(std::shared_ptr<Channel> channel);
     int getChannelCount() const;
     int getChannelIndex(Channel* channel) const;

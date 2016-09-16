@@ -18,6 +18,10 @@ void Server::addChannel(std::shared_ptr<Channel> channel) {
     emit endAddChannel();
 }
 
+auto Server::getChannels() -> decltype((channels_)) {
+    return channels_;
+};
+
 int Server::getChannelCount() const {
     return channels_.size();
 }

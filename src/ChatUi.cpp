@@ -52,25 +52,34 @@ void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
     if (item->getTreeEntryType() == 'c') { // channel selected
         Channel* channel = static_cast<Channel*>(item);
+        activateChannel(channel);
+        messageInputView->setFocus();
+    }
+}
+
+void ChatUi::activateChannel(Channel* channel) {
+    if (channel != nullptr) {
+        setWindowTitle(QString("Harpoon - ") + channel->getName());
         activeChannel = channel;
         backlogView->setModel(channel->getBacklogModel());
         userView->setModel(channel->getUserTreeModel());
+    } else {
+        setWindowTitle("Harpoon");
+        activeChannel = 0;
+        backlogView->setModel(0);
+        userView->setModel(0);
     }
 }
 
 void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {
     for (auto& server : servers) {
         auto* channel = server->getChannel(0);
-        if (channel != nullptr) {
-            activeChannel = channel;
-            backlogView->setModel(channel->getBacklogModel());
-            backlogView->resizeColumnsToContents();
-            backlogView->resizeRowsToContents();
-            return;
+        if (channel) {
+            activateChannel(channel);
+            return;;
         }
     }
-    activeChannel = 0;
-    backlogView->setModel(0);
+    activateChannel(0);
 }
 
 void ChatUi::beginNewMessage(Channel* channel) {

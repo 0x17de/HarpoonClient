@@ -32,10 +32,12 @@ public:
     Server* getServer() const;
     QString getName() const;
     bool getDisabled() const;
+    void setDisabled(bool disabled);
     BacklogModel* getBacklogModel();
     UserTreeModel* getUserTreeModel();
 
 signals:
+    void channelDataChanged(Channel* channel);
     void resetUsers(std::list<std::shared_ptr<User>> users);
     void beginAddUser(User* user);
     void endAddUser();

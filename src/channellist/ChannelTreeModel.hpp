@@ -28,9 +28,11 @@ public:
 
     int getServerIndex(Server* server);
     void connectServer(Server* server);
+    void connectChannel(Channel* channel);
     void reconnectEvents();
 
 public Q_SLOTS:
+    void channelDataChanged(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
     void beginAddChannel(Channel* channel);
