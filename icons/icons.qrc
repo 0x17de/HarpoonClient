@@ -2,5 +2,6 @@
 <qresource prefix="/icons">
     <file>user.png</file>
     <file>channel.png</file>
+    <file>channelDisabled.png</file>
 </qresource>
 </RCC>

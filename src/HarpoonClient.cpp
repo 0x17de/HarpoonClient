@@ -109,7 +109,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
             root["channel"] = channelName;
             root["password"] = parts.count() == 3 ? parts.at(2) : "";
         } else if (cmd == "part") {
-            // TODO: join stub
+            // TODO: part stub
             QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
             root["cmd"] = "part";
             root["type"] = "irc";
@@ -281,8 +281,11 @@ void HarpoonClient::irc_handleChatlist(const QJsonObject& root) {
             QString channelName = cit.key();
             QJsonValueRef channelValue = cit.value();
             if (!channelValue.isObject()) return;
+            auto channelData = channelValue.toObject();
+            auto channelDisabledValue = channelData.value("disabled");
+            bool channelDisabled = channelDisabledValue.isBool() && channelDisabledValue.toBool();
 
-            auto currentChannel = std::make_shared<Channel>(currentServer.get(), channelName);
+            auto currentChannel = std::make_shared<Channel>(currentServer.get(), channelName, channelDisabled);
             currentServer->addChannel(currentChannel);
 
             QJsonObject channel = channelValue.toObject();

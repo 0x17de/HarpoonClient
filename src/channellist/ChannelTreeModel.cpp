@@ -2,6 +2,8 @@
 #include "../Server.hpp"
 #include "../Channel.hpp"
 
+#include <QIcon>
+
 
 ChannelTreeModel::ChannelTreeModel(std::list<std::shared_ptr<Server>>& servers,
                                    QObject* parent)
@@ -90,7 +92,7 @@ QVariant ChannelTreeModel::data(const QModelIndex& index, int role) const {
         Channel* channel = static_cast<Channel*>(index.internalPointer());
 
         if (role == Qt::DecorationRole)
-            return QVariant();
+            return QIcon(channel->getDisabled() ? ":icons/channelDisabled.png" : ":icons/channel.png");
 
         if (role != Qt::DisplayRole)
             return QVariant();

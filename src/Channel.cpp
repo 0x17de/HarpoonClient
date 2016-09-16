@@ -1,10 +1,13 @@
 #include "Channel.hpp"
 
 
-Channel::Channel(Server* server, const QString& name)
+Channel::Channel(Server* server,
+                 const QString& name,
+                 bool disabled)
     : TreeEntry('c')
     , server_{server}
     , name_{name}
+    , disabled_{disabled}
 {
 }
 
@@ -20,6 +23,10 @@ Server* Channel::getServer() const {
 
 QString Channel::getName() const {
     return name_;
+}
+
+bool Channel::getDisabled() const {
+    return disabled_;
 }
 
 UserTreeModel* Channel::getUserTreeModel() {

@@ -19,8 +19,11 @@ class Channel : public TreeEntry {
     QString name_;
     BacklogModel backlogModel_;
     UserTreeModel userTreeModel_;
+    bool disabled_;
 public:
-    Channel(Server* server, const QString& name);
+    Channel(Server* server,
+            const QString& name,
+            bool disabled);
 
     void newMessage(const QString& time,
                     const QString& nick,
@@ -28,6 +31,7 @@ public:
 
     Server* getServer() const;
     QString getName() const;
+    bool getDisabled() const;
     BacklogModel* getBacklogModel();
     UserTreeModel* getUserTreeModel();
 
