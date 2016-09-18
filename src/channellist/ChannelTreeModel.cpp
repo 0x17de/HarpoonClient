@@ -144,6 +144,13 @@ void ChannelTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers)
             connectChannel(channel.get());
     }
     endResetModel();
+
+    // autoexpand servers
+    int rowIndex = 0;
+    for (auto& server : servers_) {
+        emit expand(createIndex(rowIndex, 0, server.get()));
+        rowIndex += 1;
+    }
 }
 
 void ChannelTreeModel::connectServer(Server* server) {

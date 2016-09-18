@@ -31,6 +31,9 @@ public:
     void connectChannel(Channel* channel);
     void reconnectEvents();
 
+signals:
+    void expand(const QModelIndex& index);
+
 public Q_SLOTS:
     void channelDataChanged(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);

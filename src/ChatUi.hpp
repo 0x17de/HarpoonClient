@@ -38,6 +38,7 @@ signals:
 
 public Q_SLOTS:
     void onChannelViewSelection(const QModelIndex& index);
+    void expandServer(const QModelIndex& index);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void beginNewMessage(Channel* channel);
     void endNewMessage();

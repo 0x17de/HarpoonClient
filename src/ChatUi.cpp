@@ -24,6 +24,7 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
     connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
+    connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
 
     // recv message
     connect(&client, &HarpoonClient::beginNewMessage, this, &ChatUi::beginNewMessage);
@@ -46,6 +47,11 @@ ChatUi::~ChatUi() {
     hide();
     channelView->setModel(0);
     backlogView->setModel(0);
+}
+
+void ChatUi::expandServer(const QModelIndex& index) {
+    qDebug() << "EXPAND" << endl;
+    channelView->setExpanded(index, true);
 }
 
 void ChatUi::onChannelViewSelection(const QModelIndex& index) {
