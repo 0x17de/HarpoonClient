@@ -33,7 +33,7 @@ class UserTreeModel : public QAbstractItemModel {
     void newUser(std::shared_ptr<User> user);
 
  private:
-    std::list<UserGroup*> groups_;
+    std::list<std::shared_ptr<UserGroup>> groups_;
     std::list<std::shared_ptr<User>> users_;
 };
 

@@ -17,7 +17,7 @@ QModelIndex UserTreeModel::index(int row, int column, const QModelIndex& parent)
             return QModelIndex();
         auto it = groups_.begin();
         std::advance(it, row);
-        return createIndex(row, column, *it);
+        return createIndex(row, column, it->get());
     } else {
         auto* item = static_cast<TreeEntry*>(parent.internalPointer());
         if (item->getTreeEntryType() == 'g') {
@@ -116,8 +116,8 @@ QVariant UserTreeModel::headerData(int section, Qt::Orientation orientation,
 
 int UserTreeModel::getUserGroupIndex(UserGroup* userGroup) {
     int rowIndex = 0;
-    for (auto g : groups_) {
-        if (g == userGroup)
+    for (auto& g : groups_) {
+        if (g.get() == userGroup)
             return rowIndex;
         ++rowIndex;
     }
@@ -131,17 +131,19 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
 
     // TODO: create groups depending on access permissions
     auto groupUsers = std::make_shared<UserGroup>("Users");
-    for (auto u : users)
+    for (auto& u : users_)
         groupUsers->addUser(u);
+    groups_.push_back(groupUsers);
 
     endResetModel();
 }
 
 void UserTreeModel::newUser(std::shared_ptr<User> user) {
     UserGroup* userGroup = user->getUserGroup();
+    // TODO: get or create group
     // if group does not exist yet, insert
-    if (getUserGroupIndex(userGroup) == -1)
-        groups_.push_back(userGroup);
+    //if (getUserGroupIndex(userGroup) == -1)
+    //    groups_.push_back(userGroup);
     auto rowIndex = userGroup->getUserIndex(user.get());
     beginInsertRows(index(getUserGroupIndex(userGroup), 0), rowIndex, 0);
     userGroup->addUser(user);

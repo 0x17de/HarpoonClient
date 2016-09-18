@@ -33,12 +33,12 @@ public:
     QString getName() const;
     bool getDisabled() const;
     void setDisabled(bool disabled);
+    void resetUsers(std::list<std::shared_ptr<User>>& users);
     BacklogModel* getBacklogModel();
     UserTreeModel* getUserTreeModel();
 
 signals:
     void channelDataChanged(Channel* channel);
-    void resetUsers(std::list<std::shared_ptr<User>> users);
     void beginAddUser(User* user);
     void endAddUser();
 };

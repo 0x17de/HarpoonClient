@@ -9,6 +9,7 @@
 
 #include "Server.hpp"
 #include "Channel.hpp"
+#include "User.hpp"
 
 QT_USE_NAMESPACE
 
@@ -140,11 +141,11 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
         }
     } if (type == "irc") {
         if (cmd == "chatlist") {
-            irc_handleChatlist(root);
+            irc_handleChatList(root);
         } else if (cmd == "chat") {
             irc_handleChat(root);
         } else if (cmd == "userlist") {
-            // TODO: handle userlist
+            irc_handleUserList(root);
         } else if (cmd == "nickchange") {
             // TODO: handle nickchange
         } else if (cmd == "topic") {
@@ -167,6 +168,10 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
 
 QString HarpoonClient::formatTimestamp(double timestamp) {
     return QTime{QDateTime{QDateTime::fromTime_t(timestamp/1000)}.time()}.toString("[hh:mm:ss]");
+}
+
+void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
+    
 }
 
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
@@ -272,7 +277,7 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root) {
     emit endNewMessage();
 }
 
-void HarpoonClient::irc_handleChatlist(const QJsonObject& root) {
+void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
     std::list<std::shared_ptr<Server>> serverList;
 
     QJsonValue serversValue = root.value("servers");
@@ -318,11 +323,14 @@ void HarpoonClient::irc_handleChatlist(const QJsonObject& root) {
             QJsonValue usersValue = channel.value("users");
             if (!usersValue.isObject()) return;
 
+            std::list<std::shared_ptr<User>> userList;
             QJsonObject users = usersValue.toObject();
             for (auto uit = users.begin(); uit != users.end(); ++uit) {
                 QString nick = uit.key();
-                // TODO: continue
+                userList.push_back(std::make_shared<User>(nick));
             }
+
+            currentChannel->resetUsers(userList);
         }
     }
 

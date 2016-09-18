@@ -43,7 +43,8 @@ private:
 
     QString formatTimestamp(double timestamp);
 
-    void irc_handleChatlist(const QJsonObject& root);
+    void irc_handleChatList(const QJsonObject& root);
+    void irc_handleUserList(const QJsonObject& root);
     void irc_handleChat(const QJsonObject& root);
     void irc_handleJoin(const QJsonObject& root);
     void irc_handlePart(const QJsonObject& root);

@@ -43,3 +43,7 @@ UserTreeModel* Channel::getUserTreeModel() {
 BacklogModel* Channel::getBacklogModel() {
     return &backlogModel_;
 }
+
+void Channel::resetUsers(std::list<std::shared_ptr<User>>& users) {
+    userTreeModel_.resetUsers(users);
+}
