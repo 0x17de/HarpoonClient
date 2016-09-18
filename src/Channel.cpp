@@ -44,6 +44,14 @@ BacklogModel* Channel::getBacklogModel() {
     return &backlogModel_;
 }
 
+void Channel::addUser(std::shared_ptr<User> user) {
+    userTreeModel_.addUser(user);
+}
+
 void Channel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     userTreeModel_.resetUsers(users);
+}
+
+User* Channel::getUser(QString nick) {
+    return userTreeModel_.getUser(nick);
 }

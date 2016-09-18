@@ -33,7 +33,9 @@ public:
     QString getName() const;
     bool getDisabled() const;
     void setDisabled(bool disabled);
+    void addUser(std::shared_ptr<User> user);
     void resetUsers(std::list<std::shared_ptr<User>>& users);
+    User* getUser(QString nick);
     BacklogModel* getBacklogModel();
     UserTreeModel* getUserTreeModel();
 

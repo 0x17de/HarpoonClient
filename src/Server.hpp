@@ -31,6 +31,8 @@ public:
     Channel* getChannel(int position);
     QString getId() const;
     QString getName() const;
+    QString getActiveNick() const;
+    void setActiveNick(const QString& nick);
 
 signals:
     void beginAddChannel(Channel* channel);

@@ -12,7 +12,7 @@ class UserGroup;
 class UserTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
- public:
+public:
     explicit UserTreeModel(QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
@@ -25,14 +25,18 @@ class UserTreeModel : public QAbstractItemModel {
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
+    User* getUser(QString nick);
     int getUserGroupIndex(UserGroup* userGroup);
     void reconnectEvents();
+    void addUser(std::shared_ptr<User> user);
 
- public Q_SLOTS:
+signals:
+    void expand(const QModelIndex& index);
+
+public Q_SLOTS:
     void resetUsers(std::list<std::shared_ptr<User>>& users);
-    void newUser(std::shared_ptr<User> user);
 
- private:
+private:
     std::list<std::shared_ptr<UserGroup>> groups_;
     std::list<std::shared_ptr<User>> users_;
 };

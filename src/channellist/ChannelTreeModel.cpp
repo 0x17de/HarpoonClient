@@ -172,7 +172,7 @@ void ChannelTreeModel::newServer(std::shared_ptr<Server> server) {
 void ChannelTreeModel::beginAddChannel(Channel* channel) {
     Server* server = channel->getServer();
     auto rowIndex = server->getChannelIndex(channel);
-    beginInsertRows(index(getServerIndex(server), 0), rowIndex, 0);
+    beginInsertRows(index(getServerIndex(server), 0), rowIndex, rowIndex);
     connectChannel(channel);
 }
 

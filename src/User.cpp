@@ -1,11 +1,12 @@
 #include "User.hpp"
 
 
-User::User(const QString& name)
+User::User(const QString& nick)
     : TreeEntry('u')
-    , userGroup_{0}
-    , name_{name}
+    , userGroup_{nullptr}
 {
+    auto exclamationMarkPosition = nick.indexOf("!");
+    nick_ = exclamationMarkPosition == -1 ? nick : nick.left(exclamationMarkPosition);
 }
 
 void User::setUserGroup(UserGroup* userGroup) {
@@ -16,6 +17,10 @@ UserGroup* User::getUserGroup() const {
     return userGroup_;
 }
 
-QString User::getName() const {
-    return name_;
+QString User::getNick() const {
+    return nick_;
+}
+
+void User::rename(const QString& nick) {
+    nick_ = nick;
 }

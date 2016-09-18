@@ -48,6 +48,7 @@ private:
     void irc_handleChat(const QJsonObject& root);
     void irc_handleJoin(const QJsonObject& root);
     void irc_handlePart(const QJsonObject& root);
+    void irc_handleNickChange(const QJsonObject& root);
     void irc_handleQuit(const QJsonObject& root);
 
     void onReconnectTimer();

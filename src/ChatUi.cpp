@@ -50,7 +50,6 @@ ChatUi::~ChatUi() {
 }
 
 void ChatUi::expandServer(const QModelIndex& index) {
-    qDebug() << "EXPAND" << endl;
     channelView->setExpanded(index, true);
 }
 

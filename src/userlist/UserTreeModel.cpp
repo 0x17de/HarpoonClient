@@ -93,7 +93,7 @@ QVariant UserTreeModel::data(const QModelIndex& index, int role) const {
         if (role != Qt::DisplayRole)
             return QVariant();
 
-        return user->getName();
+        return user->getNick();
     }
 
     return QVariant();
@@ -124,6 +124,13 @@ int UserTreeModel::getUserGroupIndex(UserGroup* userGroup) {
     return -1;
 }
 
+User* UserTreeModel::getUser(QString nick) {
+    auto it = find_if(users_.begin(), users_.end(), [&nick](const std::shared_ptr<User>& user){
+            return user->getNick() == nick;
+        });
+    return (it == users_.end() ? nullptr : (*it).get());
+}
+
 void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     beginResetModel();
     groups_.clear();
@@ -136,16 +143,33 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     groups_.push_back(groupUsers);
 
     endResetModel();
+
+    // autoexpand groups
+    int rowIndex = 0;
+    for (auto& group : groups_) {
+        emit expand(createIndex(rowIndex, 0, group.get()));
+        rowIndex += 1;
+    }
 }
 
-void UserTreeModel::newUser(std::shared_ptr<User> user) {
+void UserTreeModel::addUser(std::shared_ptr<User> user) {
     UserGroup* userGroup = user->getUserGroup();
+    if (userGroup == nullptr) {
+        if (groups_.size() > 0) {
+            userGroup = groups_.front().get();
+        } else
+            return; // TODO: move users into the server
+    }
     // TODO: get or create group
     // if group does not exist yet, insert
     //if (getUserGroupIndex(userGroup) == -1)
     //    groups_.push_back(userGroup);
-    auto rowIndex = userGroup->getUserIndex(user.get());
-    beginInsertRows(index(getUserGroupIndex(userGroup), 0), rowIndex, 0);
+    auto rowIndex = userGroup->getUserCount();
+    int idx = getUserGroupIndex(userGroup);
+    if (idx == -1)
+        return;
+
+    beginInsertRows(index(idx, 0), rowIndex, rowIndex);
     userGroup->addUser(user);
     endInsertRows();
 }

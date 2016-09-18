@@ -10,13 +10,14 @@
 class UserGroup;
 class User : public TreeEntry {
     UserGroup* userGroup_;
-    QString name_;
+    QString nick_;
 public:
-    User(const QString& name);
+    User(const QString& nick);
 
     void setUserGroup(UserGroup* userGroup);
     UserGroup* getUserGroup() const;
-    QString getName() const;
+    QString getNick() const;
+    void rename(const QString& newNick);
 };
 
 

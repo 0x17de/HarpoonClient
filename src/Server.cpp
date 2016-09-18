@@ -56,3 +56,11 @@ QString Server::getId() const {
 QString Server::getName() const {
     return name_;
 }
+
+QString Server::getActiveNick() const {
+    return nick_;
+}
+
+void Server::setActiveNick(const QString& nick) {
+    nick_ = nick;
+}

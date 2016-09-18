@@ -5,6 +5,7 @@
 UserGroup::UserGroup(const QString& name)
     : TreeEntry('g')
     , name_{name}
+    , expanded_{true}
 {
 }
 
@@ -27,9 +28,9 @@ int UserGroup::getUserIndex(User* user) const {
     return -1;
 }
 
-User* UserGroup::getUser(QString name) {
-    auto it = std::find_if(users_.begin(), users_.end(), [&name](const std::shared_ptr<User>& user){
-            return user->getName() == name;
+User* UserGroup::getUser(QString nick) {
+    auto it = std::find_if(users_.begin(), users_.end(), [&nick](const std::shared_ptr<User>& user){
+            return user->getNick() == nick;
         });
     return (it == users_.end() ? nullptr : (*it).get());
 }
@@ -42,4 +43,8 @@ User* UserGroup::getUser(int position) {
 
 QString UserGroup::getName() const {
     return name_;
+}
+
+bool UserGroup::getExpanded() const {
+    return expanded_;
 }
