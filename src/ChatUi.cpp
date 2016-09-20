@@ -20,6 +20,8 @@ ChatUi::ChatUi(HarpoonClient& client)
     backlogView = findChild<QTableView*>("chat");
     messageInputView = findChild<QLineEdit*>("message");
 
+    QSplitter* chatSplitter = findChild<QSplitter*>("chatSplitter");
+
     // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
@@ -40,6 +42,19 @@ ChatUi::ChatUi(HarpoonClient& client)
 
     // run
     show();
+
+    // DPI settings could be retrieved via: width() / widthMM()
+    // current width
+    int splitterWidth = chatSplitter->width();
+    const int sidePanelWidth = 200;
+
+    // resize splitter
+    if (splitterWidth > sidePanelWidth * 3) { // enough space to fit everything inside?
+        QList<int> sizes = {sidePanelWidth, splitterWidth - 2 * sidePanelWidth, sidePanelWidth};
+        chatSplitter->setSizes(sizes);
+    }
+
+    // set the focus to the input view
     messageInputView->setFocus();
 }
 
