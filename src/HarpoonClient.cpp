@@ -3,6 +3,7 @@
 #include <QtCore/QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QJsonValue>
 #include <QDateTime>
 #include <QTime>
@@ -171,7 +172,36 @@ QString HarpoonClient::formatTimestamp(double timestamp) {
 }
 
 void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto serverIdValue = root.value("server");
+    auto channelNameValue = root.value("channel");
+    auto usersValue = root.value("users");
 
+    if (!timeValue.isDouble()) return;
+    if (!serverIdValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+    if (!usersValue.isArray()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+    auto users = usersValue.toArray();
+
+    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
+            return server->getId() == serverId;
+        });
+    if (serverIt == servers_.end()) return;
+
+    Server& server = *serverIt->get();
+    Channel* channel = server.getChannel(channelName);
+    if (channel == nullptr) return;
+
+    std::list<std::shared_ptr<User>> userList;
+    for (auto userEntry : users) {
+        if (!userEntry.isString()) return;
+        userList.push_back(std::make_shared<User>(userEntry.toString()));
+    }
+    channel->resetUsers(userList);
 }
 
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
