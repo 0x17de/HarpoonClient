@@ -99,7 +99,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
             root["type"] = "irc";
             root["server"] = channel->getServer()->getId();
             root["channel"] = channel->getName();
-            root["msg"] = message.mid(cmd.count()+1);
+            root["msg"] = message.mid(cmd.count()+2);
         } else if (cmd == "join") {
             // TODO: join stub
             if (parts.count() < 2)
@@ -152,7 +152,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
         } else if (cmd == "topic") {
             // TODO: handle topic
         } else if (cmd == "action") {
-            // TODO: handle action
+            irc_handleAction(root);
         } else if (cmd == "kick") {
             // TODO: handle kick
         } else if (cmd == "notice") {
@@ -369,6 +369,38 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root) {
 
     emit beginNewMessage(channel);
     channel->newMessage(time, nick, message);
+    emit endNewMessage();
+}
+
+void HarpoonClient::irc_handleAction(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto nickValue = root.value("nick");
+    auto messageValue = root.value("msg");
+    auto serverIdValue = root.value("server");
+    auto channelNameValue = root.value("channel");
+
+    if (!timeValue.isDouble()) return;
+    if (!nickValue.isString()) return;
+    if (!messageValue.isString()) return;
+    if (!serverIdValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString nick = nickValue.toString();
+    QString message = messageValue.toString();
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+
+    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
+            return server->getId() == serverId;
+        });
+    if (serverIt == servers_.end()) return;
+
+    Channel* channel = (*serverIt)->getChannel(channelName);
+    if (channel == nullptr) return;
+
+    emit beginNewMessage(channel);
+    channel->newMessage(time, "*", nick+" "+message);
     emit endNewMessage();
 }
 
