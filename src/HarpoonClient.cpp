@@ -37,10 +37,6 @@ void HarpoonClient::run() {
     ws_.open(harpoonUrl);
 }
 
-std::list<std::shared_ptr<Server>>& HarpoonClient::getServerListReference() {
-    return servers_;
-}
-
 void HarpoonClient::onReconnectTimer() {
     ws_.open(harpoonUrl);
 }
@@ -187,21 +183,12 @@ void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
     QString channelName = channelNameValue.toString();
     auto users = usersValue.toArray();
 
-    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
-            return server->getId() == serverId;
-        });
-    if (serverIt == servers_.end()) return;
-
-    Server& server = *serverIt->get();
-    Channel* channel = server.getChannel(channelName);
-    if (channel == nullptr) return;
-
     std::list<std::shared_ptr<User>> userList;
     for (auto userEntry : users) {
         if (!userEntry.isString()) return;
         userList.push_back(std::make_shared<User>(userEntry.toString()));
     }
-    channel->resetUsers(userList);
+    emit resetUsers(serverId, channelName, userList);
 }
 
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
@@ -220,27 +207,7 @@ void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
-            return server->getId() == serverId;
-        });
-    if (serverIt == servers_.end()) return;
-
-    Server& server = *serverIt->get();
-    bool isSelf = nick == server.getActiveNick();
-    Channel* channel = server.getChannel(channelName);
-
-    if (channel == nullptr) {
-        server.addChannel(std::make_shared<Channel>(&server, channelName, false));
-    } else if (isSelf) {
-        channel->setDisabled(false);
-    }
-
-    if (!isSelf && channel) {
-        channel->addUser(std::make_shared<User>(nick));
-        emit beginNewMessage(channel);
-        channel->newMessage(time, "-->", nick + " joined the channel.");
-        emit endNewMessage();
-    }
+    emit joinChannel(serverId, channelName, time, nick);
 }
 
 void HarpoonClient::irc_handlePart(const QJsonObject& root) {
@@ -259,26 +226,7 @@ void HarpoonClient::irc_handlePart(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
-            return server->getId() == serverId;
-        });
-    if (serverIt == servers_.end()) return;
-
-    Server& server = *serverIt->get();
-    bool isSelf = nick == server.getActiveNick();
-    Channel* channel = server.getChannel(channelName);
-
-    if (channel == nullptr) {
-        server.addChannel(std::make_shared<Channel>(&server, channelName, true));
-    } else if (isSelf) {
-        channel->setDisabled(true);
-    }
-
-    if (!isSelf && channel) {
-        emit beginNewMessage(channel);
-        channel->newMessage(time, "<--", nick + " left the channel.");
-        emit endNewMessage();
-    }
+    emit partChannel(serverId, channelName, time, nick);
 }
 
 void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
@@ -300,44 +248,23 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
-            return server->getId() == serverId;
-        });
-    if (serverIt == servers_.end()) return;
-
-    Server& server = *serverIt->get();
-    bool isSelf = nick == server.getActiveNick();
-    if (isSelf)
-        server.setActiveNick(newNick);
-
-    Channel* channel = server.getChannel(channelName);
-    if (!channel)
-        return;
-
-    User* user = channel->getUser(nick);
-    if (!user)
-        return;
-
-    user->rename(newNick);
-
-    if (!isSelf && channel) {
-        emit beginNewMessage(channel);
-        channel->newMessage(time, "<->", nick + " is now known as" + newNick + ".");
-        emit endNewMessage();
-    }
+    emit nickChange(serverId, channelName, time, nick, newNick);
 }
 
 void HarpoonClient::irc_handleQuit(const QJsonObject& root) {
     auto timeValue = root.value("time");
     auto nickValue = root.value("nick");
+    auto serverIdValue = root.value("server");
 
     if (!timeValue.isDouble()) return;
     if (!nickValue.isString()) return;
+    if (!serverIdValue.isString()) return;
 
     QString time = formatTimestamp(timeValue.toDouble());
     QString nick = nickValue.toString();
+    QString serverId = serverIdValue.toString();
 
-    // TODO: handle quit
+    emit quitServer(serverId, time, nick);
 }
 
 void HarpoonClient::irc_handleChat(const QJsonObject& root) {
@@ -359,17 +286,7 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
-            return server->getId() == serverId;
-        });
-    if (serverIt == servers_.end()) return;
-
-    Channel* channel = (*serverIt)->getChannel(channelName);
-    if (channel == nullptr) return;
-
-    emit beginNewMessage(channel);
-    channel->newMessage(time, nick, message);
-    emit endNewMessage();
+    emit chatMessage(serverId, channelName, time, nick, message);
 }
 
 void HarpoonClient::irc_handleAction(const QJsonObject& root) {
@@ -391,17 +308,7 @@ void HarpoonClient::irc_handleAction(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    auto serverIt = std::find_if(servers_.begin(), servers_.end(), [&serverId](const std::shared_ptr<Server>& server) {
-            return server->getId() == serverId;
-        });
-    if (serverIt == servers_.end()) return;
-
-    Channel* channel = (*serverIt)->getChannel(channelName);
-    if (channel == nullptr) return;
-
-    emit beginNewMessage(channel);
-    channel->newMessage(time, "*", nick+" "+message);
-    emit endNewMessage();
+    emit chatAction(serverId, channelName, time, nick, message);
 }
 
 void HarpoonClient::irc_handleChatList(const QJsonObject& root) {

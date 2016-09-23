@@ -13,8 +13,7 @@ class ChannelTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
-    explicit ChannelTreeModel(std::list<std::shared_ptr<Server>>& servers,
-                              QObject* parent = 0);
+    explicit ChannelTreeModel(QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
@@ -33,6 +32,7 @@ public:
 
 signals:
     void expand(const QModelIndex& index);
+    void channelConnected(Channel* channel);
 
 public Q_SLOTS:
     void channelDataChanged(Channel* channel);
@@ -42,7 +42,7 @@ public Q_SLOTS:
     void endAddChannel();
 
 private:
-    std::list<std::shared_ptr<Server>>& servers_;
+    std::list<std::shared_ptr<Server>> servers_;
 };
 
 #endif

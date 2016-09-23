@@ -13,13 +13,14 @@ class HarpoonClient;
 class QTreeView;
 class QTableView;
 class QLineEdit;
+class QStackedWidget;
 
 class ChatUi : public QMainWindow {
     Q_OBJECT
 
     ChannelTreeModel channelTreeModel;
     QTreeView* channelView;
-    QTreeView* userView;
+    QStackedWidget* userViews;
     QTableView* backlogView;
     QLineEdit* messageInputView;
     Channel* activeChannel;
@@ -39,6 +40,7 @@ signals:
 public Q_SLOTS:
     void onChannelViewSelection(const QModelIndex& index);
     void expandServer(const QModelIndex& index);
+    void channelConnected(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void beginNewMessage(Channel* channel);
     void endNewMessage();

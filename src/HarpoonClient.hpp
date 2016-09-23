@@ -13,13 +13,14 @@ class QJsonObject;
 class QJsonDocument;
 class Server;
 class Channel;
+class User;
+
 
 class HarpoonClient : public QObject {
     Q_OBJECT
 
     bool shutdown;
 
-    std::list<std::shared_ptr<Server>> servers_;
     QUrl harpoonUrl;
 
     QWebSocket ws_;
@@ -32,7 +33,6 @@ public:
     HarpoonClient();
     ~HarpoonClient();
     void run();
-    std::list<std::shared_ptr<Server>>& getServerListReference();
 
 private:
     void onConnected();
@@ -60,10 +60,36 @@ public Q_SLOTS:
 
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
+    void resetUsers(const QString& serverId,
+                    const QString& channelName,
+                    std::list<std::shared_ptr<User>>& userList);
     void newServer(std::shared_ptr<Server> server);
-    void joinChannel(Channel* channel);
-    void beginNewMessage(Channel* channel);
-    void endNewMessage();
+    void joinChannel(const QString& serverId,
+                     const QString& channelName,
+                     const QString& timestamp,
+                     const QString& nick);
+    void partChannel(const QString& serverId,
+                     const QString& channelName,
+                     const QString& timestamp,
+                     const QString& nick);
+    void nickChange(const QString& serverId,
+                    const QString& channelName,
+                    const QString& timestamp,
+                    const QString& nick,
+                    const QString& newNick);
+    void quitServer(const QString& serverId,
+                    const QString& timestamp,
+                    const QString& nick);
+    void chatMessage(const QString& serverId,
+                     const QString& channelName,
+                     const QString& timestamp,
+                     const QString& nick,
+                     const QString& message);
+    void chatAction(const QString& serverId,
+                    const QString& channelName,
+                    const QString& timestamp,
+                    const QString& nick,
+                    const QString& action);
 };
 
 #endif

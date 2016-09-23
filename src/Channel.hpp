@@ -3,6 +3,7 @@
 
 
 #include <QString>
+#include <QTreeView>
 #include <list>
 #include <memory>
 
@@ -20,6 +21,7 @@ class Channel : public TreeEntry {
     BacklogModel backlogModel_;
     UserTreeModel userTreeModel_;
     bool disabled_;
+    QTreeView userTreeView_;
 public:
     Channel(Server* server,
             const QString& name,
@@ -37,6 +39,7 @@ public:
     void resetUsers(std::list<std::shared_ptr<User>>& users);
     User* getUser(QString nick);
     BacklogModel* getBacklogModel();
+    QTreeView* getUserTreeView();
     UserTreeModel* getUserTreeModel();
 
 signals:

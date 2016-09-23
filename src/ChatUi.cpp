@@ -2,6 +2,7 @@
 
 #include <QTreeWidget>
 #include <QScrollBar>
+#include <QStackedWidget>
 #include "ui_client.h"
 #include "HarpoonClient.hpp"
 
@@ -10,13 +11,12 @@
 
 
 ChatUi::ChatUi(HarpoonClient& client)
-    : channelTreeModel(client.getServerListReference())
 {
     Ui::Client{}.setupUi(this);
 
     // assign views
     channelView = findChild<QTreeView*>("channels");
-    userView = findChild<QTreeView*>("users");
+    userViews = findChild<QStackedWidget*>("userViews");
     backlogView = findChild<QTableView*>("chat");
     messageInputView = findChild<QLineEdit*>("message");
 
@@ -27,10 +27,10 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
     connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
+    connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);
 
     // recv message
-    connect(&client, &HarpoonClient::beginNewMessage, this, &ChatUi::beginNewMessage);
-    connect(&client, &HarpoonClient::endNewMessage, this, &ChatUi::endNewMessage);
+    // TODO: recv message
 
     // input event
     connect(messageInputView, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);
@@ -38,7 +38,6 @@ ChatUi::ChatUi(HarpoonClient& client)
 
     // assign models
     channelView->setModel(&channelTreeModel);
-    userView->setModel(0);
 
     // run
     show();
@@ -68,6 +67,10 @@ void ChatUi::expandServer(const QModelIndex& index) {
     channelView->setExpanded(index, true);
 }
 
+void ChatUi::channelConnected(Channel* channel) {
+    userViews->addWidget(channel->getUserTreeView());
+}
+
 void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
     if (item->getTreeEntryType() == 'c') { // channel selected
@@ -82,12 +85,12 @@ void ChatUi::activateChannel(Channel* channel) {
         setWindowTitle(QString("Harpoon - ") + channel->getName());
         activeChannel = channel;
         backlogView->setModel(channel->getBacklogModel());
-        userView->setModel(channel->getUserTreeModel());
+        if (channel->getUserTreeView()->parentWidget() != nullptr)
+            userViews->setCurrentWidget(channel->getUserTreeView());
     } else {
         setWindowTitle("Harpoon");
         activeChannel = 0;
         backlogView->setModel(0);
-        userView->setModel(0);
     }
 }
 

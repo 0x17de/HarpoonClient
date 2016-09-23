@@ -5,10 +5,8 @@
 #include <QIcon>
 
 
-ChannelTreeModel::ChannelTreeModel(std::list<std::shared_ptr<Server>>& servers,
-                                   QObject* parent)
+ChannelTreeModel::ChannelTreeModel(QObject* parent)
     : QAbstractItemModel(parent)
-    , servers_{servers}
 {
 }
 
@@ -160,6 +158,7 @@ void ChannelTreeModel::connectServer(Server* server) {
 
 void ChannelTreeModel::connectChannel(Channel* channel) {
     connect(channel, &Channel::channelDataChanged, this, &ChannelTreeModel::channelDataChanged);
+    emit channelConnected(channel);
 }
 
 void ChannelTreeModel::newServer(std::shared_ptr<Server> server) {

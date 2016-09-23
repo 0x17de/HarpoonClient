@@ -1,5 +1,7 @@
 #include "Channel.hpp"
 
+#include <QStackedWidget>
+
 
 Channel::Channel(Server* server,
                  const QString& name,
@@ -9,6 +11,7 @@ Channel::Channel(Server* server,
     , name_{name}
     , disabled_{disabled}
 {
+    userTreeView_.setModel(&userTreeModel_);
 }
 
 void Channel::newMessage(const QString& time,
@@ -38,6 +41,10 @@ void Channel::setDisabled(bool disabled) {
 
 UserTreeModel* Channel::getUserTreeModel() {
     return &userTreeModel_;
+}
+
+QTreeView* Channel::getUserTreeView() {
+    return &userTreeView_;
 }
 
 BacklogModel* Channel::getBacklogModel() {
