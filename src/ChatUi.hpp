@@ -21,7 +21,7 @@ class ChatUi : public QMainWindow {
     ChannelTreeModel channelTreeModel;
     QTreeView* channelView;
     QStackedWidget* userViews;
-    QTableView* backlogView;
+    QStackedWidget* backlogViews;
     QLineEdit* messageInputView;
     Channel* activeChannel;
 

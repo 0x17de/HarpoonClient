@@ -11,6 +11,7 @@ Channel::Channel(Server* server,
     , name_{name}
     , disabled_{disabled}
 {
+    backlogView_.setModel(&backlogModel_);
     userTreeView_.setModel(&userTreeModel_);
 }
 
@@ -37,6 +38,10 @@ void Channel::setDisabled(bool disabled) {
         disabled_ = disabled;
         emit channelDataChanged(this);
     }
+}
+
+QTableView* Channel::getBacklogView() {
+    return &backlogView_;
 }
 
 UserTreeModel* Channel::getUserTreeModel() {

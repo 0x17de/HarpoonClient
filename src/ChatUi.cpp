@@ -17,7 +17,7 @@ ChatUi::ChatUi(HarpoonClient& client)
     // assign views
     channelView = findChild<QTreeView*>("channels");
     userViews = findChild<QStackedWidget*>("userViews");
-    backlogView = findChild<QTableView*>("chat");
+    backlogViews = findChild<QStackedWidget*>("chats");
     messageInputView = findChild<QLineEdit*>("message");
 
     QSplitter* chatSplitter = findChild<QSplitter*>("chatSplitter");
@@ -60,7 +60,6 @@ ChatUi::ChatUi(HarpoonClient& client)
 ChatUi::~ChatUi() {
     hide();
     channelView->setModel(0);
-    backlogView->setModel(0);
 }
 
 void ChatUi::expandServer(const QModelIndex& index) {
@@ -69,6 +68,7 @@ void ChatUi::expandServer(const QModelIndex& index) {
 
 void ChatUi::channelConnected(Channel* channel) {
     userViews->addWidget(channel->getUserTreeView());
+    backlogViews->addWidget(channel->getBacklogView());
 }
 
 void ChatUi::onChannelViewSelection(const QModelIndex& index) {
@@ -84,13 +84,13 @@ void ChatUi::activateChannel(Channel* channel) {
     if (channel != nullptr) {
         setWindowTitle(QString("Harpoon - ") + channel->getName());
         activeChannel = channel;
-        backlogView->setModel(channel->getBacklogModel());
         if (channel->getUserTreeView()->parentWidget() != nullptr)
             userViews->setCurrentWidget(channel->getUserTreeView());
+        if (channel->getBacklogView()->parentWidget() != nullptr)
+            backlogViews->setCurrentWidget(channel->getBacklogView());
     } else {
         setWindowTitle("Harpoon");
         activeChannel = 0;
-        backlogView->setModel(0);
     }
 }
 
@@ -99,22 +99,24 @@ void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {
         auto* channel = server->getChannel(0);
         if (channel) {
             activateChannel(channel);
-            return;;
+            return;
         }
     }
     activateChannel(0);
 }
 
 void ChatUi::beginNewMessage(Channel* channel) {
-    QScrollBar* bar = backlogView->verticalScrollBar();
+    if (activeChannel == nullptr) return;
+    QScrollBar* bar = activeChannel->getBacklogView()->verticalScrollBar();
     backlogScrollToBottom = activeChannel
         && (bar == nullptr
             || bar->sliderPosition() == bar->maximum());
 }
 
 void ChatUi::endNewMessage() {
+    if (activeChannel == nullptr) return;
     if (backlogScrollToBottom)
-        backlogView->scrollToBottom();
+        activeChannel->getBacklogView()->scrollToBottom();
 }
 
 void ChatUi::messageReturnPressed() {
