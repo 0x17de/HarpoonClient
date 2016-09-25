@@ -14,6 +14,7 @@ class User : public TreeEntry {
 public:
     User(const QString& nick);
 
+    static QString stripNick(const QString& nick);
     void setUserGroup(UserGroup* userGroup);
     UserGroup* getUserGroup() const;
     QString getNick() const;

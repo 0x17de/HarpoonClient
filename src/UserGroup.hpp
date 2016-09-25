@@ -18,6 +18,7 @@ public:
     UserGroup(const QString& name);
 
     void addUser(std::shared_ptr<User> channel);
+    void removeUser(User* user);
     int getUserCount() const;
     int getUserIndex(User* user) const;
     User* getUser(QString user);

@@ -8,6 +8,7 @@
 
 #include "Server.hpp"
 #include "Channel.hpp"
+#include "User.hpp"
 
 
 ChatUi::ChatUi(HarpoonClient& client)
@@ -29,14 +30,55 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
     connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);
+
     connect(&client, &HarpoonClient::chatMessage, [this](const QString& serverId,
                                                      const QString& channelName,
                                                      const QString& timestamp,
                                                      const QString& nick,
                                                      const QString& message) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
-                if (!channel) return;
-                channel->getBacklogModel()->addMessage(timestamp, nick, message);
+                if (channel == nullptr) return;
+                 channel->getBacklogModel()->addMessage(timestamp, nick, message);
+            });
+
+    connect(&client, &HarpoonClient::joinChannel, [this](const QString& serverId,
+                                                         const QString& channelName,
+                                                         const QString& timestamp,
+                                                         const QString& nick) {
+                Server* server = channelTreeModel.getServer(serverId);
+                if (!server) return;
+                if (server->getActiveNick() == User::stripNick(nick)) { // this user
+                    Channel* channel = channelTreeModel.getChannel(server, channelName);
+                    if (channel == nullptr) // does not exist yet
+                        server->addChannel(std::make_shared<Channel>(server, channelName, false));
+                    else // re-activate
+                        channel->setDisabled(false);
+                } else {
+                    Channel* channel = channelTreeModel.getChannel(server, channelName);
+                    if (channel == nullptr) return;
+                    channel->getUserTreeModel()->addUser(std::make_shared<User>(nick));
+                    channel->getBacklogModel()->addMessage(timestamp, "-->", nick + " joined the channel");
+                }
+            });
+
+    connect(&client, &HarpoonClient::partChannel, [this](const QString& serverId,
+                                                         const QString& channelName,
+                                                         const QString& timestamp,
+                                                         const QString& nick) {
+                Server* server = channelTreeModel.getServer(serverId);
+                if (!server) return;
+                if (server->getActiveNick() == User::stripNick(nick)) { // this user
+                    Channel* channel = channelTreeModel.getChannel(server, channelName);
+                    if (channel == nullptr) // does not exist yet
+                        server->addChannel(std::make_shared<Channel>(server, channelName, true));
+                    else // disable
+                        channel->setDisabled(true);
+                } else {
+                    Channel* channel = channelTreeModel.getChannel(server, channelName);
+                    if (channel == nullptr) return;
+                    channel->getUserTreeModel()->removeUser(User::stripNick(nick));
+                    channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " left the channel");
+                }
             });
 
     // input event

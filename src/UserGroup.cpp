@@ -14,6 +14,12 @@ void UserGroup::addUser(std::shared_ptr<User> user) {
     user->setUserGroup(this);
 }
 
+void UserGroup::removeUser(User* user) {
+    users_.remove_if([user](const std::shared_ptr<User>& userPtr) {
+            return user == userPtr.get();
+        });
+}
+
 int UserGroup::getUserCount() const {
     return users_.size();
 }

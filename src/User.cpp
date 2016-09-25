@@ -5,8 +5,12 @@ User::User(const QString& nick)
     : TreeEntry('u')
     , userGroup_{nullptr}
 {
+    nick_ = stripNick(nick);
+}
+
+QString User::stripNick(const QString& nick) {
     auto exclamationMarkPosition = nick.indexOf("!");
-    nick_ = exclamationMarkPosition == -1 ? nick : nick.left(exclamationMarkPosition);
+    return exclamationMarkPosition == -1 ? nick : nick.left(exclamationMarkPosition);
 }
 
 void User::setUserGroup(UserGroup* userGroup) {
