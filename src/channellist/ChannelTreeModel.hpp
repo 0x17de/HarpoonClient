@@ -25,6 +25,9 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
+    Server* getServer(const QString& serverId);
+    Channel* getChannel(Server* server, const QString& channelName);
+    Channel* getChannel(const QString& serverId, const QString& channelName);
     int getServerIndex(Server* server);
     void connectServer(Server* server);
     void connectChannel(Channel* channel);

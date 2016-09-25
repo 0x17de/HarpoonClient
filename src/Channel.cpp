@@ -13,12 +13,7 @@ Channel::Channel(Server* server,
 {
     backlogView_.setModel(&backlogModel_);
     userTreeView_.setModel(&userTreeModel_);
-}
-
-void Channel::newMessage(const QString& time,
-                         const QString& nick,
-                         const QString& message) {
-    backlogModel_.addMessage(time, nick, message);
+    connect(&userTreeModel_, &UserTreeModel::expand, this, &Channel::expandUserGroup);
 }
 
 Server* Channel::getServer() const {
@@ -38,6 +33,10 @@ void Channel::setDisabled(bool disabled) {
         disabled_ = disabled;
         emit channelDataChanged(this);
     }
+}
+
+void Channel::expandUserGroup(const QModelIndex& index) {
+    userTreeView_.setExpanded(index, true);
 }
 
 QTableView* Channel::getBacklogView() {

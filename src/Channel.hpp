@@ -29,10 +29,6 @@ public:
             const QString& name,
             bool disabled);
 
-    void newMessage(const QString& time,
-                    const QString& nick,
-                    const QString& message);
-
     Server* getServer() const;
     QString getName() const;
     bool getDisabled() const;
@@ -44,6 +40,9 @@ public:
     BacklogModel* getBacklogModel();
     QTreeView* getUserTreeView();
     UserTreeModel* getUserTreeModel();
+
+public Q_SLOTS:
+    void expandUserGroup(const QModelIndex& index);
 
 signals:
     void channelDataChanged(Channel* channel);

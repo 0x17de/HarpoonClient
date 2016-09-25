@@ -11,6 +11,7 @@
 
 
 ChatUi::ChatUi(HarpoonClient& client)
+    : client{client}
 {
     Ui::Client{}.setupUi(this);
 
@@ -28,9 +29,15 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
     connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);
-
-    // recv message
-    // TODO: recv message
+    connect(&client, &HarpoonClient::chatMessage, [this](const QString& serverId,
+                                                     const QString& channelName,
+                                                     const QString& timestamp,
+                                                     const QString& nick,
+                                                     const QString& message) {
+                Channel* channel = channelTreeModel.getChannel(serverId, channelName);
+                if (!channel) return;
+                channel->getBacklogModel()->addMessage(timestamp, nick, message);
+            });
 
     // input event
     connect(messageInputView, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);

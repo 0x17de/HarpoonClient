@@ -18,6 +18,7 @@ class QStackedWidget;
 class ChatUi : public QMainWindow {
     Q_OBJECT
 
+    HarpoonClient& client;
     ChannelTreeModel channelTreeModel;
     QTreeView* channelView;
     QStackedWidget* userViews;

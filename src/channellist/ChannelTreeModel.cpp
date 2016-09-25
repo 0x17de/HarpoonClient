@@ -116,6 +116,24 @@ QVariant ChannelTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
+Server* ChannelTreeModel::getServer(const QString& serverId) {
+    auto it = find_if(servers_.begin(), servers_.end(), [&serverId](std::shared_ptr<Server> server){
+            return server->getId() == serverId;
+        });
+    if (it == servers_.end()) return nullptr;
+    return it->get();
+}
+
+Channel* ChannelTreeModel::getChannel(const QString& serverId, const QString& channelName) {
+    Server* server = getServer(serverId);;
+    if (!server) return nullptr;
+    return server->getChannel(channelName);
+}
+
+Channel* ChannelTreeModel::getChannel(Server* server, const QString& channelName) {
+    return server->getChannel(channelName);
+}
+
 int ChannelTreeModel::getServerIndex(Server* server) {
     int rowIndex = 0;
     for (auto s : servers_) {
