@@ -175,11 +175,11 @@ void UserTreeModel::addUser(std::shared_ptr<User> user) {
     endInsertRows();
 }
 
-void UserTreeModel::removeUser(const QString& nick) {
+bool UserTreeModel::removeUser(const QString& nick) {
     auto it = find_if(users_.begin(), users_.end(), [&nick](const std::shared_ptr<User>& user){
             return user->getNick() == nick;
         });
-    if (it == users_.end()) return;
+    if (it == users_.end()) return false;
 
     User* user = (*it).get();
     UserGroup* userGroup = user->getUserGroup();
@@ -187,10 +187,12 @@ void UserTreeModel::removeUser(const QString& nick) {
 
     int idx = getUserGroupIndex(userGroup);
     if (idx == -1)
-        return;
+        return false;
 
     beginRemoveRows(index(idx, 0), rowIndex, rowIndex);
     users_.erase(it);
     userGroup->removeUser(user);
     endRemoveRows();
+
+    return true;
 }

@@ -41,6 +41,16 @@ ChatUi::ChatUi(HarpoonClient& client)
                  channel->getBacklogModel()->addMessage(timestamp, nick, message);
             });
 
+    connect(&client, &HarpoonClient::chatAction, [this](const QString& serverId,
+                                                        const QString& channelName,
+                                                        const QString& timestamp,
+                                                        const QString& nick,
+                                                        const QString& message) {
+                Channel* channel = channelTreeModel.getChannel(serverId, channelName);
+                if (channel == nullptr) return;
+                channel->getBacklogModel()->addMessage(timestamp, "*", nick + " " + message);
+            });
+
     connect(&client, &HarpoonClient::joinChannel, [this](const QString& serverId,
                                                          const QString& channelName,
                                                          const QString& timestamp,
@@ -78,6 +88,17 @@ ChatUi::ChatUi(HarpoonClient& client)
                     if (channel == nullptr) return;
                     channel->getUserTreeModel()->removeUser(User::stripNick(nick));
                     channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " left the channel");
+                }
+            });
+
+    connect(&client, &HarpoonClient::quitServer, [this](const QString& serverId,
+                                                        const QString& timestamp,
+                                                        const QString& nick) {
+                for (auto& server : channelTreeModel.getServers()) {
+                    for (auto& channel : server->getChannels()) {
+                        if (channel->getUserTreeModel()->removeUser(User::stripNick(nick)))
+                            channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " has quit");
+                    }
                 }
             });
 

@@ -29,7 +29,7 @@ public:
     int getUserGroupIndex(UserGroup* userGroup);
     void reconnectEvents();
     void addUser(std::shared_ptr<User> user);
-    void removeUser(const QString& nick);
+    bool removeUser(const QString& nick);
 
 signals:
     void expand(const QModelIndex& index);

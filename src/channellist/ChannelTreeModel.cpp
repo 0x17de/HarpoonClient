@@ -116,6 +116,10 @@ QVariant ChannelTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
+std::list<std::shared_ptr<Server>> ChannelTreeModel::getServers() {
+    return servers_;
+}
+
 Server* ChannelTreeModel::getServer(const QString& serverId) {
     auto it = find_if(servers_.begin(), servers_.end(), [&serverId](std::shared_ptr<Server> server){
             return server->getId() == serverId;
