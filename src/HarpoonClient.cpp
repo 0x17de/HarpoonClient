@@ -150,7 +150,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
         } else if (cmd == "action") {
             irc_handleAction(root);
         } else if (cmd == "kick") {
-            // TODO: handle kick
+            irc_handleKick(root);
         } else if (cmd == "notice") {
             // TODO: handle notice
         } else if (cmd == "join") {
@@ -249,6 +249,31 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
     QString channelName = channelNameValue.toString();
 
     emit nickChange(serverId, channelName, time, nick, newNick);
+}
+
+void HarpoonClient::irc_handleKick(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto nickValue = root.value("nick");
+    auto serverIdValue = root.value("server");
+    auto channelNameValue = root.value("channel");
+    auto targetValue = root.value("target");
+    auto reasonValue = root.value("msg");
+
+    if (!timeValue.isDouble()) return;
+    if (!nickValue.isString()) return;
+    if (!serverIdValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+    if (!targetValue.isString()) return;
+    if (!reasonValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString nick = nickValue.toString();
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+    QString target = targetValue.toString();
+    QString reason = reasonValue.toString();
+
+    emit userKicked(serverId, channelName, time, nick, target, reason);
 }
 
 void HarpoonClient::irc_handleQuit(const QJsonObject& root) {

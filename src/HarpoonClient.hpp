@@ -51,6 +51,7 @@ private:
     void irc_handlePart(const QJsonObject& root);
     void irc_handleNickChange(const QJsonObject& root);
     void irc_handleQuit(const QJsonObject& root);
+    void irc_handleKick(const QJsonObject& root);
 
     void onReconnectTimer();
     void onPingTimer();
@@ -80,6 +81,12 @@ signals:
     void quitServer(const QString& serverId,
                     const QString& timestamp,
                     const QString& nick);
+    void userKicked(const QString& serverId,
+                    const QString& channelName,
+                    const QString& timestamp,
+                    const QString& nick,
+                    const QString& target,
+                    const QString& reason);
     void chatMessage(const QString& serverId,
                      const QString& channelName,
                      const QString& timestamp,
