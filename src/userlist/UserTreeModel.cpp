@@ -196,3 +196,18 @@ bool UserTreeModel::removeUser(const QString& nick) {
 
     return true;
 }
+
+bool UserTreeModel::renameUser(const QString& nick,
+                               const QString& newNick) {
+    auto it = find_if(users_.begin(), users_.end(), [&nick](const std::shared_ptr<User>& user){
+            return user->getNick() == nick;
+        });
+    if (it == users_.end()) return false;
+
+    User* user = (*it).get();
+    auto modelIndex = createIndex(user->getUserGroup()->getUserIndex(user), 0, user);
+    user->rename(newNick);
+    emit dataChanged(modelIndex, modelIndex);
+
+    return true;
+}

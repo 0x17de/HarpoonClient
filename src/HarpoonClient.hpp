@@ -75,7 +75,6 @@ signals:
                      const QString& timestamp,
                      const QString& nick);
     void nickChange(const QString& serverId,
-                    const QString& channelName,
                     const QString& timestamp,
                     const QString& nick,
                     const QString& newNick);

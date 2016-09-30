@@ -96,6 +96,13 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
             root["server"] = channel->getServer()->getId();
             root["channel"] = channel->getName();
             root["msg"] = message.mid(cmd.count()+2);
+        } else if (cmd == "nick") {
+            if (parts.count() < 2)
+                return;
+            root["cmd"] = "nick";
+            root["type"] = "irc";
+            root["server"] = channel->getServer()->getId();
+            root["nick"] = parts.at(1);
         } else if (cmd == "join") {
             // TODO: join stub
             if (parts.count() < 2)
@@ -234,21 +241,18 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
     auto nickValue = root.value("nick");
     auto newNickValue = root.value("newNick");
     auto serverIdValue = root.value("server");
-    auto channelNameValue = root.value("channel");
 
     if (!timeValue.isDouble()) return;
     if (!nickValue.isString()) return;
     if (!newNickValue.isString()) return;
     if (!serverIdValue.isString()) return;
-    if (!channelNameValue.isString()) return;
 
     QString time = formatTimestamp(timeValue.toDouble());
     QString nick = nickValue.toString();
     QString newNick = newNickValue.toString();
     QString serverId = serverIdValue.toString();
-    QString channelName = channelNameValue.toString();
 
-    emit nickChange(serverId, channelName, time, nick, newNick);
+    emit nickChange(serverId, time, nick, newNick);
 }
 
 void HarpoonClient::irc_handleKick(const QJsonObject& root) {

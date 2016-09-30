@@ -31,6 +31,30 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
     connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);
 
+    connect(&client, &HarpoonClient::nickChange, [this](const QString& serverId,
+                                                        const QString& timestamp,
+                                                        const QString& nick,
+                                                        const QString& newNick) {
+                Server* server = channelTreeModel.getServer(serverId);
+                if (server == nullptr) return;
+
+                if (server->getActiveNick() == nick)
+                    server->setActiveNick(newNick);
+
+                for (auto& channel : server->getChannels()) {
+                    if (channel->getUserTreeModel()->renameUser(User::stripNick(nick), newNick))
+                        channel->getBacklogModel()->addMessage(timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick);
+                }
+            });
+
+    connect(&client, &HarpoonClient::resetUsers, [this](const QString& serverId,
+                                                        const QString& channelName,
+                                                        std::list<std::shared_ptr<User>>& users) {
+                Channel* channel = channelTreeModel.getChannel(serverId, channelName);
+                if (channel == nullptr) return;
+                channel->getUserTreeModel()->resetUsers(users);
+            });
+
     connect(&client, &HarpoonClient::chatMessage, [this](const QString& serverId,
                                                          const QString& channelName,
                                                          const QString& timestamp,

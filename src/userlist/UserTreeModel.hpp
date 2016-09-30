@@ -30,6 +30,8 @@ public:
     void reconnectEvents();
     void addUser(std::shared_ptr<User> user);
     bool removeUser(const QString& nick);
+    bool renameUser(const QString& nick,
+                    const QString& newNick);
 
 signals:
     void expand(const QModelIndex& index);
