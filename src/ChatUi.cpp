@@ -32,13 +32,14 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);
 
     connect(&client, &HarpoonClient::chatMessage, [this](const QString& serverId,
-                                                     const QString& channelName,
-                                                     const QString& timestamp,
-                                                     const QString& nick,
-                                                     const QString& message) {
+                                                         const QString& channelName,
+                                                         const QString& timestamp,
+                                                         const QString& nick,
+                                                         const QString& message,
+                                                         bool notice) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
-                 channel->getBacklogModel()->addMessage(timestamp, nick, message);
+                channel->getBacklogModel()->addMessage(timestamp, notice ? '['+nick+']' : nick, message);
             });
 
     connect(&client, &HarpoonClient::chatAction, [this](const QString& serverId,
@@ -89,6 +90,16 @@ ChatUi::ChatUi(HarpoonClient& client)
                     channel->getUserTreeModel()->removeUser(User::stripNick(nick));
                     channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " left the channel");
                 }
+            });
+
+    connect(&client, &HarpoonClient::userKicked, [this](const QString& serverId,
+                                                        const QString& channelName,
+                                                        const QString& timestamp,
+                                                        const QString& nick) {
+                Channel* channel = channelTreeModel.getChannel(serverId, channelName);
+                if (channel == nullptr) return;
+                channel->getUserTreeModel()->removeUser(User::stripNick(nick));
+                channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " was kicked from the channel");
             });
 
     connect(&client, &HarpoonClient::quitServer, [this](const QString& serverId,

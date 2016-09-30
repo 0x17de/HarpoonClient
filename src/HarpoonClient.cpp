@@ -311,7 +311,29 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    emit chatMessage(serverId, channelName, time, nick, message);
+    emit chatMessage(serverId, channelName, time, nick, message, false);
+}
+
+void HarpoonClient::irc_handleNotice(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto nickValue = root.value("nick");
+    auto messageValue = root.value("msg");
+    auto serverIdValue = root.value("server");
+    auto channelNameValue = root.value("channel");
+
+    if (!timeValue.isDouble()) return;
+    if (!nickValue.isString()) return;
+    if (!messageValue.isString()) return;
+    if (!serverIdValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString nick = nickValue.toString();
+    QString message = messageValue.toString();
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+
+    emit chatMessage(serverId, channelName, time, nick, message, true);
 }
 
 void HarpoonClient::irc_handleAction(const QJsonObject& root) {

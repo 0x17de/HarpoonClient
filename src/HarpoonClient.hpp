@@ -46,6 +46,7 @@ private:
     void irc_handleChatList(const QJsonObject& root);
     void irc_handleUserList(const QJsonObject& root);
     void irc_handleChat(const QJsonObject& root);
+    void irc_handleNotice(const QJsonObject& root);
     void irc_handleAction(const QJsonObject& root);
     void irc_handleJoin(const QJsonObject& root);
     void irc_handlePart(const QJsonObject& root);
@@ -91,7 +92,8 @@ signals:
                      const QString& channelName,
                      const QString& timestamp,
                      const QString& nick,
-                     const QString& message);
+                     const QString& message,
+                     bool notice);
     void chatAction(const QString& serverId,
                     const QString& channelName,
                     const QString& timestamp,
