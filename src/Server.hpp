@@ -17,11 +17,13 @@ class Server : public TreeEntry {
     QString id_;
     QString name_;
     QString nick_;
+    bool disabled_;
 
 public:
     Server(const QString& activeNick,
            const QString& id,
-           const QString& name);
+           const QString& name,
+           bool disabled);
 
     decltype((channels_)) getChannels();
     void addChannel(std::shared_ptr<Channel> channel);

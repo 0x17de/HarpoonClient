@@ -4,11 +4,13 @@
 
 Server::Server(const QString& activeNick,
                const QString& id,
-               const QString& name)
+               const QString& name,
+               bool disabled)
     : TreeEntry('s')
     , id_{id}
     , name_{name}
     , nick_{activeNick}
+    , disabled_{disabled}
 {
 }
 
