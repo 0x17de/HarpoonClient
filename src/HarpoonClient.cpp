@@ -155,7 +155,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
         } else if (cmd == "serveradded") {
             irc_handleServerAdded(root);
         } else if (cmd == "topic") {
-            // TODO: handle topic
+            irc_handleTopic(root);
         } else if (cmd == "action") {
             irc_handleAction(root);
         } else if (cmd == "kick") {
@@ -188,6 +188,28 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
 
     // no nick yet, also inactive
     emit newServer(std::make_shared<Server>("", serverId, name, true));
+}
+
+void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
+    auto timeValue = root.value("time");
+    auto serverIdValue = root.value("server");
+    auto channelNameValue = root.value("channel");
+    auto nickValue = root.value("nick");
+    auto topicValue = root.value("topic");
+
+    if (!timeValue.isDouble()) return;
+    if (!serverIdValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+    if (!nickValue.isString()) return;
+    if (!topicValue.isString()) return;
+
+    QString time = formatTimestamp(timeValue.toDouble());
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+    QString nick = nickValue.toString();
+    QString topic = topicValue.toString();
+
+    emit topicChanged(serverId, channelName, time, nick, topic);
 }
 
 void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
