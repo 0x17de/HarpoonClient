@@ -24,6 +24,14 @@ QString Channel::getName() const {
     return name_;
 }
 
+void Channel::setTopic(const QString& topic) {
+    topic_ = topic;
+}
+
+QString Channel::getTopic() const {
+    return topic_;
+}
+
 bool Channel::getDisabled() const {
     return disabled_;
 }

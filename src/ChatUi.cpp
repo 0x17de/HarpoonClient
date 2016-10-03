@@ -19,6 +19,7 @@ ChatUi::ChatUi(HarpoonClient& client)
     // assign views
     channelView = findChild<QTreeView*>("channels");
     userViews = findChild<QStackedWidget*>("userViews");
+    topicView = findChild<QLineEdit*>("topic");
     backlogViews = findChild<QStackedWidget*>("chats");
     messageInputView = findChild<QLineEdit*>("message");
 
@@ -30,6 +31,17 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
     connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);
+
+    connect(&client, &HarpoonClient::topicChanged, [this](const QString& serverId,
+                                                          const QString& channelName,
+                                                          const QString& timestamp,
+                                                          const QString& nick,
+                                                          const QString& topic) {
+                Channel* channel = channelTreeModel.getChannel(serverId, channelName);
+                if (channel == nullptr) return;
+                channel->setTopic(topic);
+                channel->getBacklogModel()->addMessage(timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic);
+            });
 
     connect(&client, &HarpoonClient::nickChange, [this](const QString& serverId,
                                                         const QString& timestamp,
@@ -193,9 +205,11 @@ void ChatUi::activateChannel(Channel* channel) {
             userViews->setCurrentWidget(channel->getUserTreeView());
         if (channel->getBacklogView()->parentWidget() != nullptr)
             backlogViews->setCurrentWidget(channel->getBacklogView());
+        topicView->setText(channel->getTopic());
     } else {
         setWindowTitle("Harpoon");
         activeChannel = 0;
+        topicView->setText("");
     }
 }
 

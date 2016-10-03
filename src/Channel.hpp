@@ -19,6 +19,7 @@ class Channel : public TreeEntry {
 
     Server* server_;
     QString name_;
+    QString topic_;
     BacklogModel backlogModel_;
     UserTreeModel userTreeModel_;
     bool disabled_;
@@ -31,6 +32,8 @@ public:
 
     Server* getServer() const;
     QString getName() const;
+    void setTopic(const QString& topic);
+    QString getTopic() const;
     bool getDisabled() const;
     void setDisabled(bool disabled);
     void addUser(std::shared_ptr<User> user);
