@@ -5,6 +5,8 @@
 #include <QString>
 #include <QTableView>
 #include <QTreeView>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 #include <list>
 #include <memory>
 
@@ -24,7 +26,10 @@ class Channel : public TreeEntry {
     UserTreeModel userTreeModel_;
     bool disabled_;
     QTreeView userTreeView_;
-    QTableView backlogView_;
+    QTableView backlogView_; // TODO: completely replace with graphicsview
+    QGraphicsScene backlogScene_; // TODO: create own class + chat line class
+    QGraphicsView backlogCanvas_;
+
 public:
     Channel(Server* server,
             const QString& name,
@@ -39,7 +44,7 @@ public:
     void addUser(std::shared_ptr<User> user);
     void resetUsers(std::list<std::shared_ptr<User>>& users);
     User* getUser(QString nick);
-    QTableView* getBacklogView();
+    QGraphicsView* getBacklogView();
     BacklogModel* getBacklogModel();
     QTreeView* getUserTreeView();
     UserTreeModel* getUserTreeModel();

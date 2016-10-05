@@ -234,8 +234,10 @@ void ChatUi::beginNewMessage(Channel* channel) {
 
 void ChatUi::endNewMessage() {
     if (activeChannel == nullptr) return;
-    if (backlogScrollToBottom)
-        activeChannel->getBacklogView()->scrollToBottom();
+    if (backlogScrollToBottom) {
+        QGraphicsView* view = activeChannel->getBacklogView();
+        view->ensureVisible(0, view->scene()->sceneRect().height());
+    }
 }
 
 void ChatUi::messageReturnPressed() {
