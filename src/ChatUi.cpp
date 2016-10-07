@@ -39,6 +39,8 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                           const QString& topic) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
+                if (channel == activeChannel)
+                    topicView->setText(topic);
                 channel->setTopic(topic);
                 channel->getBacklogModel()->addMessage(timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic);
             });
