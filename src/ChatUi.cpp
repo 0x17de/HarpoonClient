@@ -3,7 +3,6 @@
 #include <QTreeWidget>
 #include <QScrollBar>
 #include <QStackedWidget>
-#include "ui_client.h"
 #include "HarpoonClient.hpp"
 
 #include "Server.hpp"
@@ -13,17 +12,29 @@
 
 ChatUi::ChatUi(HarpoonClient& client)
     : client{client}
+    , settings{client.getSettings()}
 {
-    Ui::Client{}.setupUi(this);
+    clientUi.setupUi(this);
+    serverConfigurationDialogUi.setupUi(&serverConfigurationDialog);
+
+    serverConfigurationDialogUi.host->setText(settings.value("host", "ws://localhost:8080/ws").toString());
 
     // assign views
-    channelView = findChild<QTreeView*>("channels");
-    userViews = findChild<QStackedWidget*>("userViews");
-    topicView = findChild<QLineEdit*>("topic");
-    backlogViews = findChild<QStackedWidget*>("chats");
-    messageInputView = findChild<QLineEdit*>("message");
+    channelView = clientUi.channels;
+    userViews = clientUi.userViews;
+    topicView = clientUi.topic;
+    backlogViews = clientUi.chats;
+    messageInputView = clientUi.message;
 
-    QSplitter* chatSplitter = findChild<QSplitter*>("chatSplitter");
+    QSplitter* chatSplitter = clientUi.chatSplitter;
+
+    // server configuration dialog handling
+    connect(clientUi.actionConfigure_Server, &QAction::triggered, [this] { showConfigureServerDialog(); });
+    connect(&serverConfigurationDialog, &QDialog::accepted, [this] {
+            QString host = serverConfigurationDialogUi.host->text();
+            settings.setValue("host", host);
+            this->client.reconnect(host);
+        });
 
     // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
@@ -179,6 +190,10 @@ ChatUi::ChatUi(HarpoonClient& client)
 ChatUi::~ChatUi() {
     hide();
     channelView->setModel(0);
+}
+
+void ChatUi::showConfigureServerDialog() {
+    serverConfigurationDialog.show();
 }
 
 void ChatUi::expandServer(const QModelIndex& index) {

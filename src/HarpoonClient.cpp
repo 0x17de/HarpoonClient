@@ -17,6 +17,7 @@ QT_USE_NAMESPACE
 
 HarpoonClient::HarpoonClient()
     : shutdown{false}
+    , settings("_0x17de", "HarpoonClient")
 {
     connect(&ws_, &QWebSocket::connected, this, &HarpoonClient::onConnected);
     connect(&ws_, &QWebSocket::disconnected, this, &HarpoonClient::onDisconnected);
@@ -26,11 +27,20 @@ HarpoonClient::HarpoonClient()
     connect(&pingTimer, &QTimer::timeout, this, &HarpoonClient::onPingTimer);
 
     reconnectTimer.setSingleShot(true);
-    harpoonUrl = "ws://localhost:8080/ws";
+    harpoonUrl = settings.value("host", "ws://localhost:8080/ws").toString();
 }
 
 HarpoonClient::~HarpoonClient() {
     shutdown = true;
+}
+
+void HarpoonClient::reconnect(const QString& host) {
+    ws_.close();
+    harpoonUrl = host;
+}
+
+QSettings& HarpoonClient::getSettings() {
+    return settings;
 }
 
 void HarpoonClient::run() {

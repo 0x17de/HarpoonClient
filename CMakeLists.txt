@@ -29,11 +29,13 @@ qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
 qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
+qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
 
 add_executable(HarpoonClient
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
     ${CHATUI_SRC}
+    ${SERVERCONFIGUI_HEADERS}
     ${CHANNELTREEMODEL_SRC}
     ${USERTREEMODEL_SRC}
     ${HARPOONCLIENT_SRC}

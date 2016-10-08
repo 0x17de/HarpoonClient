@@ -1,10 +1,12 @@
 #ifndef CHATUI_H
 #define CHATUI_H
 
-#include <QMainWindow>
+#include <QSettings>
 #include <list>
 #include <memory>
 #include "channellist/ChannelTreeModel.hpp"
+#include "ui_client.h"
+#include "ui_serverConfigurationDialog.h"
 
 
 class Server;
@@ -18,7 +20,12 @@ class QStackedWidget;
 class ChatUi : public QMainWindow {
     Q_OBJECT
 
+    Ui::Client clientUi;
+    Ui::ServerConfigurationDialog serverConfigurationDialogUi;
+
+    QSettings& settings;
     HarpoonClient& client;
+
     ChannelTreeModel channelTreeModel;
     QLineEdit* topicView;
     QTreeView* channelView;
@@ -26,6 +33,8 @@ class ChatUi : public QMainWindow {
     QStackedWidget* backlogViews;
     QLineEdit* messageInputView;
     Channel* activeChannel;
+
+    QDialog serverConfigurationDialog;
 
     bool backlogScrollToBottom;
 
@@ -35,6 +44,7 @@ public:
 
 private:
     void activateChannel(Channel* channel);
+    void showConfigureServerDialog();
 
 signals:
     void sendMessage(Channel* channel, const QString& message);

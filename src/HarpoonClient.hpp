@@ -4,6 +4,7 @@
 #include <QWebSocket>
 #include <QString>
 #include <QTimer>
+#include <QSettings>
 #include <QUrl>
 #include <list>
 #include <memory>
@@ -28,11 +29,14 @@ class HarpoonClient : public QObject {
     QString activeNick;
     QTimer reconnectTimer;
     QTimer pingTimer;
+    QSettings settings;
 
 public:
     HarpoonClient();
     ~HarpoonClient();
     void run();
+    void reconnect(const QString& host);
+    QSettings& getSettings();
 
 private:
     void onConnected();
