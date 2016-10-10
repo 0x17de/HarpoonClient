@@ -15,6 +15,7 @@ set(SRC_CLIENT
     src/Channel.cpp src/Channel.hpp
     src/UserGroup.cpp src/UserGroup.hpp
     src/User.cpp src/User.hpp
+    src/ChatLine.cpp src/ChatLine.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp
     src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
     src/userlist/UserTreeModel.cpp src/userlist/UserTreeModel.hpp
