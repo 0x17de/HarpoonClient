@@ -1,5 +1,4 @@
 #include "BacklogModel.hpp"
-#include <QDebug>
 
 
 BacklogModel::BacklogModel(QObject* parent)
@@ -16,7 +15,17 @@ QModelIndex BacklogModel::index(int row, int column, const QModelIndex& parent) 
             return QModelIndex();
         auto it = messages_.begin();
         std::advance(it, row);
-        return createIndex(row, column, (void*)&it->at(column));
+
+        const ChatLine& line = *it;
+        const QString* data;
+        if (column == 0) {
+            data = &line.getTimeRef();
+        } else if (column == 1) {
+            data = &line.getWhoRef();
+        } else if (column == 2) {
+            data = &line.getMessageRef();
+        }
+        return createIndex(row, column, (void*)data);
     }
     return QModelIndex();
 }

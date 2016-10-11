@@ -18,6 +18,9 @@ public:
     QString getTime() const;
     QString getWho() const;
     QString getMessage() const;
+    const QString& getTimeRef() const;
+    const QString& getWhoRef() const;
+    const QString& getMessageRef() const;
 };
 
 

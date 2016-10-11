@@ -21,3 +21,15 @@ QString ChatLine::getWho() const {
 QString ChatLine::getMessage() const {
     return message_;
 }
+
+const QString& ChatLine::getTimeRef() const {
+    return time_;
+}
+
+const QString& ChatLine::getWhoRef() const {
+    return who_;
+}
+
+const QString& ChatLine::getMessageRef() const {
+    return message_;
+}

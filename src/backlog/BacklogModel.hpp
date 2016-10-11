@@ -3,6 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <array>
+#include "../ChatLine.hpp"
 
 
 class BacklogModel : public QAbstractItemModel {
@@ -23,7 +24,6 @@ public:
                     const QString& nick,
                     const QString& message);
 private:
-    typedef std::array<QString, 3> ChatLine;
     std::list<ChatLine> messages_;
 };
 
