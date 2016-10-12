@@ -19,7 +19,6 @@ set(SRC_CLIENT
     src/HarpoonClient.cpp src/HarpoonClient.hpp
     src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
     src/userlist/UserTreeModel.cpp src/userlist/UserTreeModel.hpp
-    src/backlog/BacklogModel.cpp src/backlog/BacklogModel.hpp
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)

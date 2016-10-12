@@ -53,7 +53,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 if (channel == activeChannel)
                     topicView->setText(topic);
                 channel->setTopic(topic);
-                channel->getBacklogModel()->addMessage(timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic);
+                channel->addMessage(timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic);
             });
 
     connect(&client, &HarpoonClient::nickChange, [this](const QString& serverId,
@@ -68,7 +68,7 @@ ChatUi::ChatUi(HarpoonClient& client)
 
                 for (auto& channel : server->getChannels()) {
                     if (channel->getUserTreeModel()->renameUser(User::stripNick(nick), newNick))
-                        channel->getBacklogModel()->addMessage(timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick);
+                        channel->addMessage(timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick);
                 }
             });
 
@@ -88,7 +88,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                          bool notice) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
-                channel->getBacklogModel()->addMessage(timestamp, notice ? '['+nick+']' : nick, message);
+                channel->addMessage(timestamp, notice ? '['+nick+']' : nick, message);
             });
 
     connect(&client, &HarpoonClient::chatAction, [this](const QString& serverId,
@@ -98,7 +98,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                         const QString& message) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
-                channel->getBacklogModel()->addMessage(timestamp, "*", nick + " " + message);
+                channel->addMessage(timestamp, "*", nick + " " + message);
             });
 
     connect(&client, &HarpoonClient::joinChannel, [this](const QString& serverId,
@@ -117,7 +117,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                     Channel* channel = channelTreeModel.getChannel(server, channelName);
                     if (channel == nullptr) return;
                     channel->getUserTreeModel()->addUser(std::make_shared<User>(nick));
-                    channel->getBacklogModel()->addMessage(timestamp, "-->", nick + " joined the channel");
+                    channel->addMessage(timestamp, "-->", nick + " joined the channel");
                 }
             });
 
@@ -137,7 +137,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                     Channel* channel = channelTreeModel.getChannel(server, channelName);
                     if (channel == nullptr) return;
                     channel->getUserTreeModel()->removeUser(User::stripNick(nick));
-                    channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " left the channel");
+                    channel->addMessage(timestamp, "<--", nick + " left the channel");
                 }
             });
 
@@ -148,7 +148,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
                 channel->getUserTreeModel()->removeUser(User::stripNick(nick));
-                channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " was kicked from the channel");
+                channel->addMessage(timestamp, "<--", nick + " was kicked from the channel");
             });
 
     connect(&client, &HarpoonClient::quitServer, [this](const QString& serverId,
@@ -157,7 +157,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 for (auto& server : channelTreeModel.getServers()) {
                     for (auto& channel : server->getChannels()) {
                         if (channel->getUserTreeModel()->removeUser(User::stripNick(nick)))
-                            channel->getBacklogModel()->addMessage(timestamp, "<--", nick + " has quit");
+                            channel->addMessage(timestamp, "<--", nick + " has quit");
                     }
                 }
             });

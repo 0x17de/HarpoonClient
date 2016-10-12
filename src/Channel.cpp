@@ -12,28 +12,41 @@ Channel::Channel(Server* server,
     , name_{name}
     , disabled_{disabled}
     , backlogCanvas_{&backlogScene_}
+    , splitting_{0.15, 0.15, 0.7}
 {
-    backlogView_.setModel(&backlogModel_);
     userTreeView_.setModel(&userTreeModel_);
     backlogCanvas_.setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     connect(&userTreeModel_, &UserTreeModel::expand, this, &Channel::expandUserGroup);
+    // TODO: connect on resize event => handle chat view
+}
 
-    // TODO: for debugging reasons, later in scene
-    static size_t row = 0;
-    connect(&backlogModel_, &BacklogModel::rowsInserted, [this](const QModelIndex& index,
-                                                                int rowStart,
-                                                                int rowEnd) {
-                for (size_t i = rowStart; i <= rowEnd; ++i) {
-                    auto time = backlogModel_.data(backlogModel_.index(i, 0, index), Qt::DisplayRole);
-                    backlogScene_.addText(time.toString())->setPos(0, row * 20);
-                    auto nick = backlogModel_.data(backlogModel_.index(i, 1, index), Qt::DisplayRole);
-                    backlogScene_.addText(nick.toString())->setPos(80, row * 20);
-                    auto message = backlogModel_.data(backlogModel_.index(i, 2, index), Qt::DisplayRole);
-                    backlogScene_.addText(message.toString())->setPos(200, row * 20);
-                    ++row;
-                }
-        });
+void Channel::resizeLines() {
+    auto contentsRect = backlogCanvas_.contentsRect();
+    qreal width = contentsRect.width();
+    qreal timeWidth = splitting_[0] * width;
+    qreal whoWidth = splitting_[1] * width;
+    qreal messageWidth = splitting_[2] * width;
+
+    int top = 0;
+    int left = 0;
+    for (auto& line : chatLines_) {
+        left = 0;
+        auto* timeGfx = line.getTimeGfx();
+        auto* whoGfx = line.getWhoGfx();
+        auto* messageGfx = line.getMessageGfx();
+        timeGfx->setTextWidth(timeWidth);
+        whoGfx->setTextWidth(whoWidth);
+        messageGfx->setTextWidth(messageWidth);
+
+        timeGfx->setPos(left, top);
+        left += timeWidth;
+        whoGfx->setPos(left, top);
+        left += whoWidth;
+        messageGfx->setPos(left, top);
+
+        top += std::max({timeGfx->boundingRect().height(), whoGfx->boundingRect().height(), messageGfx->boundingRect().height()});
+    }
 }
 
 Server* Channel::getServer() const {
@@ -63,6 +76,17 @@ void Channel::setDisabled(bool disabled) {
     }
 }
 
+void Channel::addMessage(const QString& time,
+                         const QString& nick,
+                         const QString& message) {
+    chatLines_.emplace_back(time, nick, message);
+    ChatLine& line = chatLines_.back();
+    backlogScene_.addItem(line.getTimeGfx());
+    backlogScene_.addItem(line.getWhoGfx());
+    backlogScene_.addItem(line.getMessageGfx());
+    resizeLines();
+}
+
 void Channel::expandUserGroup(const QModelIndex& index) {
     userTreeView_.setExpanded(index, true);
 }
@@ -77,10 +101,6 @@ UserTreeModel* Channel::getUserTreeModel() {
 
 QTreeView* Channel::getUserTreeView() {
     return &userTreeView_;
-}
-
-BacklogModel* Channel::getBacklogModel() {
-    return &backlogModel_;
 }
 
 void Channel::addUser(std::shared_ptr<User> user) {

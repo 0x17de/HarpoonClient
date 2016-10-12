@@ -7,6 +7,9 @@ ChatLine::ChatLine(const QString& time,
     : time_{time}
     , who_{who}
     , message_{message}
+    , timeGfx_(time)
+    , whoGfx_(who)
+    , messageGfx_(message)
 {
 }
 
@@ -32,4 +35,16 @@ const QString& ChatLine::getWhoRef() const {
 
 const QString& ChatLine::getMessageRef() const {
     return message_;
+}
+
+QGraphicsTextItem* ChatLine::getTimeGfx() {
+    return &timeGfx_;
+}
+
+QGraphicsTextItem* ChatLine::getWhoGfx() {
+    return &whoGfx_;
+}
+
+QGraphicsTextItem* ChatLine::getMessageGfx() {
+    return &messageGfx_;
 }
