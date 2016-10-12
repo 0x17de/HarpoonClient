@@ -14,6 +14,7 @@ Channel::Channel(Server* server,
     , backlogCanvas_{&backlogScene_}
     , splitting_{0.15, 0.15, 0.7}
 {
+    userTreeView_.setHeaderHidden(true);
     userTreeView_.setModel(&userTreeModel_);
     backlogCanvas_.setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
