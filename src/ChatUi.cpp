@@ -88,7 +88,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                          bool notice) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
-                channel->addMessage(timestamp, notice ? '['+nick+']' : nick, message);
+                channel->addMessage(timestamp, notice ? '['+nick+']' : '<'+nick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
             });
 
     connect(&client, &HarpoonClient::chatAction, [this](const QString& serverId,

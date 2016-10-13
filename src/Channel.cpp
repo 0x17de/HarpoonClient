@@ -4,6 +4,8 @@
 #include <QGraphicsTextItem>
 
 
+
+
 Channel::Channel(Server* server,
                  const QString& name,
                  bool disabled)
@@ -79,12 +81,22 @@ void Channel::setDisabled(bool disabled) {
 
 void Channel::addMessage(const QString& time,
                          const QString& nick,
-                         const QString& message) {
+                         const QString& message,
+                         const MessageColor color) {
     chatLines_.emplace_back(time, nick, message);
     ChatLine& line = chatLines_.back();
     backlogScene_.addItem(line.getTimeGfx());
     backlogScene_.addItem(line.getWhoGfx());
     backlogScene_.addItem(line.getMessageGfx());
+
+    switch (color) {
+    case MessageColor::Notice:
+        line.getTimeGfx()->setDefaultTextColor(Qt::darkYellow);
+        line.getWhoGfx()->setDefaultTextColor(Qt::darkYellow);
+        line.getMessageGfx()->setDefaultTextColor(Qt::darkYellow);
+        break;
+    }
+
     resizeLines();
 }
 

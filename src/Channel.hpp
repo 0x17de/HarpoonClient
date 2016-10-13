@@ -7,6 +7,7 @@
 #include <QTreeView>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QFont>
 #include <list>
 #include <memory>
 
@@ -14,6 +15,11 @@
 #include "TreeEntry.hpp"
 #include "userlist/UserTreeModel.hpp"
 
+
+enum class MessageColor {
+    Default,
+    Notice
+};
 
 class Server;
 class Channel : public TreeEntry {
@@ -47,7 +53,8 @@ public:
     void addUser(std::shared_ptr<User> user);
     void addMessage(const QString& time,
                     const QString& nick,
-                    const QString& message);
+                    const QString& message,
+                    const MessageColor color = MessageColor::Default);
     void resetUsers(std::list<std::shared_ptr<User>>& users);
     User* getUser(QString nick);
     QGraphicsView* getBacklogView();
