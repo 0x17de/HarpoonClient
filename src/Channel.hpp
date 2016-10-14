@@ -16,11 +16,6 @@
 #include "userlist/UserTreeModel.hpp"
 
 
-enum class MessageColor {
-    Default,
-    Notice
-};
-
 class Server;
 class Channel : public TreeEntry {
     Q_OBJECT

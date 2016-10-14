@@ -53,7 +53,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 if (channel == activeChannel)
                     topicView->setText(topic);
                 channel->setTopic(topic);
-                channel->addMessage(timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic);
+                channel->addMessage(timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
             });
 
     connect(&client, &HarpoonClient::nickChange, [this](const QString& serverId,
@@ -68,7 +68,7 @@ ChatUi::ChatUi(HarpoonClient& client)
 
                 for (auto& channel : server->getChannels()) {
                     if (channel->getUserTreeModel()->renameUser(User::stripNick(nick), newNick))
-                        channel->addMessage(timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick);
+                        channel->addMessage(timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick, MessageColor::Event);
                 }
             });
 
@@ -88,7 +88,8 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                          bool notice) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
-                channel->addMessage(timestamp, notice ? '['+nick+']' : '<'+nick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
+                auto sNick = User::stripNick(nick);
+                channel->addMessage(timestamp, notice ? '['+sNick+']' : '<'+sNick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
             });
 
     connect(&client, &HarpoonClient::chatAction, [this](const QString& serverId,
@@ -98,7 +99,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                         const QString& message) {
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
-                channel->addMessage(timestamp, "*", nick + " " + message);
+                channel->addMessage(timestamp, "*", User::stripNick(nick) + " " + message, MessageColor::Action);
             });
 
     connect(&client, &HarpoonClient::joinChannel, [this](const QString& serverId,
@@ -117,7 +118,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                     Channel* channel = channelTreeModel.getChannel(server, channelName);
                     if (channel == nullptr) return;
                     channel->getUserTreeModel()->addUser(std::make_shared<User>(nick));
-                    channel->addMessage(timestamp, "-->", nick + " joined the channel");
+                    channel->addMessage(timestamp, "-->", nick + " joined the channel", MessageColor::Event);
                 }
             });
 
@@ -137,7 +138,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                     Channel* channel = channelTreeModel.getChannel(server, channelName);
                     if (channel == nullptr) return;
                     channel->getUserTreeModel()->removeUser(User::stripNick(nick));
-                    channel->addMessage(timestamp, "<--", nick + " left the channel");
+                    channel->addMessage(timestamp, "<--", nick + " left the channel", MessageColor::Event);
                 }
             });
 
@@ -148,7 +149,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 Channel* channel = channelTreeModel.getChannel(serverId, channelName);
                 if (channel == nullptr) return;
                 channel->getUserTreeModel()->removeUser(User::stripNick(nick));
-                channel->addMessage(timestamp, "<--", nick + " was kicked from the channel");
+                channel->addMessage(timestamp, "<--", nick + " was kicked from the channel", MessageColor::Event);
             });
 
     connect(&client, &HarpoonClient::quitServer, [this](const QString& serverId,
@@ -157,7 +158,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 for (auto& server : channelTreeModel.getServers()) {
                     for (auto& channel : server->getChannels()) {
                         if (channel->getUserTreeModel()->removeUser(User::stripNick(nick)))
-                            channel->addMessage(timestamp, "<--", nick + " has quit");
+                            channel->addMessage(timestamp, "<--", nick + " has quit", MessageColor::Event);
                     }
                 }
             });

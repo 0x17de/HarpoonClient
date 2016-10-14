@@ -6,6 +6,13 @@
 #include <QGraphicsTextItem>
 
 
+enum class MessageColor {
+    Default,
+    Notice,
+    Event,
+    Action
+};
+
 class ChatLine {
     QString time_;
     QString who_;
@@ -17,7 +24,8 @@ class ChatLine {
 public:
     ChatLine(const QString& time,
              const QString& who,
-             const QString& message);
+             const QString& message,
+             const MessageColor color = MessageColor::Default);
 
     QString getTime() const;
     QString getWho() const;
