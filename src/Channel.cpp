@@ -2,7 +2,8 @@
 
 #include <QStackedWidget>
 #include <QGraphicsTextItem>
-
+#include <QTextBlockFormat>
+#include <QTextCursor>
 
 
 
@@ -14,11 +15,12 @@ Channel::Channel(Server* server,
     , name_{name}
     , disabled_{disabled}
     , backlogCanvas_{&backlogScene_}
-    , splitting_{0.15, 0.15, 0.7}
+    , splitting_{75, 0.2, 0.8}
 {
     userTreeView_.setHeaderHidden(true);
     userTreeView_.setModel(&userTreeModel_);
     backlogCanvas_.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    backlogCanvas_.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     connect(&userTreeModel_, &UserTreeModel::expand, this, &Channel::expandUserGroup);
     // TODO: connect on resize event => handle chat view
@@ -27,7 +29,8 @@ Channel::Channel(Server* server,
 void Channel::resizeLines() {
     auto contentsRect = backlogCanvas_.contentsRect();
     qreal width = contentsRect.width();
-    qreal timeWidth = splitting_[0] * width;
+    qreal timeWidth = splitting_[0]; // time is fixed width
+    width -= splitting_[0];
     qreal whoWidth = splitting_[1] * width;
     qreal messageWidth = splitting_[2] * width;
 
@@ -47,6 +50,15 @@ void Channel::resizeLines() {
         whoGfx->setPos(left, top);
         left += whoWidth;
         messageGfx->setPos(left, top);
+
+        // nick col: align right
+        QTextBlockFormat format;
+        format.setAlignment(Qt::AlignRight);
+        QTextCursor cursor = whoGfx->textCursor();
+        cursor.select(QTextCursor::Document);
+        cursor.mergeBlockFormat(format);
+        cursor.clearSelection();
+        whoGfx->setTextCursor(cursor);
 
         top += std::max({timeGfx->boundingRect().height(), whoGfx->boundingRect().height(), messageGfx->boundingRect().height()});
     }
