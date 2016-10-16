@@ -13,6 +13,7 @@ set(SRC_CLIENT
     src/TreeEntry.cpp src/TreeEntry.hpp
     src/Server.cpp src/Server.hpp
     src/Channel.cpp src/Channel.hpp
+    src/BacklogView.cpp src/BacklogView.hpp
     src/UserGroup.cpp src/UserGroup.hpp
     src/User.cpp src/User.hpp
     src/ChatLine.cpp src/ChatLine.hpp
@@ -26,6 +27,7 @@ qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/channellist/ChannelTreeModel.hpp)
 qt5_wrap_cpp(USERTREEMODEL_SRC src/userlist/UserTreeModel.hpp)
 qt5_wrap_cpp(HARPOONCLIENT_SRC src/HarpoonClient.hpp)
 qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
+qt5_wrap_cpp(BACKLOGVIEW_SRC src/BacklogView.hpp)
 qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
@@ -40,6 +42,7 @@ add_executable(HarpoonClient
     ${USERTREEMODEL_SRC}
     ${HARPOONCLIENT_SRC}
     ${SERVER_SRC}
+    ${BACKLOGVIEW_SRC}
     ${CHANNEL_SRC}
     ${ICONS_SRC}
     )

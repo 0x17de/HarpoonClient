@@ -11,6 +11,7 @@
 #include <list>
 #include <memory>
 
+#include "BacklogView.hpp"
 #include "ChatLine.hpp"
 #include "TreeEntry.hpp"
 #include "userlist/UserTreeModel.hpp"
@@ -27,12 +28,7 @@ class Channel : public TreeEntry {
     bool disabled_;
     QTreeView userTreeView_;
     QGraphicsScene backlogScene_; // TODO: create own class + chat line class
-    QGraphicsView backlogCanvas_;
-
-    std::array<qreal, 3> splitting_;
-    std::list<ChatLine> chatLines_;
-
-    void resizeLines();
+    BacklogView backlogCanvas_;
 
 public:
     Channel(Server* server,
@@ -46,13 +42,9 @@ public:
     bool getDisabled() const;
     void setDisabled(bool disabled);
     void addUser(std::shared_ptr<User> user);
-    void addMessage(const QString& time,
-                    const QString& nick,
-                    const QString& message,
-                    const MessageColor color = MessageColor::Default);
     void resetUsers(std::list<std::shared_ptr<User>>& users);
     User* getUser(QString nick);
-    QGraphicsView* getBacklogView();
+    BacklogView* getBacklogView();
     QTreeView* getUserTreeView();
     UserTreeModel* getUserTreeModel();
 
