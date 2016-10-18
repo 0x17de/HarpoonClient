@@ -1,7 +1,6 @@
 #include "ChatUi.hpp"
 
 #include <QTreeWidget>
-#include <QScrollBar>
 #include <QStackedWidget>
 #include "HarpoonClient.hpp"
 
@@ -241,22 +240,6 @@ void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {
         }
     }
     activateChannel(0);
-}
-
-void ChatUi::beginNewMessage(Channel* channel) {
-    if (activeChannel == nullptr) return;
-    QScrollBar* bar = activeChannel->getBacklogView()->verticalScrollBar();
-    backlogScrollToBottom = activeChannel
-        && (bar == nullptr
-            || bar->sliderPosition() == bar->maximum());
-}
-
-void ChatUi::endNewMessage() {
-    if (activeChannel == nullptr) return;
-    if (backlogScrollToBottom) {
-        QGraphicsView* view = activeChannel->getBacklogView();
-        view->ensureVisible(0, view->scene()->sceneRect().height());
-    }
 }
 
 void ChatUi::messageReturnPressed() {

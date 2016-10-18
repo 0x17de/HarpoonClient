@@ -36,8 +36,6 @@ class ChatUi : public QMainWindow {
 
     QDialog serverConfigurationDialog;
 
-    bool backlogScrollToBottom;
-
 public:
     ChatUi(HarpoonClient& client);
     ~ChatUi();
@@ -54,8 +52,6 @@ public Q_SLOTS:
     void expandServer(const QModelIndex& index);
     void channelConnected(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
-    void beginNewMessage(Channel* channel);
-    void endNewMessage();
     void messageReturnPressed();
 };
 

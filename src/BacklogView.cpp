@@ -2,8 +2,7 @@
 
 #include <QTextBlockFormat>
 #include <QTextCursor>
-
-#include <QDebug> // REMOVE THIS LINE
+#include <QScrollBar>
 
 
 BacklogView::BacklogView(QGraphicsScene* scene)
@@ -19,7 +18,6 @@ void BacklogView::resizeEvent(QResizeEvent* event) {
 void BacklogView::mouseMoveEvent(QMouseEvent* event) {
     // TODO: update cursor if over resize bar
     auto mousePosition = event->localPos();
-    qDebug() << mousePosition.x() << ":" << mousePosition.y();
 }
 
 void BacklogView::resizeLines() {
@@ -64,6 +62,9 @@ void BacklogView::addMessage(const QString& time,
                              const QString& nick,
                              const QString& message,
                              const MessageColor color){
+    QScrollBar* bar = this->verticalScrollBar();
+    bool scrollToBottom = bar != nullptr && bar->sliderPosition() == bar->maximum();
+
     chatLines_.emplace_back(time, nick, message, color);
     ChatLine& line = chatLines_.back();
 
@@ -73,4 +74,7 @@ void BacklogView::addMessage(const QString& time,
     scene->addItem(line.getMessageGfx());
 
     resizeLines();
+
+    if (scrollToBottom)
+        this->ensureVisible(QRectF(0, this->scene()->sceneRect().height(), 0, 0));
 }
