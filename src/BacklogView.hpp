@@ -26,7 +26,8 @@ protected:
 public:
     BacklogView(QGraphicsScene* scene);
 
-    void addMessage(const QString& time,
+    void addMessage(size_t id,
+                    double time,
                     const QString& nick,
                     const QString& message,
                     const MessageColor color = MessageColor::Default);

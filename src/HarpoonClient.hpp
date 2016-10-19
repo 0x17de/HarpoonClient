@@ -45,8 +45,6 @@ private:
     void onBinaryMessage(const QByteArray& data);
     void handleCommand(const QJsonDocument& doc);
 
-    QString formatTimestamp(double timestamp);
-
     void irc_handleChatList(const QJsonObject& root);
     void irc_handleUserList(const QJsonObject& root);
     void irc_handleTopic(const QJsonObject& root);
@@ -71,41 +69,49 @@ signals:
                     const QString& channelName,
                     std::list<std::shared_ptr<User>>& userList);
     void newServer(std::shared_ptr<Server> server);
-    void joinChannel(const QString& serverId,
+    void joinChannel(size_t id,
+                     const QString& serverId,
                      const QString& channelName,
-                     const QString& timestamp,
+                     double timestamp,
                      const QString& nick);
-    void partChannel(const QString& serverId,
+    void partChannel(size_t id,
+                     const QString& serverId,
                      const QString& channelName,
-                     const QString& timestamp,
+                     double timestamp,
                      const QString& nick);
-    void topicChanged(const QString& serverId,
+    void topicChanged(size_t id,
+                      const QString& serverId,
                       const QString& channelName,
-                      const QString& timestamp,
+                      double timestamp,
                       const QString& nick,
                       const QString& topic);
-    void nickChange(const QString& serverId,
-                    const QString& timestamp,
+    void nickChange(size_t id,
+                    const QString& serverId,
+                    double timestamp,
                     const QString& nick,
                     const QString& newNick);
-    void quitServer(const QString& serverId,
-                    const QString& timestamp,
+    void quitServer(size_t id,
+                    const QString& serverId,
+                    double timestamp,
                     const QString& nick);
-    void userKicked(const QString& serverId,
+    void userKicked(size_t id,
+                    const QString& serverId,
                     const QString& channelName,
-                    const QString& timestamp,
+                    double timestamp,
                     const QString& nick,
                     const QString& target,
                     const QString& reason);
-    void chatMessage(const QString& serverId,
+    void chatMessage(size_t id,
+                     const QString& serverId,
                      const QString& channelName,
-                     const QString& timestamp,
+                     double timestamp,
                      const QString& nick,
                      const QString& message,
                      bool notice);
-    void chatAction(const QString& serverId,
+    void chatAction(size_t id,
+                    const QString& serverId,
                     const QString& channelName,
-                    const QString& timestamp,
+                    double timestamp,
                     const QString& nick,
                     const QString& action);
 };

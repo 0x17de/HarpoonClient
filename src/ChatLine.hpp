@@ -14,26 +14,33 @@ enum class MessageColor {
 };
 
 class ChatLine {
-    QString time_;
+    size_t id_;
+    double time_;
+    QString timestamp_;
     QString who_;
     QString message_;
-    QGraphicsTextItem timeGfx_;
+    QGraphicsTextItem timestampGfx_;
     QGraphicsTextItem whoGfx_;
     QGraphicsTextItem messageGfx_;
 
+    static QString formatTimestamp(double timestamp);
+
 public:
-    ChatLine(const QString& time,
+    ChatLine(size_t id,
+             double time,
              const QString& who,
              const QString& message,
              const MessageColor color = MessageColor::Default);
 
-    QString getTime() const;
+    size_t getId() const;
+    double getTime() const;
+    QString getTimestamp() const;
     QString getWho() const;
     QString getMessage() const;
-    const QString& getTimeRef() const;
+    const QString& getTimestampRef() const;
     const QString& getWhoRef() const;
     const QString& getMessageRef() const;
-    QGraphicsTextItem* getTimeGfx();
+    QGraphicsTextItem* getTimestampGfx();
     QGraphicsTextItem* getWhoGfx();
     QGraphicsTextItem* getMessageGfx();
 };

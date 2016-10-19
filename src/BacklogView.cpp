@@ -32,14 +32,14 @@ void BacklogView::resizeLines() {
     int left = 0;
     for (auto& line : chatLines_) {
         left = 0;
-        auto* timeGfx = line.getTimeGfx();
+        auto* timestampGfx = line.getTimestampGfx();
         auto* whoGfx = line.getWhoGfx();
         auto* messageGfx = line.getMessageGfx();
-        timeGfx->setTextWidth(timeWidth);
+        timestampGfx->setTextWidth(timeWidth);
         whoGfx->setTextWidth(whoWidth);
         messageGfx->setTextWidth(messageWidth);
 
-        timeGfx->setPos(left, top);
+        timestampGfx->setPos(left, top);
         left += timeWidth;
         whoGfx->setPos(left, top);
         left += whoWidth;
@@ -54,22 +54,23 @@ void BacklogView::resizeLines() {
         cursor.clearSelection();
         whoGfx->setTextCursor(cursor);
 
-        top += std::max({timeGfx->boundingRect().height(), whoGfx->boundingRect().height(), messageGfx->boundingRect().height()});
+        top += std::max({timestampGfx->boundingRect().height(), whoGfx->boundingRect().height(), messageGfx->boundingRect().height()});
     }
 }
 
-void BacklogView::addMessage(const QString& time,
+void BacklogView::addMessage(size_t id,
+                             double time,
                              const QString& nick,
                              const QString& message,
                              const MessageColor color){
     QScrollBar* bar = this->verticalScrollBar();
     bool scrollToBottom = bar != nullptr && bar->sliderPosition() == bar->maximum();
 
-    chatLines_.emplace_back(time, nick, message, color);
+    chatLines_.emplace_back(id, time, nick, message, color);
     ChatLine& line = chatLines_.back();
 
     QGraphicsScene* scene = this->scene();
-    scene->addItem(line.getTimeGfx());
+    scene->addItem(line.getTimestampGfx());
     scene->addItem(line.getWhoGfx());
     scene->addItem(line.getMessageGfx());
 
