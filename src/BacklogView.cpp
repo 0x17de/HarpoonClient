@@ -66,13 +66,24 @@ void BacklogView::addMessage(size_t id,
     QScrollBar* bar = this->verticalScrollBar();
     bool scrollToBottom = bar != nullptr && bar->sliderPosition() == bar->maximum();
 
-    chatLines_.emplace_back(id, time, nick, message, color);
-    ChatLine& line = chatLines_.back();
+    ChatLine* line;
+    if (chatLines_.size() == 0 || id > chatLines_.back().getId()) {
+        chatLines_.emplace_back(id, time, nick, message, color);
+        line = &chatLines_.back();
+    } else if (id < chatLines_.front().getId()) {
+        chatLines_.emplace_front(id, time, nick, message, color);
+        line = &chatLines_.front();
+    } else {
+        auto it = chatLines_.begin();
+        while (id > it->getId())
+            ++it;
+        chatLines_.emplace(it, id, time, nick, message, color);
+    }
 
     QGraphicsScene* scene = this->scene();
-    scene->addItem(line.getTimestampGfx());
-    scene->addItem(line.getWhoGfx());
-    scene->addItem(line.getMessageGfx());
+    scene->addItem(line->getTimestampGfx());
+    scene->addItem(line->getWhoGfx());
+    scene->addItem(line->getMessageGfx());
 
     resizeLines();
 
