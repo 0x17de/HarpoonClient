@@ -17,7 +17,7 @@ class BacklogView : public QGraphicsView {
     std::array<qreal, 3> splitting_;
     std::list<ChatLine> chatLines_;
 
-    void resizeLines();
+    void updateLayout();
 
 protected:
     virtual void resizeEvent(QResizeEvent* event);
@@ -30,7 +30,8 @@ public:
                     double time,
                     const QString& nick,
                     const QString& message,
-                    const MessageColor color = MessageColor::Default);
+                    const MessageColor color = MessageColor::Default,
+                    bool bUpdateLayout = true);
 };
 
 

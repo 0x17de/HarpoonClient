@@ -12,7 +12,7 @@ BacklogView::BacklogView(QGraphicsScene* scene)
 }
 
 void BacklogView::resizeEvent(QResizeEvent* event) {
-    resizeLines();
+    updateLayout();
 }
 
 void BacklogView::mouseMoveEvent(QMouseEvent* event) {
@@ -20,7 +20,7 @@ void BacklogView::mouseMoveEvent(QMouseEvent* event) {
     auto mousePosition = event->localPos();
 }
 
-void BacklogView::resizeLines() {
+void BacklogView::updateLayout() {
     auto contentsRect = this->contentsRect();
     qreal width = contentsRect.width();
     qreal timeWidth = splitting_[0]; // time is fixed width
@@ -62,7 +62,8 @@ void BacklogView::addMessage(size_t id,
                              double time,
                              const QString& nick,
                              const QString& message,
-                             const MessageColor color){
+                             const MessageColor color,
+                             bool bUpdateLayout){
     QScrollBar* bar = this->verticalScrollBar();
     bool scrollToBottom = bar != nullptr && bar->sliderPosition() == bar->maximum();
 
@@ -85,7 +86,8 @@ void BacklogView::addMessage(size_t id,
     scene->addItem(line->getWhoGfx());
     scene->addItem(line->getMessageGfx());
 
-    resizeLines();
+    if (bUpdateLayout)
+        updateLayout();
 
     if (scrollToBottom)
         this->ensureVisible(QRectF(0, this->scene()->sceneRect().height(), 0, 0));
