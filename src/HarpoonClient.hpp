@@ -62,6 +62,7 @@ private:
 
 public Q_SLOTS:
     void sendMessage(Channel* channel, const QString& message);
+    void backlogRequest(Channel* channel);
 
 signals:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);

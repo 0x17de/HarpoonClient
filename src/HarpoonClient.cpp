@@ -82,6 +82,10 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
     handleCommand(doc);
 }
 
+void HarpoonClient::backlogRequest(Channel* channel) {
+    // TODO: handle backlog request
+}
+
 void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
     // TODO: only irc works yet.
     if (message.count() == 0)

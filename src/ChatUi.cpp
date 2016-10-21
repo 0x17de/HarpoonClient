@@ -210,6 +210,7 @@ void ChatUi::expandServer(const QModelIndex& index) {
 }
 
 void ChatUi::channelConnected(Channel* channel) {
+    connect(channel, &Channel::backlogRequest, &client, &HarpoonClient::backlogRequest);
     userViews->addWidget(channel->getUserTreeView());
     backlogViews->addWidget(channel->getBacklogView());
 }
@@ -232,6 +233,7 @@ void ChatUi::activateChannel(Channel* channel) {
         if (channel->getBacklogView()->parentWidget() != nullptr)
             backlogViews->setCurrentWidget(channel->getBacklogView());
         topicView->setText(channel->getTopic());
+        channel->activate();
     } else {
         setWindowTitle("Harpoon");
         activeChannel = 0;

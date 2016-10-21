@@ -21,6 +21,8 @@ class Server;
 class Channel : public TreeEntry {
     Q_OBJECT
 
+    bool backlogRequested;
+
     Server* server_;
     QString name_;
     QString topic_;
@@ -47,6 +49,7 @@ public:
     BacklogView* getBacklogView();
     QTreeView* getUserTreeView();
     UserTreeModel* getUserTreeModel();
+    void activate();
 
 public Q_SLOTS:
     void expandUserGroup(const QModelIndex& index);
@@ -55,6 +58,7 @@ signals:
     void channelDataChanged(Channel* channel);
     void beginAddUser(User* user);
     void endAddUser();
+    void backlogRequest(Channel* channel);
 };
 
 

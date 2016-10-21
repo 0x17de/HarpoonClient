@@ -4,13 +4,14 @@
 #include <QGraphicsTextItem>
 #include <QTextBlockFormat>
 #include <QTextCursor>
-
+#include <QScrollBar>
 
 
 Channel::Channel(Server* server,
                  const QString& name,
                  bool disabled)
     : TreeEntry('c')
+    , backlogRequested{false}
     , server_{server}
     , name_{name}
     , disabled_{disabled}
@@ -23,6 +24,16 @@ Channel::Channel(Server* server,
 
     connect(&userTreeModel_, &UserTreeModel::expand, this, &Channel::expandUserGroup);
     // TODO: connect on resize event => handle chat view
+}
+
+void Channel::activate() {
+    QScrollBar* bar = backlogCanvas_.verticalScrollBar();
+    if (bar && bar->sliderPosition() == 0) {
+        if (!backlogRequested) {
+            backlogRequested = true;
+            emit backlogRequest(this);
+        }
+    }
 }
 
 Server* Channel::getServer() const {
