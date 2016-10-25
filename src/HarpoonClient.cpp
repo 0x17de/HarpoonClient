@@ -84,6 +84,7 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
 
 void HarpoonClient::backlogRequest(Channel* channel) {
     // TODO: handle backlog request
+    size_t firstId = channel->getServer()->getFirstId();
 }
 
 void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
@@ -196,6 +197,7 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
     QString name = nameValue.toString();
 
     // no nick yet, also inactive
+    // TODO: firstId for new servers
     emit newServer(std::make_shared<Server>("", serverId, name, true));
 }
 
@@ -426,6 +428,11 @@ void HarpoonClient::irc_handleAction(const QJsonObject& root) {
 void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
     std::list<std::shared_ptr<Server>> serverList;
 
+    QJsonValue firstIdValue = root.value("firstId");
+    if (!firstIdValue.isString()) return;
+    size_t firstId;
+    std::istringstream(firstIdValue.toString().toStdString()) >> firstId;
+
     QJsonValue serversValue = root.value("servers");
     if (!serversValue.isObject()) return;
 
@@ -462,7 +469,7 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
             auto channelDisabledValue = channelData.value("disabled");
             bool channelDisabled = channelDisabledValue.isBool() && channelDisabledValue.toBool();
 
-            auto currentChannel = std::make_shared<Channel>(currentServer.get(), channelName, channelDisabled);
+            auto currentChannel = std::make_shared<Channel>(firstId, currentServer.get(), channelName, channelDisabled);
             currentServer->addChannel(currentChannel);
 
             QJsonObject channel = channelValue.toObject();

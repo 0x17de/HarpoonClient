@@ -7,7 +7,8 @@
 #include <QScrollBar>
 
 
-Channel::Channel(Server* server,
+Channel::Channel(size_t firstId,
+                 Server* server,
                  const QString& name,
                  bool disabled)
     : TreeEntry('c')
@@ -34,6 +35,10 @@ void Channel::activate() {
             emit backlogRequest(this);
         }
     }
+}
+
+size_t Channel::getFirstId() const {
+    return firstId_;
 }
 
 Server* Channel::getServer() const {

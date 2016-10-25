@@ -23,6 +23,7 @@ class Channel : public TreeEntry {
 
     bool backlogRequested;
 
+    size_t firstId_;
     Server* server_;
     QString name_;
     QString topic_;
@@ -33,10 +34,12 @@ class Channel : public TreeEntry {
     BacklogView backlogCanvas_;
 
 public:
-    Channel(Server* server,
+    Channel(size_t firstId,
+            Server* server,
             const QString& name,
             bool disabled);
 
+    size_t getFirstId() const;
     Server* getServer() const;
     QString getName() const;
     void setTopic(const QString& topic);
