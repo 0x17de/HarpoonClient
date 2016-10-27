@@ -17,6 +17,8 @@ ChatUi::ChatUi(HarpoonClient& client)
     clientUi.setupUi(this);
     serverConfigurationDialogUi.setupUi(&serverConfigurationDialog);
 
+    serverConfigurationDialogUi.username->setText(settings.value("username", "user").toString());
+    serverConfigurationDialogUi.password->setText(settings.value("password", "password").toString());
     serverConfigurationDialogUi.host->setText(settings.value("host", "ws://localhost:8080/ws").toString());
 
     // assign views
@@ -31,9 +33,13 @@ ChatUi::ChatUi(HarpoonClient& client)
     // server configuration dialog handling
     connect(clientUi.actionConfigure_Server, &QAction::triggered, [this] { showConfigureServerDialog(); });
     connect(&serverConfigurationDialog, &QDialog::accepted, [this] {
+            QString username = serverConfigurationDialogUi.username->text();
+            QString password = serverConfigurationDialogUi.password->text();
             QString host = serverConfigurationDialogUi.host->text();
+            settings.setValue("username", username);
+            settings.setValue("password", password);
             settings.setValue("host", host);
-            this->client.reconnect(host);
+            this->client.reconnect(username, password, host);
         });
 
     // channel list events
@@ -116,7 +122,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 if (server->getActiveNick() == User::stripNick(nick)) { // this user
                     Channel* channel = channelTreeModel.getChannel(server, channelName);
                     if (channel == nullptr) // does not exist yet
-                        server->addChannel(std::make_shared<Channel>(server, channelName, false));
+                        server->addChannel(std::make_shared<Channel>(0 /* TODO */, server, channelName, false));
                     else // re-activate
                         channel->setDisabled(false);
                 } else {
@@ -137,7 +143,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                 if (server->getActiveNick() == User::stripNick(nick)) { // this user
                     Channel* channel = channelTreeModel.getChannel(server, channelName);
                     if (channel == nullptr) // does not exist yet
-                        server->addChannel(std::make_shared<Channel>(server, channelName, true));
+                        server->addChannel(std::make_shared<Channel>(0 /* TODO */, server, channelName, true));
                     else // disable
                         channel->setDisabled(true);
                 } else {

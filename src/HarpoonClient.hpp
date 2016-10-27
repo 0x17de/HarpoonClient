@@ -23,6 +23,8 @@ class HarpoonClient : public QObject {
     bool shutdown;
 
     QUrl harpoonUrl;
+    QString username;
+    QString password;
 
     QWebSocket ws_;
 
@@ -35,7 +37,9 @@ public:
     HarpoonClient();
     ~HarpoonClient();
     void run();
-    void reconnect(const QString& host);
+    void reconnect(const QString& username,
+                   const QString& password,
+                   const QString& host);
     QSettings& getSettings();
 
 private:

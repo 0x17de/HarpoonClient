@@ -26,6 +26,8 @@ HarpoonClient::HarpoonClient()
     connect(&pingTimer, &QTimer::timeout, this, &HarpoonClient::onPingTimer);
 
     reconnectTimer.setSingleShot(true);
+    username = settings.value("username", "user").toString();
+    password = settings.value("password", "password").toString();
     harpoonUrl = settings.value("host", "ws://localhost:8080/ws").toString();
 }
 
@@ -33,8 +35,13 @@ HarpoonClient::~HarpoonClient() {
     shutdown = true;
 }
 
-void HarpoonClient::reconnect(const QString& host) {
+void HarpoonClient::reconnect(const QString& lusername,
+                              const QString& lpassword,
+                              const QString& host) {
+    qDebug() << "reconnect";
     ws_.close();
+    username = lusername;
+    password = lpassword;
     harpoonUrl = host;
 }
 
@@ -57,7 +64,8 @@ void HarpoonClient::onPingTimer() {
 
 void HarpoonClient::onConnected() {
     qDebug() << "connected";
-    ws_.sendTextMessage("LOGIN user password\n");
+    QString loginCommand = QString("LOGIN ") + username + " " + password + "\n";
+    ws_.sendTextMessage(loginCommand);
     pingTimer.start(60000);
 }
 
@@ -84,7 +92,7 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
 
 void HarpoonClient::backlogRequest(Channel* channel) {
     // TODO: handle backlog request
-    size_t firstId = channel->getServer()->getFirstId();
+    size_t firstId = channel->getFirstId();
 }
 
 void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
@@ -94,7 +102,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
     QJsonObject root;
     if (message.at(0) != '/' || (message.count() > 2 && message.at(1) == '/')) {
         root["cmd"] = "chat";
-        root["type"] = "irc";
+        root["protocol"] = "irc";
         root["server"] = channel->getServer()->getId();
         root["channel"] = channel->getName();
         root["msg"] = message;
@@ -106,7 +114,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
 
         if (cmd == "me") {
             root["cmd"] = "action";
-            root["type"] = "irc";
+            root["protocol"] = "irc";
             root["server"] = channel->getServer()->getId();
             root["channel"] = channel->getName();
             root["msg"] = message.mid(cmd.count()+2);
@@ -114,7 +122,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
             if (parts.count() < 2)
                 return;
             root["cmd"] = "nick";
-            root["type"] = "irc";
+            root["protocol"] = "irc";
             root["server"] = channel->getServer()->getId();
             root["nick"] = parts.at(1);
         } else if (cmd == "join") {
@@ -123,7 +131,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
                 return;
             QString channelName = parts.at(1);
             root["cmd"] = "join";
-            root["type"] = "irc";
+            root["protocol"] = "irc";
             root["server"] = channel->getServer()->getId();
             root["channel"] = channelName;
             root["password"] = parts.count() == 3 ? parts.at(2) : "";
@@ -131,7 +139,7 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
             // TODO: part stub
             QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
             root["cmd"] = "part";
-            root["type"] = "irc";
+            root["protocol"] = "irc";
             root["server"] = channel->getServer()->getId();
             root["channel"] = channelName;
         } else {
@@ -148,7 +156,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     QJsonValue cmdValue = root.value("cmd");
     if (!cmdValue.isString()) return;
 
-    QJsonValue typeValue = root.value("type");
+    QJsonValue typeValue = root.value("protocol");
     QString type = typeValue.isString() ? typeValue.toString() : "";
 
     QString cmd = cmdValue.toString();
