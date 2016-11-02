@@ -32,12 +32,14 @@ qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
+qt5_wrap_ui(SETTINGSUI_HEADERS ui_forms/settings.ui)
+qt5_wrap_ui(IRCCONFIGUI_HEADERS ui_forms/ircSettings.ui)
 
 add_executable(HarpoonClient
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
     ${CHATUI_SRC}
-    ${SERVERCONFIGUI_HEADERS}
+    ${SETTINGSUI_HEADERS}
     ${CHANNELTREEMODEL_SRC}
     ${USERTREEMODEL_SRC}
     ${HARPOONCLIENT_SRC}
@@ -45,6 +47,8 @@ add_executable(HarpoonClient
     ${BACKLOGVIEW_SRC}
     ${CHANNEL_SRC}
     ${ICONS_SRC}
+    ${SERVERCONFIGUI_HEADERS}
+    ${IRCCONFIGUI_HEADERS}
     )
 target_include_directories(HarpoonClient PUBLIC src)
 target_link_libraries(HarpoonClient Qt5::Widgets Qt5::WebSockets)
