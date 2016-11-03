@@ -17,6 +17,13 @@ ChatUi::ChatUi(HarpoonClient& client)
     clientUi.setupUi(this);
     serverConfigurationDialogUi.setupUi(&serverConfigurationDialog);
 
+    // settings dialog
+    settingsDialogUi.setupUi(&settingsDialog);
+    ircSettingsUi.setupUi(&ircSettingsWidget);
+
+    settingsDialogUi.protocolSettings->addWidget(&ircSettingsWidget);
+
+    // bouncer configuration
     serverConfigurationDialogUi.username->setText(settings.value("username", "user").toString());
     serverConfigurationDialogUi.password->setText(settings.value("password", "password").toString());
     serverConfigurationDialogUi.host->setText(settings.value("host", "ws://localhost:8080/ws").toString());

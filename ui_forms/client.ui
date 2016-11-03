@@ -64,6 +64,7 @@
      <string>File</string>
     </property>
     <addaction name="actionConfigure_Server"/>
+    <addaction name="actionConfigure_Networks"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -77,7 +78,12 @@
   </action>
   <action name="actionConfigure_Server">
    <property name="text">
-    <string>Configure Server</string>
+    <string>Configure Bouncer</string>
+   </property>
+  </action>
+  <action name="actionConfigure_Networks">
+   <property name="text">
+    <string>Configure Networks</string>
    </property>
   </action>
  </widget>

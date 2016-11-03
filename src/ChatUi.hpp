@@ -7,6 +7,8 @@
 #include "channellist/ChannelTreeModel.hpp"
 #include "ui_client.h"
 #include "ui_serverConfigurationDialog.h"
+#include "ui_settings.h"
+#include "ui_ircSettings.h"
 
 
 class Server;
@@ -22,6 +24,8 @@ class ChatUi : public QMainWindow {
 
     Ui::Client clientUi;
     Ui::ServerConfigurationDialog serverConfigurationDialogUi;
+    Ui::Settings settingsDialogUi;
+    Ui::IrcSettings ircSettingsUi;
 
     QSettings& settings;
     HarpoonClient& client;
@@ -35,6 +39,8 @@ class ChatUi : public QMainWindow {
     Channel* activeChannel;
 
     QDialog serverConfigurationDialog;
+    QDialog settingsDialog;
+    QWidget ircSettingsWidget;
 
 public:
     ChatUi(HarpoonClient& client);
