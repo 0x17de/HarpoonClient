@@ -15,7 +15,7 @@ ChatUi::ChatUi(HarpoonClient& client)
     , settings{client.getSettings()}
 {
     clientUi.setupUi(this);
-    serverConfigurationDialogUi.setupUi(&serverConfigurationDialog);
+    bouncerConfigurationDialogUi.setupUi(&bouncerConfigurationDialog);
 
     // settings dialog
     settingsDialogUi.setupUi(&settingsDialog);
@@ -24,9 +24,9 @@ ChatUi::ChatUi(HarpoonClient& client)
     settingsDialogUi.protocolSettings->addWidget(&ircSettingsWidget);
 
     // bouncer configuration
-    serverConfigurationDialogUi.username->setText(settings.value("username", "user").toString());
-    serverConfigurationDialogUi.password->setText(settings.value("password", "password").toString());
-    serverConfigurationDialogUi.host->setText(settings.value("host", "ws://localhost:8080/ws").toString());
+    bouncerConfigurationDialogUi.username->setText(settings.value("username", "user").toString());
+    bouncerConfigurationDialogUi.password->setText(settings.value("password", "password").toString());
+    bouncerConfigurationDialogUi.host->setText(settings.value("host", "ws://localhost:8080/ws").toString());
 
     // assign views
     channelView = clientUi.channels;
@@ -37,12 +37,15 @@ ChatUi::ChatUi(HarpoonClient& client)
 
     QSplitter* chatSplitter = clientUi.chatSplitter;
 
-    // server configuration dialog handling
-    connect(clientUi.actionConfigure_Server, &QAction::triggered, [this] { showConfigureServerDialog(); });
-    connect(&serverConfigurationDialog, &QDialog::accepted, [this] {
-            QString username = serverConfigurationDialogUi.username->text();
-            QString password = serverConfigurationDialogUi.password->text();
-            QString host = serverConfigurationDialogUi.host->text();
+    // network configuration
+    connect(clientUi.actionConfigure_Networks, &QAction::triggered, [this] { showConfigureNetworksDialog(); });
+
+    // bouncer configuration dialog handling
+    connect(clientUi.actionConfigure_Server, &QAction::triggered, [this] { showConfigureBouncerDialog(); });
+    connect(&bouncerConfigurationDialog, &QDialog::accepted, [this] {
+            QString username = bouncerConfigurationDialogUi.username->text();
+            QString password = bouncerConfigurationDialogUi.password->text();
+            QString host = bouncerConfigurationDialogUi.host->text();
             settings.setValue("username", username);
             settings.setValue("password", password);
             settings.setValue("host", host);
@@ -214,8 +217,12 @@ ChatUi::~ChatUi() {
     channelView->setModel(0);
 }
 
-void ChatUi::showConfigureServerDialog() {
-    serverConfigurationDialog.show();
+void ChatUi::showConfigureBouncerDialog() {
+    bouncerConfigurationDialog.show();
+}
+
+void ChatUi::showConfigureNetworksDialog() {
+    settingsDialog.show();
 }
 
 void ChatUi::expandServer(const QModelIndex& index) {

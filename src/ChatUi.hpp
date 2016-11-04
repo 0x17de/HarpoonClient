@@ -23,7 +23,7 @@ class ChatUi : public QMainWindow {
     Q_OBJECT
 
     Ui::Client clientUi;
-    Ui::ServerConfigurationDialog serverConfigurationDialogUi;
+    Ui::ServerConfigurationDialog bouncerConfigurationDialogUi;
     Ui::Settings settingsDialogUi;
     Ui::IrcSettings ircSettingsUi;
 
@@ -38,7 +38,7 @@ class ChatUi : public QMainWindow {
     QLineEdit* messageInputView;
     Channel* activeChannel;
 
-    QDialog serverConfigurationDialog;
+    QDialog bouncerConfigurationDialog;
     QDialog settingsDialog;
     QWidget ircSettingsWidget;
 
@@ -48,7 +48,8 @@ public:
 
 private:
     void activateChannel(Channel* channel);
-    void showConfigureServerDialog();
+    void showConfigureNetworksDialog();
+    void showConfigureBouncerDialog();
 
 signals:
     void sendMessage(Channel* channel, const QString& message);
