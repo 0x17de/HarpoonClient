@@ -4,11 +4,10 @@
 #include <QSettings>
 #include <list>
 #include <memory>
+#include "SettingsDialog.hpp"
 #include "channellist/ChannelTreeModel.hpp"
 #include "ui_client.h"
 #include "ui_serverConfigurationDialog.h"
-#include "ui_settings.h"
-#include "ui_ircSettings.h"
 
 
 class Server;
@@ -24,8 +23,6 @@ class ChatUi : public QMainWindow {
 
     Ui::Client clientUi;
     Ui::ServerConfigurationDialog bouncerConfigurationDialogUi;
-    Ui::Settings settingsDialogUi;
-    Ui::IrcSettings ircSettingsUi;
 
     QSettings& settings;
     HarpoonClient& client;
@@ -39,8 +36,7 @@ class ChatUi : public QMainWindow {
     Channel* activeChannel;
 
     QDialog bouncerConfigurationDialog;
-    QDialog settingsDialog;
-    QWidget ircSettingsWidget;
+    SettingsDialog settingsDialog;
 
 public:
     ChatUi(HarpoonClient& client);

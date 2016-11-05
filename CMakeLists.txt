@@ -17,6 +17,7 @@ set(SRC_CLIENT
     src/UserGroup.cpp src/UserGroup.hpp
     src/User.cpp src/User.hpp
     src/ChatLine.cpp src/ChatLine.hpp
+    src/SettingsDialog.cpp src/SettingsDialog.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp
     src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
     src/userlist/UserTreeModel.cpp src/userlist/UserTreeModel.hpp
@@ -30,6 +31,7 @@ qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
 qt5_wrap_cpp(BACKLOGVIEW_SRC src/BacklogView.hpp)
 qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
+qt5_wrap_cpp(SETTINGSDIALOG_SRC src/SettingsDialog.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
 qt5_wrap_ui(SETTINGSUI_HEADERS ui_forms/settings.ui)
@@ -39,6 +41,7 @@ add_executable(HarpoonClient
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
     ${CHATUI_SRC}
+    ${SETTINGSDIALOG_SRC}
     ${SETTINGSUI_HEADERS}
     ${CHANNELTREEMODEL_SRC}
     ${USERTREEMODEL_SRC}

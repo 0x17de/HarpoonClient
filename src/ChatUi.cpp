@@ -17,12 +17,6 @@ ChatUi::ChatUi(HarpoonClient& client)
     clientUi.setupUi(this);
     bouncerConfigurationDialogUi.setupUi(&bouncerConfigurationDialog);
 
-    // settings dialog
-    settingsDialogUi.setupUi(&settingsDialog);
-    ircSettingsUi.setupUi(&ircSettingsWidget);
-
-    settingsDialogUi.protocolSettings->addWidget(&ircSettingsWidget);
-
     // bouncer configuration
     bouncerConfigurationDialogUi.username->setText(settings.value("username", "user").toString());
     bouncerConfigurationDialogUi.password->setText(settings.value("password", "password").toString());
