@@ -13,7 +13,7 @@ class Host; // will be added in server.hpp
 class SettingsDialog : public QObject {
     Q_OBJECT
 
-    Ui::Settings settingsDialogUi_;
+    Ui::SettingsDialog settingsDialogUi_;
     Ui::IrcSettings ircSettingsUi_;
     QDialog settingsDialog_;
     QWidget ircSettingsWidget_;
