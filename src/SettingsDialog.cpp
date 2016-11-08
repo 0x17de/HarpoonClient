@@ -7,6 +7,7 @@ SettingsDialog::SettingsDialog() {
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
 
     settingsDialogUi_.protocolSettings->addWidget(&ircSettingsWidget_);
+    ircSettingsUi_.serverList->setModel(&ircSettingsServerTreeModel);
 }
 
 SettingsDialog::~SettingsDialog() {

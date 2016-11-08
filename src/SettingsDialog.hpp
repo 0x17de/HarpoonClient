@@ -7,11 +7,14 @@
 #include "Server.hpp"
 #include "ui_settings.h"
 #include "ui_ircSettings.h"
+#include "serversettings/SettingsServerTreeModel.hpp"
 
 
 class Host; // will be added in server.hpp
 class SettingsDialog : public QObject {
     Q_OBJECT
+
+    SettingsServerTreeModel ircSettingsServerTreeModel;
 
     Ui::SettingsDialog settingsDialogUi_;
     Ui::IrcSettings ircSettingsUi_;
