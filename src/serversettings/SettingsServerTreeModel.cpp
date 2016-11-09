@@ -140,7 +140,8 @@ int SettingsServerTreeModel::getServerIndex(Server* server) {
 
 void SettingsServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
     beginResetModel();
-    servers_.swap(servers);
+    servers_.clear();
+    servers_.insert(servers_.begin(), servers.begin(), servers.end());
     endResetModel();
 
     // autoexpand servers

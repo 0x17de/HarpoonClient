@@ -1,13 +1,16 @@
 #include "SettingsDialog.hpp"
+#include "HarpoonClient.hpp"
 
 
-SettingsDialog::SettingsDialog() {
+SettingsDialog::SettingsDialog(HarpoonClient& client) {
     // settings dialog
     settingsDialogUi_.setupUi(&settingsDialog_);
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
 
     settingsDialogUi_.protocolSettings->addWidget(&ircSettingsWidget_);
     ircSettingsUi_.serverList->setModel(&ircSettingsServerTreeModel);
+
+    connect(&client, &HarpoonClient::resetServers, &ircSettingsServerTreeModel, &SettingsServerTreeModel::resetServers);
 }
 
 SettingsDialog::~SettingsDialog() {

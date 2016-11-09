@@ -6,6 +6,7 @@
 #include <memory>
 
 
+class HarpoonClient;
 class Server;
 
 class SettingsServerTreeModel : public QAbstractItemModel {

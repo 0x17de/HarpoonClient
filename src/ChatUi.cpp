@@ -13,6 +13,7 @@
 ChatUi::ChatUi(HarpoonClient& client)
     : client{client}
     , settings{client.getSettings()}
+    , settingsDialog{client}
 {
     clientUi.setupUi(this);
     bouncerConfigurationDialogUi.setupUi(&bouncerConfigurationDialog);

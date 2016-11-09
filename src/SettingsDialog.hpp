@@ -22,7 +22,7 @@ class SettingsDialog : public QObject {
     QWidget ircSettingsWidget_;
 
 public:
-    SettingsDialog();
+    SettingsDialog(HarpoonClient& client);
     virtual ~SettingsDialog();
     void show();
 

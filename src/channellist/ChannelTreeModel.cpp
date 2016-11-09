@@ -157,7 +157,8 @@ void ChannelTreeModel::channelDataChanged(Channel* channel) {
 
 void ChannelTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
     beginResetModel();
-    servers_.swap(servers);
+    servers_.clear();
+    servers_.insert(servers_.begin(), servers.begin(), servers.end());
     for (auto& server : servers_) {
         connectServer(server.get());
         for (auto& channel : server->getChannels())
