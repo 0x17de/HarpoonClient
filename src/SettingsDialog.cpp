@@ -11,6 +11,7 @@ SettingsDialog::SettingsDialog(HarpoonClient& client) {
     ircSettingsUi_.serverList->setModel(&ircSettingsServerTreeModel);
 
     connect(&client, &HarpoonClient::resetServers, &ircSettingsServerTreeModel, &SettingsServerTreeModel::resetServers);
+    connect(&client, &HarpoonClient::newServer, &ircSettingsServerTreeModel, &SettingsServerTreeModel::newServer);
 }
 
 SettingsDialog::~SettingsDialog() {
