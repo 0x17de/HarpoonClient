@@ -60,6 +60,7 @@ private:
     void irc_handleQuit(const QJsonObject& root);
     void irc_handleKick(const QJsonObject& root);
     void irc_handleServerAdded(const QJsonObject& root);
+    void irc_handleServerDeleted(const QJsonObject& root);
 
     void onReconnectTimer();
     void onPingTimer();
@@ -74,6 +75,7 @@ signals:
                     const QString& channelName,
                     std::list<std::shared_ptr<User>>& userList);
     void newServer(std::shared_ptr<Server> server);
+    void serverDeleted(const QString& serverId);
     void joinChannel(size_t id,
                      const QString& serverId,
                      const QString& channelName,

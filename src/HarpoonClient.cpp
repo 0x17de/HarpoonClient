@@ -176,6 +176,8 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleNickChange(root);
         } else if (cmd == "serveradded") {
             irc_handleServerAdded(root);
+        } else if (cmd == "serverremoved") {
+            irc_handleServerDeleted(root);
         } else if (cmd == "topic") {
             irc_handleTopic(root);
         } else if (cmd == "action") {
@@ -207,6 +209,16 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
     // no nick yet, also inactive
     // TODO: firstId for new servers
     emit newServer(std::make_shared<Server>("", serverId, name, true));
+}
+
+void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
+    auto serverIdValue = root.value("server");
+
+    if (!serverIdValue.isString()) return;
+
+    QString serverId = serverIdValue.toString();
+
+    emit serverDeleted(serverId);
 }
 
 void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
