@@ -191,6 +191,19 @@ void ChannelTreeModel::newServer(std::shared_ptr<Server> server) {
     endInsertRows();
 }
 
+void ChannelTreeModel::deleteServer(const QString& serverId) {
+    int rowIndex = 0;
+    decltype(servers_)::iterator it;
+    for (it = servers_.begin(); it != servers_.end(); ++it, ++rowIndex) {
+        if ((*it)->getId() == serverId)
+            break;
+    }
+    if (it == servers_.end()) return;
+    beginRemoveRows(QModelIndex{}, rowIndex, rowIndex+1);
+    servers_.erase(it);
+    endRemoveRows();
+}
+
 void ChannelTreeModel::beginAddChannel(Channel* channel) {
     Server* server = channel->getServer();
     auto rowIndex = server->getChannelIndex(channel);

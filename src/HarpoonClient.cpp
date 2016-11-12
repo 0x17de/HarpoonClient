@@ -218,7 +218,7 @@ void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
 
     QString serverId = serverIdValue.toString();
 
-    emit serverDeleted(serverId);
+    emit deleteServer(serverId);
 }
 
 void HarpoonClient::irc_handleTopic(const QJsonObject& root) {

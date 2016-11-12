@@ -51,6 +51,7 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(&client, &HarpoonClient::resetServers, &channelTreeModel, &ChannelTreeModel::resetServers);
     connect(&client, &HarpoonClient::newServer, &channelTreeModel, &ChannelTreeModel::newServer);
+    connect(&client, &HarpoonClient::deleteServer, &channelTreeModel, &ChannelTreeModel::deleteServer);
     connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&channelTreeModel, &ChannelTreeModel::expand, this, &ChatUi::expandServer);
     connect(&channelTreeModel, &ChannelTreeModel::channelConnected, this, &ChatUi::channelConnected);

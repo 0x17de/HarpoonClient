@@ -42,6 +42,7 @@ public Q_SLOTS:
     void channelDataChanged(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
+    void deleteServer(const QString& serverId);
     void beginAddChannel(Channel* channel);
     void endAddChannel();
 
