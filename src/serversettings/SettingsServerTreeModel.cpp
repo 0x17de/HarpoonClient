@@ -158,3 +158,16 @@ void SettingsServerTreeModel::newServer(std::shared_ptr<Server> server) {
     servers_.push_back(server);
     endInsertRows();
 }
+
+void SettingsServerTreeModel::deleteServer(const QString& serverId) {
+    int rowIndex = 0;
+    decltype(servers_)::iterator it;
+    for (it = servers_.begin(); it != servers_.end(); ++it, ++rowIndex) {
+        if ((*it)->getId() == serverId)
+            break;
+    }
+    if (it == servers_.end()) return;
+    beginRemoveRows(QModelIndex{}, rowIndex, rowIndex+1);
+    servers_.erase(it);
+    endRemoveRows();
+}

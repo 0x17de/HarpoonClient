@@ -36,6 +36,7 @@ signals:
 public Q_SLOTS:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
+    void deleteServer(const QString& serverId);
 
 private:
     std::list<std::shared_ptr<Server>> servers_;
