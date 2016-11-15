@@ -178,6 +178,10 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleServerAdded(root);
         } else if (cmd == "serverremoved") {
             irc_handleServerDeleted(root);
+        } else if (cmd == "hostadded") {
+            irc_handleHostAdded(root);
+        } else if (cmd == "hostremoved") {
+            irc_handleHostDeleted(root);
         } else if (cmd == "topic") {
             irc_handleTopic(root);
         } else if (cmd == "action") {
@@ -219,6 +223,47 @@ void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
 
     emit deleteServer(serverId);
+}
+
+void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
+    auto serverIdValue = root.value("server");
+    auto hostValue = root.value("host");
+    auto hasPasswordValue = root.value("hasPassword");
+    auto portValue = root.value("port");
+    auto ipv6Value = root.value("ipv6");
+    auto sslValue = root.value("ssl");
+
+    if (!serverIdValue.isString()) return;
+    if (!hostValue.isString()) return;
+    if (!hasPasswordValue.isString()) return;
+    if (!portValue.isString()) return;
+    if (!ipv6Value.isString()) return;
+    if (!sslValue.isString()) return;
+
+    QString serverId = serverIdValue.toString();
+    QString host = hostValue.toString();
+    bool hasPassword = hostValue.toBool();
+    int port = hostValue.toInt();
+    bool ipv6 = hostValue.toBool();
+    bool ssl = hostValue.toBool();
+
+    //emit newHost(...);
+}
+
+void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
+    auto serverIdValue = root.value("server");
+    auto hostValue = root.value("host");
+    auto portValue = root.value("port");
+
+    if (!serverIdValue.isString()) return;
+    if (!hostValue.isString()) return;
+    if (!portValue.isString()) return;
+
+    QString serverId = serverIdValue.toString();
+    QString host = hostValue.toString();
+    int port = hostValue.toInt();
+
+    //emit deleteHost(...);
 }
 
 void HarpoonClient::irc_handleTopic(const QJsonObject& root) {

@@ -61,6 +61,8 @@ private:
     void irc_handleKick(const QJsonObject& root);
     void irc_handleServerAdded(const QJsonObject& root);
     void irc_handleServerDeleted(const QJsonObject& root);
+    void irc_handleHostAdded(const QJsonObject& root);
+    void irc_handleHostDeleted(const QJsonObject& root);
 
     void onReconnectTimer();
     void onPingTimer();
