@@ -1,6 +1,7 @@
 #include "HarpoonClient.hpp"
 
 #include "Server.hpp"
+#include "Host.hpp"
 #include "Channel.hpp"
 #include "User.hpp"
 
@@ -212,7 +213,10 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
 
     // no nick yet, also inactive
     // TODO: firstId for new servers
-    emit newServer(std::make_shared<Server>("", serverId, name, true));
+
+    auto server = std::make_shared<Server>("", serverId, name, true);
+    serverMap.insert(serverId, server);
+    emit newServer(server);
 }
 
 void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
@@ -221,7 +225,7 @@ void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
     if (!serverIdValue.isString()) return;
 
     QString serverId = serverIdValue.toString();
-
+    serverMap.remove(serverId);
     emit deleteServer(serverId);
 }
 
@@ -247,7 +251,10 @@ void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
     bool ipv6 = hostValue.toBool();
     bool ssl = hostValue.toBool();
 
-    //emit newHost(...);
+    auto it = serverMap.find(serverId);
+    if (it == serverMap.end()) return;
+    std::shared_ptr<Server> server = *it;
+    emit newHost(std::make_shared<Host>(server.get(), host, port));
 }
 
 void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
@@ -263,7 +270,7 @@ void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
     QString host = hostValue.toString();
     int port = hostValue.toInt();
 
-    //emit deleteHost(...);
+    emit deleteHost(serverId, host, port);
 }
 
 void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
@@ -501,6 +508,8 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
     QJsonValue serversValue = root.value("servers");
     if (!serversValue.isObject()) return;
 
+    serverMap.clear();
+
     QJsonObject servers = serversValue.toObject();
     for (auto sit = servers.begin(); sit != servers.end(); ++sit) {
         QString serverId = sit.key();
@@ -524,6 +533,7 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
 
         auto currentServer = std::make_shared<Server>(activeNick, serverId, serverName, false); // TODO: server needs to send if status is disabled
         serverList.push_back(currentServer);
+        serverMap.insert(serverId, currentServer);
 
         QJsonObject channels = channelsValue.toObject();
         for (auto cit = channels.begin(); cit != channels.end(); ++cit) {

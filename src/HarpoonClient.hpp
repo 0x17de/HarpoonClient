@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QSettings>
 #include <QUrl>
+#include <QHash>
 #include <list>
 #include <memory>
 
@@ -13,6 +14,7 @@
 class QJsonObject;
 class QJsonDocument;
 class Server;
+class Host;
 class Channel;
 class User;
 
@@ -32,6 +34,8 @@ class HarpoonClient : public QObject {
     QTimer reconnectTimer;
     QTimer pingTimer;
     QSettings settings;
+
+    QHash<QString, std::shared_ptr<Server>> serverMap;
 
 public:
     HarpoonClient();
@@ -78,6 +82,8 @@ signals:
                     std::list<std::shared_ptr<User>>& userList);
     void newServer(std::shared_ptr<Server> server);
     void deleteServer(const QString& serverId);
+    void newHost(std::shared_ptr<Host> host);
+    void deleteHost(const QString& serverId, const QString& host, int port);
     void joinChannel(size_t id,
                      const QString& serverId,
                      const QString& channelName,
