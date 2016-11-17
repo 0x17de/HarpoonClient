@@ -38,6 +38,7 @@ public:
             Server* server,
             const QString& name,
             bool disabled);
+    virtual ~Channel();
 
     size_t getFirstId() const;
     Server* getServer() const;

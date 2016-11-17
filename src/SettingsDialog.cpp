@@ -16,6 +16,9 @@ SettingsDialog::SettingsDialog(HarpoonClient& client) {
 }
 
 SettingsDialog::~SettingsDialog() {
+    settingsDialog_.hide();
+    ircSettingsUi_.serverList->setModel(0);
+    settingsDialogUi_.protocolSettings->removeWidget(&ircSettingsWidget_);
 }
 
 void SettingsDialog::show() {

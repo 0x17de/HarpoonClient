@@ -75,6 +75,7 @@ void HarpoonClient::onDisconnected() {
     qDebug() << "disconnected";
     std::list<std::shared_ptr<Server>> empty;
     emit resetServers(empty);
+    serverMap.clear();
     if (!shutdown)
         reconnectTimer.start(3000);
 }
@@ -507,8 +508,6 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
 
     QJsonValue serversValue = root.value("servers");
     if (!serversValue.isObject()) return;
-
-    serverMap.clear();
 
     QJsonObject servers = serversValue.toObject();
     for (auto sit = servers.begin(); sit != servers.end(); ++sit) {

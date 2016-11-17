@@ -40,7 +40,7 @@ class ChatUi : public QMainWindow {
 
 public:
     ChatUi(HarpoonClient& client);
-    ~ChatUi();
+    virtual ~ChatUi();
 
 private:
     void activateChannel(Channel* channel);

@@ -27,6 +27,10 @@ Channel::Channel(size_t firstId,
     // TODO: connect on resize event => handle chat view
 }
 
+Channel::~Channel() {
+    userTreeView_.setModel(0);
+}
+
 void Channel::activate() {
     QScrollBar* bar = backlogCanvas_.verticalScrollBar();
     if (bar && bar->sliderPosition() == 0) {

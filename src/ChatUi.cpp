@@ -211,6 +211,17 @@ ChatUi::ChatUi(HarpoonClient& client)
 
 ChatUi::~ChatUi() {
     hide();
+
+    QWidget* widget;
+    while((widget = userViews->currentWidget())) {
+        userViews->removeWidget(widget);
+        widget->setParent(0);
+    }
+    while((widget = backlogViews->currentWidget())) {
+        backlogViews->removeWidget(widget);
+        widget->setParent(0);
+    }
+
     channelView->setModel(0);
 }
 
