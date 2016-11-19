@@ -19,7 +19,6 @@ set(SRC_CLIENT
     src/User.cpp src/User.hpp
     src/ChatLine.cpp src/ChatLine.hpp
     src/SettingsDialog.cpp src/SettingsDialog.hpp
-    src/serversettings/SettingsServerTreeModel.cpp src/serversettings/SettingsServerTreeModel.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp
     src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
     src/userlist/UserTreeModel.cpp src/userlist/UserTreeModel.hpp
@@ -35,7 +34,6 @@ qt5_wrap_cpp(BACKLOGVIEW_SRC src/BacklogView.hpp)
 qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_cpp(SETTINGSDIALOG_SRC src/SettingsDialog.hpp)
-qt5_wrap_cpp(SETTINGSSERVERMODEL_SRC src/serversettings/SettingsServerTreeModel.hpp)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
 qt5_wrap_ui(SETTINGSUI_HEADERS ui_forms/settings.ui)
@@ -56,7 +54,6 @@ add_executable(HarpoonClient
     ${CHANNEL_SRC}
     ${ICONS_SRC}
     ${SERVERCONFIGUI_HEADERS}
-    ${SETTINGSSERVERMODEL_SRC}
     ${IRCCONFIGUI_HEADERS}
     )
 target_include_directories(HarpoonClient PUBLIC src)
