@@ -1,9 +1,9 @@
 #include "SettingsDialog.hpp"
-#include "channellist/ChannelTreeModel.hpp"
+#include "models/ServerTreeModel.hpp"
 #include "HarpoonClient.hpp"
 
 
-SettingsDialog::SettingsDialog(HarpoonClient& client, ChannelTreeModel& channelTreeModel)
+SettingsDialog::SettingsDialog(HarpoonClient& client, ServerTreeModel& channelTreeModel)
     : channelTreeModel_{channelTreeModel}
 {
     // settings dialog

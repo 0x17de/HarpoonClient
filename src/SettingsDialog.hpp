@@ -10,19 +10,19 @@
 #include "ui_ircSettings.h"
 
 
-class ChannelTreeModel;
+class ServerTreeModel;
 class Host; // will be added in server.hpp
 class SettingsDialog : public QObject {
     Q_OBJECT
 
-    ChannelTreeModel& channelTreeModel_;
+    ServerTreeModel& channelTreeModel_;
     Ui::SettingsDialog settingsDialogUi_;
     Ui::IrcSettings ircSettingsUi_;
     QDialog settingsDialog_;
     QWidget ircSettingsWidget_;
 
 public:
-    SettingsDialog(HarpoonClient& client, ChannelTreeModel& channelTreeModel);
+    SettingsDialog(HarpoonClient& client, ServerTreeModel& channelTreeModel);
     virtual ~SettingsDialog();
     void show();
 

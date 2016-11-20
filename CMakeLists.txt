@@ -20,13 +20,13 @@ set(SRC_CLIENT
     src/ChatLine.cpp src/ChatLine.hpp
     src/SettingsDialog.cpp src/SettingsDialog.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp
-    src/channellist/ChannelTreeModel.cpp src/channellist/ChannelTreeModel.hpp
-    src/userlist/UserTreeModel.cpp src/userlist/UserTreeModel.hpp
+    src/models/ServerTreeModel.cpp src/models/ServerTreeModel.hpp
+    src/models/UserTreeModel.cpp src/models/UserTreeModel.hpp
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
-qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/channellist/ChannelTreeModel.hpp)
-qt5_wrap_cpp(USERTREEMODEL_SRC src/userlist/UserTreeModel.hpp)
+qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/models/ServerTreeModel.hpp)
+qt5_wrap_cpp(USERTREEMODEL_SRC src/models/UserTreeModel.hpp)
 qt5_wrap_cpp(HARPOONCLIENT_SRC src/HarpoonClient.hpp)
 qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
 qt5_wrap_cpp(HOST_SRC src/Host.hpp)

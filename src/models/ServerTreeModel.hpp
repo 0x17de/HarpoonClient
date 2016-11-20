@@ -1,5 +1,5 @@
-#ifndef CHANNELTREEMODEL_H
-#define CHANNELTREEMODEL_H
+#ifndef SERVERTREEMODEL_H
+#define SERVERTREEMODEL_H
 
 #include <QAbstractItemModel>
 #include <list>
@@ -9,11 +9,11 @@
 class Server;
 class Channel;
 
-class ChannelTreeModel : public QAbstractItemModel {
+class ServerTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
-    explicit ChannelTreeModel(QObject* parent = 0);
+    explicit ServerTreeModel(QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;

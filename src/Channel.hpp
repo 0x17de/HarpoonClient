@@ -14,7 +14,7 @@
 #include "BacklogView.hpp"
 #include "ChatLine.hpp"
 #include "TreeEntry.hpp"
-#include "userlist/UserTreeModel.hpp"
+#include "models/UserTreeModel.hpp"
 
 
 class Server;

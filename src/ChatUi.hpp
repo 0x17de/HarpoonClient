@@ -5,7 +5,7 @@
 #include <list>
 #include <memory>
 #include "SettingsDialog.hpp"
-#include "channellist/ChannelTreeModel.hpp"
+#include "models/ServerTreeModel.hpp"
 #include "ui_client.h"
 #include "ui_serverConfigurationDialog.h"
 
@@ -27,7 +27,7 @@ class ChatUi : public QMainWindow {
     QSettings& settings;
     HarpoonClient& client;
 
-    ChannelTreeModel channelTreeModel;
+    ServerTreeModel channelTreeModel;
     QLineEdit* topicView;
     QTreeView* channelView;
     QStackedWidget* userViews;

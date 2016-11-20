@@ -172,7 +172,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleChatList(root);
         } else if (cmd == "chat") {
             irc_handleChat(root, false);
-        } else if (cmd == "userlist") {
+        } else if (cmd == "models") {
             irc_handleUserList(root);
         } else if (cmd == "nickchange") {
             irc_handleNickChange(root);
