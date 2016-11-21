@@ -27,7 +27,7 @@ class ChatUi : public QMainWindow {
     QSettings& settings;
     HarpoonClient& client;
 
-    ServerTreeModel channelTreeModel;
+    ServerTreeModel serverTreeModel;
     QLineEdit* topicView;
     QTreeView* channelView;
     QStackedWidget* userViews;

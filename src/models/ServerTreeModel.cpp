@@ -24,7 +24,7 @@ QModelIndex ServerTreeModel::index(int row, int column, const QModelIndex& paren
         auto* item = static_cast<TreeEntry*>(parent.internalPointer());
         if (item->getTreeEntryType() == 's') {
             Server* server = static_cast<Server*>(parent.internalPointer());
-            return createIndex(row, column, server->getChannel(row));
+            return createIndex(row, column, server->getChannelModel().getChannel(row));
         }
     }
     return QModelIndex();
@@ -40,7 +40,7 @@ QModelIndex ServerTreeModel::parent(const QModelIndex& index) const {
         Channel* channel = static_cast<Channel*>(ptr);
         Server* server = channel->getServer();
 
-        int rowIndex = server->getChannelIndex(channel);
+        int rowIndex = server->getChannelModel().getChannelIndex(channel);
         if (rowIndex >= 0)
             return createIndex(rowIndex, 0, server);
     }
@@ -58,7 +58,7 @@ int ServerTreeModel::rowCount(const QModelIndex& parent) const {
         auto* item = static_cast<TreeEntry*>(parent.internalPointer());
         if (item->getTreeEntryType() == 's') {
             Server* server = static_cast<Server*>(parent.internalPointer());
-            return server->getChannelCount();
+            return server->getChannelModel().rowCount();
         }
     }
 
@@ -128,16 +128,6 @@ Server* ServerTreeModel::getServer(const QString& serverId) {
     return it->get();
 }
 
-Channel* ServerTreeModel::getChannel(const QString& serverId, const QString& channelName) {
-    Server* server = getServer(serverId);;
-    if (!server) return nullptr;
-    return server->getChannel(channelName);
-}
-
-Channel* ServerTreeModel::getChannel(Server* server, const QString& channelName) {
-    return server->getChannel(channelName);
-}
-
 int ServerTreeModel::getServerIndex(Server* server) {
     int rowIndex = 0;
     for (auto s : servers_) {
@@ -148,22 +138,17 @@ int ServerTreeModel::getServerIndex(Server* server) {
     return -1;
 }
 
-void ServerTreeModel::channelDataChanged(Channel* channel) {
-    Server* server = channel->getServer();
-    auto rowIndex = server->getChannelIndex(channel);
-    auto modelIndex = createIndex(rowIndex, 0, channel);
-    emit dataChanged(modelIndex, modelIndex);
-}
-
 void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
     beginResetModel();
     servers_.clear();
     servers_.insert(servers_.begin(), servers.begin(), servers.end());
+    /*
     for (auto& server : servers_) {
         connectServer(server.get());
-        for (auto& channel : server->getChannels())
+        for (auto& channel : server->getChannelModel().getChannels())
             connectChannel(channel.get());
     }
+    */
     endResetModel();
 
     // autoexpand servers
@@ -172,16 +157,6 @@ void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) 
         emit expand(createIndex(rowIndex, 0, server.get()));
         rowIndex += 1;
     }
-}
-
-void ServerTreeModel::connectServer(Server* server) {
-    connect(server, &Server::beginAddChannel, this, &ServerTreeModel::beginAddChannel);
-    connect(server, &Server::endAddChannel, this, &ServerTreeModel::endAddChannel);
-}
-
-void ServerTreeModel::connectChannel(Channel* channel) {
-    connect(channel, &Channel::channelDataChanged, this, &ServerTreeModel::channelDataChanged);
-    emit channelConnected(channel);
 }
 
 void ServerTreeModel::newServer(std::shared_ptr<Server> server) {
@@ -202,15 +177,4 @@ void ServerTreeModel::deleteServer(const QString& serverId) {
     beginRemoveRows(QModelIndex{}, rowIndex, rowIndex+1);
     servers_.erase(it);
     endRemoveRows();
-}
-
-void ServerTreeModel::beginAddChannel(Channel* channel) {
-    Server* server = channel->getServer();
-    auto rowIndex = server->getChannelIndex(channel);
-    beginInsertRows(index(getServerIndex(server), 0), rowIndex, rowIndex);
-    connectChannel(channel);
-}
-
-void ServerTreeModel::endAddChannel() {
-    endInsertRows();
 }

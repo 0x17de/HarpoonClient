@@ -544,7 +544,7 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
             bool channelDisabled = channelDisabledValue.isBool() && channelDisabledValue.toBool();
 
             auto currentChannel = std::make_shared<Channel>(firstId, currentServer.get(), channelName, channelDisabled);
-            currentServer->addChannel(currentChannel);
+            currentServer->getChannelModel().newChannel(currentChannel);
 
             QJsonObject channel = channelValue.toObject();
             QJsonValue usersValue = channel.value("users");

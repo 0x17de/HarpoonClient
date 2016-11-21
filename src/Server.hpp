@@ -7,13 +7,14 @@
 #include <QString>
 
 #include "TreeEntry.hpp"
+#include "models/ChannelTreeModel.hpp"
 
 
 class Channel;
 class Server : public TreeEntry {
     Q_OBJECT
 
-    std::list<std::shared_ptr<Channel>> channels_;
+    ChannelTreeModel channelModel_;
     QString id_;
     QString name_;
     QString nick_;
@@ -25,20 +26,11 @@ public:
            const QString& name,
            bool disabled);
 
-    decltype((channels_)) getChannels();
-    void addChannel(std::shared_ptr<Channel> channel);
-    int getChannelCount() const;
-    int getChannelIndex(Channel* channel) const;
-    Channel* getChannel(QString channelName);
-    Channel* getChannel(int position);
+    ChannelTreeModel& getChannelModel();
     QString getId() const;
     QString getName() const;
     QString getActiveNick() const;
     void setActiveNick(const QString& nick);
-
-signals:
-    void beginAddChannel(Channel* channel);
-    void endAddChannel();
 };
 
 

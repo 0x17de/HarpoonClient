@@ -27,8 +27,6 @@ public:
 
     std::list<std::shared_ptr<Server>> getServers();
     Server* getServer(const QString& serverId);
-    Channel* getChannel(Server* server, const QString& channelName);
-    Channel* getChannel(const QString& serverId, const QString& channelName);
     int getServerIndex(Server* server);
     void connectServer(Server* server);
     void connectChannel(Channel* channel);
@@ -36,15 +34,11 @@ public:
 
 signals:
     void expand(const QModelIndex& index);
-    void channelConnected(Channel* channel);
 
 public Q_SLOTS:
-    void channelDataChanged(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void newServer(std::shared_ptr<Server> server);
     void deleteServer(const QString& serverId);
-    void beginAddChannel(Channel* channel);
-    void endAddChannel();
 
 private:
     std::list<std::shared_ptr<Server>> servers_;
