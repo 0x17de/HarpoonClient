@@ -10,6 +10,14 @@ Host::Host(Server* server,
 {
 }
 
+QString Host::getHost() const {
+    return host;
+}
+
+int Host::getPort() const {
+    return port;
+}
+
 Server* Host::getServer() const {
     return server;
 }

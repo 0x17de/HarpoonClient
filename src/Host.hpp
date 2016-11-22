@@ -17,6 +17,8 @@ public:
          const QString& host,
          int port);
 
+    QString getHost() const;
+    int getPort() const;
     Server* getServer() const;
 
 public Q_SLOTS:

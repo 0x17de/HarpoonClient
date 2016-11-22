@@ -18,6 +18,10 @@ ChannelTreeModel& Server::getChannelModel() {
     return channelModel_;
 }
 
+HostTreeModel& Server::getHostModel() {
+    return hostModel_;
+}
+
 QString Server::getId() const {
     return id_;
 }

@@ -8,13 +8,14 @@
 
 #include "TreeEntry.hpp"
 #include "models/ChannelTreeModel.hpp"
+#include "models/HostTreeModel.hpp"
 
 
-class Channel;
 class Server : public TreeEntry {
     Q_OBJECT
 
     ChannelTreeModel channelModel_;
+    HostTreeModel hostModel_;
     QString id_;
     QString name_;
     QString nick_;
@@ -27,6 +28,7 @@ public:
            bool disabled);
 
     ChannelTreeModel& getChannelModel();
+    HostTreeModel& getHostModel();
     QString getId() const;
     QString getName() const;
     QString getActiveNick() const;
