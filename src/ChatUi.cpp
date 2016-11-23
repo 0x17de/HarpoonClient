@@ -3,6 +3,7 @@
 #include <QTreeWidget>
 #include <QStackedWidget>
 #include "HarpoonClient.hpp"
+#include "models/ServerTreeModel.hpp"
 
 #include "Server.hpp"
 #include "BacklogView.hpp"
@@ -10,51 +11,49 @@
 #include "User.hpp"
 
 
-ChatUi::ChatUi(HarpoonClient& client)
-    : client{client}
-    , settings{client.getSettings()}
-    , settingsDialog{client, serverTreeModel}
+ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
+    : client_{client}
+    , serverTreeModel_{serverTreeModel}
+    , settings_{client.getSettings()}
+    , settingsDialog_{client, serverTreeModel}
 {
-    clientUi.setupUi(this);
-    bouncerConfigurationDialogUi.setupUi(&bouncerConfigurationDialog);
+    clientUi_.setupUi(this);
+    bouncerConfigurationDialogUi_.setupUi(&bouncerConfigurationDialog_);
 
     // bouncer configuration
-    bouncerConfigurationDialogUi.username->setText(settings.value("username", "user").toString());
-    bouncerConfigurationDialogUi.password->setText(settings.value("password", "password").toString());
-    bouncerConfigurationDialogUi.host->setText(settings.value("host", "ws://localhost:8080/ws").toString());
+    bouncerConfigurationDialogUi_.username->setText(settings_.value("username", "user").toString());
+    bouncerConfigurationDialogUi_.password->setText(settings_.value("password", "password").toString());
+    bouncerConfigurationDialogUi_.host->setText(settings_.value("host", "ws://localhost:8080/ws").toString());
 
     // assign views
-    channelView = clientUi.channels;
-    userViews = clientUi.userViews;
-    topicView = clientUi.topic;
-    backlogViews = clientUi.chats;
-    messageInputView = clientUi.message;
+    channelView_ = clientUi_.channels;
+    userViews_ = clientUi_.userViews;
+    topicView_ = clientUi_.topic;
+    backlogViews_ = clientUi_.chats;
+    messageInputView_ = clientUi_.message;
 
-    QSplitter* chatSplitter = clientUi.chatSplitter;
+    QSplitter* chatSplitter = clientUi_.chatSplitter;
 
     // network configuration
-    connect(clientUi.actionConfigure_Networks, &QAction::triggered, [this] { showConfigureNetworksDialog(); });
+    connect(clientUi_.actionConfigure_Networks, &QAction::triggered, [this] { showConfigureNetworksDialog(); });
 
     // bouncer configuration dialog handling
-    connect(clientUi.actionConfigure_Server, &QAction::triggered, [this] { showConfigureBouncerDialog(); });
-    connect(&bouncerConfigurationDialog, &QDialog::accepted, [this] {
-            QString username = bouncerConfigurationDialogUi.username->text();
-            QString password = bouncerConfigurationDialogUi.password->text();
-            QString host = bouncerConfigurationDialogUi.host->text();
-            settings.setValue("username", username);
-            settings.setValue("password", password);
-            settings.setValue("host", host);
-            this->client.reconnect(username, password, host);
+    connect(clientUi_.actionConfigure_Server, &QAction::triggered, [this] { showConfigureBouncerDialog(); });
+    connect(&bouncerConfigurationDialog_, &QDialog::accepted, [this] {
+            QString username = bouncerConfigurationDialogUi_.username->text();
+            QString password = bouncerConfigurationDialogUi_.password->text();
+            QString host = bouncerConfigurationDialogUi_.host->text();
+            settings_.setValue("username", username);
+            settings_.setValue("password", password);
+            settings_.setValue("host", host);
+            this->client_.reconnect(username, password, host);
         });
 
     // channel list events
     connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
-    connect(&client, &HarpoonClient::resetServers, &serverTreeModel, &ServerTreeModel::resetServers);
-    connect(&client, &HarpoonClient::newServer, &serverTreeModel, &ServerTreeModel::newServer);
-    connect(&client, &HarpoonClient::deleteServer, &serverTreeModel, &ServerTreeModel::deleteServer);
-    connect(channelView, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
-    connect(&serverTreeModel, &ServerTreeModel::expand, this, &ChatUi::expandServer);
-    //connect(&serverTreeModel, &ServerTreeModel::channelConnected, this, &ChatUi::channelConnected);
+    connect(channelView_, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
+    connect(&serverTreeModel_, &ServerTreeModel::expand, this, &ChatUi::expandServer);
+    //connect(&serverTreeModel_, &ServerTreeModel::channelConnected, this, &ChatUi::channelConnected);
 
     connect(&client, &HarpoonClient::topicChanged, [this](size_t id,
                                                           const QString& serverId,
@@ -62,10 +61,10 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                           double timestamp,
                                                           const QString& nick,
                                                           const QString& topic) {
-                Channel* channel = serverTreeModel.getServer(serverId)->getChannelModel().getChannel(channelName);
+                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
-                if (channel == activeChannel)
-                    topicView->setText(topic);
+                if (channel == activeChannel_)
+                    topicView_->setText(topic);
                 channel->setTopic(topic);
                 channel->getBacklogView()->addMessage(id, timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
             });
@@ -75,7 +74,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                         double timestamp,
                                                         const QString& nick,
                                                         const QString& newNick) {
-                Server* server = serverTreeModel.getServer(serverId);
+                Server* server = serverTreeModel_.getServer(serverId);
                 if (server == nullptr) return;
 
                 if (server->getActiveNick() == nick)
@@ -90,7 +89,7 @@ ChatUi::ChatUi(HarpoonClient& client)
     connect(&client, &HarpoonClient::resetUsers, [this](const QString& serverId,
                                                         const QString& channelName,
                                                         std::list<std::shared_ptr<User>>& users) {
-                Channel* channel = serverTreeModel.getServer(serverId)->getChannelModel().getChannel(channelName);
+                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
                 channel->getUserTreeModel()->resetUsers(users);
             });
@@ -102,7 +101,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                          const QString& nick,
                                                          const QString& message,
                                                          bool notice) {
-                Channel* channel = serverTreeModel.getServer(serverId)->getChannelModel().getChannel(channelName);
+                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
                 auto sNick = User::stripNick(nick);
                 channel->getBacklogView()->addMessage(id, timestamp, notice ? '['+sNick+']' : '<'+sNick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
@@ -114,7 +113,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                         double timestamp,
                                                         const QString& nick,
                                                         const QString& message) {
-                Channel* channel = serverTreeModel.getServer(serverId)->getChannelModel().getChannel(channelName);
+                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
                 channel->getBacklogView()->addMessage(id, timestamp, "*", User::stripNick(nick) + " " + message, MessageColor::Action);
             });
@@ -124,7 +123,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                          const QString& channelName,
                                                          double timestamp,
                                                          const QString& nick) {
-                Server* server = serverTreeModel.getServer(serverId);
+                Server* server = serverTreeModel_.getServer(serverId);
                 if (!server) return;
                 if (server->getActiveNick() == User::stripNick(nick)) { // this user
                     Channel* channel = server->getChannelModel().getChannel(channelName);
@@ -145,7 +144,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                          const QString& channelName,
                                                          double timestamp,
                                                          const QString& nick) {
-                Server* server = serverTreeModel.getServer(serverId);
+                Server* server = serverTreeModel_.getServer(serverId);
                 if (!server) return;
                 if (server->getActiveNick() == User::stripNick(nick)) { // this user
                     Channel* channel = server->getChannelModel().getChannel(channelName);
@@ -166,7 +165,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                         const QString& channelName,
                                                         double timestamp,
                                                         const QString& nick) {
-                Channel* channel = serverTreeModel.getServer(serverId)->getChannelModel().getChannel(channelName);
+                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
                 channel->getUserTreeModel()->removeUser(User::stripNick(nick));
                 channel->getBacklogView()->addMessage(id, timestamp, "<--", nick + " was kicked from the channel", MessageColor::Event);
@@ -176,7 +175,7 @@ ChatUi::ChatUi(HarpoonClient& client)
                                                         const QString& serverId,
                                                         double timestamp,
                                                         const QString& nick) {
-                for (auto& server : serverTreeModel.getServers()) {
+                for (auto& server : serverTreeModel_.getServers()) {
                     for (auto& channel : server->getChannelModel().getChannels()) {
                         if (channel->getUserTreeModel()->removeUser(User::stripNick(nick)))
                             channel->getBacklogView()->addMessage(id, timestamp, "<--", nick + " has quit", MessageColor::Event);
@@ -185,11 +184,11 @@ ChatUi::ChatUi(HarpoonClient& client)
             });
 
     // input event
-    connect(messageInputView, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);
+    connect(messageInputView_, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);
     connect(this, &ChatUi::sendMessage, &client, &HarpoonClient::sendMessage);
 
     // assign models
-    channelView->setModel(&serverTreeModel);
+    channelView_->setModel(&serverTreeModel);
 
     // run
     show();
@@ -206,41 +205,41 @@ ChatUi::ChatUi(HarpoonClient& client)
     }
 
     // set the focus to the input view
-    messageInputView->setFocus();
+    messageInputView_->setFocus();
 }
 
 ChatUi::~ChatUi() {
     hide();
 
     QWidget* widget;
-    while((widget = userViews->currentWidget())) {
-        userViews->removeWidget(widget);
+    while((widget = userViews_->currentWidget())) {
+        userViews_->removeWidget(widget);
         widget->setParent(0);
     }
-    while((widget = backlogViews->currentWidget())) {
-        backlogViews->removeWidget(widget);
+    while((widget = backlogViews_->currentWidget())) {
+        backlogViews_->removeWidget(widget);
         widget->setParent(0);
     }
 
-    channelView->setModel(0);
+    channelView_->setModel(0);
 }
 
 void ChatUi::showConfigureBouncerDialog() {
-    bouncerConfigurationDialog.show();
+    bouncerConfigurationDialog_.show();
 }
 
 void ChatUi::showConfigureNetworksDialog() {
-    settingsDialog.show();
+    settingsDialog_.show();
 }
 
 void ChatUi::expandServer(const QModelIndex& index) {
-    channelView->setExpanded(index, true);
+    channelView_->setExpanded(index, true);
 }
 
 void ChatUi::channelConnected(Channel* channel) {
-    connect(channel, &Channel::backlogRequest, &client, &HarpoonClient::backlogRequest);
-    userViews->addWidget(channel->getUserTreeView());
-    backlogViews->addWidget(channel->getBacklogView());
+    connect(channel, &Channel::backlogRequest, &client_, &HarpoonClient::backlogRequest);
+    userViews_->addWidget(channel->getUserTreeView());
+    backlogViews_->addWidget(channel->getBacklogView());
 }
 
 void ChatUi::onChannelViewSelection(const QModelIndex& index) {
@@ -248,24 +247,24 @@ void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     if (item->getTreeEntryType() == 'c') { // channel selected
         Channel* channel = static_cast<Channel*>(item);
         activateChannel(channel);
-        messageInputView->setFocus();
+        messageInputView_->setFocus();
     }
 }
 
 void ChatUi::activateChannel(Channel* channel) {
     if (channel != nullptr) {
         setWindowTitle(QString("Harpoon - ") + channel->getName());
-        activeChannel = channel;
+        activeChannel_ = channel;
         if (channel->getUserTreeView()->parentWidget() != nullptr)
-            userViews->setCurrentWidget(channel->getUserTreeView());
+            userViews_->setCurrentWidget(channel->getUserTreeView());
         if (channel->getBacklogView()->parentWidget() != nullptr)
-            backlogViews->setCurrentWidget(channel->getBacklogView());
-        topicView->setText(channel->getTopic());
+            backlogViews_->setCurrentWidget(channel->getBacklogView());
+        topicView_->setText(channel->getTopic());
         channel->activate();
     } else {
         setWindowTitle("Harpoon");
-        activeChannel = 0;
-        topicView->setText("");
+        activeChannel_ = nullptr;
+        topicView_->setText("");
     }
 }
 
@@ -281,8 +280,8 @@ void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {
 }
 
 void ChatUi::messageReturnPressed() {
-    if (activeChannel != nullptr) {
-        emit sendMessage(activeChannel, messageInputView->text());
-        messageInputView->clear();
+    if (activeChannel_ != nullptr) {
+        emit sendMessage(activeChannel_, messageInputView_->text());
+        messageInputView_->clear();
     }
 }

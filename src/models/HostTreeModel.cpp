@@ -169,11 +169,11 @@ void HostTreeModel::newHost(std::shared_ptr<Host> host) {
     endInsertRows();
 }
 
-void HostTreeModel::deleteHost(const QString& hostName) {
+void HostTreeModel::deleteHost(const QString& hostName, int port) {
     int rowIndex = 0;
     decltype(hosts_)::iterator it;
     for (it = hosts_.begin(); it != hosts_.end(); ++it, ++rowIndex) {
-        if ((*it)->getHost() == hostName)
+        if ((*it)->getHost() == hostName && (*it)->getPort() == port)
             break;
     }
     if (it == hosts_.end()) return;

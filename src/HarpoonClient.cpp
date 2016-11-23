@@ -1,6 +1,7 @@
 #include "HarpoonClient.hpp"
 
 #include "Server.hpp"
+#include "models/ServerTreeModel.hpp"
 #include "Host.hpp"
 #include "Channel.hpp"
 #include "User.hpp"
@@ -16,24 +17,25 @@
 QT_USE_NAMESPACE
 
 
-HarpoonClient::HarpoonClient()
-    : shutdown{false}
-    , settings("_0x17de", "HarpoonClient")
+HarpoonClient::HarpoonClient(ServerTreeModel& serverTreeModel)
+    : shutdown_{false}
+    , serverTreeModel_{serverTreeModel}
+    , settings_("_0x17de", "HarpoonClient")
 {
     connect(&ws_, &QWebSocket::connected, this, &HarpoonClient::onConnected);
     connect(&ws_, &QWebSocket::textMessageReceived, this, &HarpoonClient::onTextMessage);
     connect(&ws_, &QWebSocket::binaryMessageReceived, this, &HarpoonClient::onBinaryMessage);
-    connect(&reconnectTimer, &QTimer::timeout, this, &HarpoonClient::onReconnectTimer);
-    connect(&pingTimer, &QTimer::timeout, this, &HarpoonClient::onPingTimer);
+    connect(&reconnectTimer_, &QTimer::timeout, this, &HarpoonClient::onReconnectTimer);
+    connect(&pingTimer_, &QTimer::timeout, this, &HarpoonClient::onPingTimer);
 
-    reconnectTimer.setSingleShot(true);
-    username = settings.value("username", "user").toString();
-    password = settings.value("password", "password").toString();
-    harpoonUrl = settings.value("host", "ws://localhost:8080/ws").toString();
+    reconnectTimer_.setSingleShot(true);
+    username_ = settings_.value("username", "user").toString();
+    password_ = settings_.value("password", "password").toString();
+    harpoonUrl_ = settings_.value("host", "ws://localhost:8080/ws").toString();
 }
 
 HarpoonClient::~HarpoonClient() {
-    shutdown = true;
+    shutdown_ = true;
 }
 
 void HarpoonClient::reconnect(const QString& lusername,
@@ -41,21 +43,21 @@ void HarpoonClient::reconnect(const QString& lusername,
                               const QString& host) {
     qDebug() << "reconnect";
     ws_.close();
-    username = lusername;
-    password = lpassword;
-    harpoonUrl = host;
+    username_ = lusername;
+    password_ = lpassword;
+    harpoonUrl_ = host;
 }
 
 QSettings& HarpoonClient::getSettings() {
-    return settings;
+    return settings_;
 }
 
 void HarpoonClient::run() {
-    ws_.open(harpoonUrl);
+    ws_.open(harpoonUrl_);
 }
 
 void HarpoonClient::onReconnectTimer() {
-    ws_.open(harpoonUrl);
+    ws_.open(harpoonUrl_);
 }
 
 void HarpoonClient::onPingTimer() {
@@ -65,19 +67,18 @@ void HarpoonClient::onPingTimer() {
 
 void HarpoonClient::onConnected() {
     qDebug() << "connected";
-    QString loginCommand = QString("LOGIN ") + username + " " + password + "\n";
+    QString loginCommand = QString("LOGIN ") + username_ + " " + password_ + "\n";
     ws_.sendTextMessage(loginCommand);
-    pingTimer.start(60000);
+    pingTimer_.start(60000);
 }
 
 void HarpoonClient::onDisconnected() {
-    pingTimer.stop();
+    pingTimer_.stop();
     qDebug() << "disconnected";
     std::list<std::shared_ptr<Server>> empty;
     emit resetServers(empty);
-    serverMap.clear();
-    if (!shutdown)
-        reconnectTimer.start(3000);
+    if (!shutdown_)
+        reconnectTimer_.start(3000);
 }
 
 void HarpoonClient::onTextMessage(const QString& message) {
@@ -216,7 +217,7 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
     // TODO: firstId for new servers
 
     auto server = std::make_shared<Server>("", serverId, name, true);
-    serverMap.insert(serverId, server);
+    serverTreeModel_.newServer(server);
     emit newServer(server);
 }
 
@@ -226,7 +227,7 @@ void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
     if (!serverIdValue.isString()) return;
 
     QString serverId = serverIdValue.toString();
-    serverMap.remove(serverId);
+    serverTreeModel_.deleteServer(serverId);
     emit deleteServer(serverId);
 }
 
@@ -246,16 +247,16 @@ void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
     if (!sslValue.isString()) return;
 
     QString serverId = serverIdValue.toString();
-    QString host = hostValue.toString();
+    QString hostName = hostValue.toString();
     bool hasPassword = hostValue.toBool();
     int port = hostValue.toInt();
     bool ipv6 = hostValue.toBool();
     bool ssl = hostValue.toBool();
 
-    auto it = serverMap.find(serverId);
-    if (it == serverMap.end()) return;
-    std::shared_ptr<Server> server = *it;
-    emit newHost(std::make_shared<Host>(server.get(), host, port));
+    Server* server = serverTreeModel_.getServer(serverId);
+    auto host = std::make_shared<Host>(server, hostName, port);
+    server->getHostModel().newHost(host);
+    emit newHost(host);
 }
 
 void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
@@ -271,6 +272,7 @@ void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
     QString host = hostValue.toString();
     int port = hostValue.toInt();
 
+    serverTreeModel_.getServer(serverId)->getHostModel().deleteHost(host, port);
     emit deleteHost(serverId, host, port);
 }
 
@@ -531,8 +533,6 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
         if (!channelsValue.isObject()) return;
 
         auto currentServer = std::make_shared<Server>(activeNick, serverId, serverName, false); // TODO: server needs to send if status is disabled
-        serverList.push_back(currentServer);
-        serverMap.insert(serverId, currentServer);
 
         QJsonObject channels = channelsValue.toObject();
         for (auto cit = channels.begin(); cit != channels.end(); ++cit) {
@@ -559,6 +559,8 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
 
             currentChannel->resetUsers(userList);
         }
+
+        serverTreeModel_.newServer(currentServer);
     }
 
     emit resetServers(serverList);

@@ -38,7 +38,7 @@ public Q_SLOTS:
     void hostDataChanged(Host* host);
     void resetHosts(std::list<std::shared_ptr<Host>>& servers);
     void newHost(std::shared_ptr<Host> server);
-    void deleteHost(const QString& serverId);
+    void deleteHost(const QString& host, int port);
 
 private:
     std::list<std::shared_ptr<Host>> hosts_;

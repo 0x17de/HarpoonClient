@@ -14,6 +14,7 @@
 class QJsonObject;
 class QJsonDocument;
 class Server;
+class ServerTreeModel;
 class Host;
 class Channel;
 class User;
@@ -22,23 +23,23 @@ class User;
 class HarpoonClient : public QObject {
     Q_OBJECT
 
-    bool shutdown;
+    bool shutdown_;
 
-    QUrl harpoonUrl;
-    QString username;
-    QString password;
+    ServerTreeModel& serverTreeModel_;
+
+    QUrl harpoonUrl_;
+    QString username_;
+    QString password_;
 
     QWebSocket ws_;
 
-    QString activeNick;
-    QTimer reconnectTimer;
-    QTimer pingTimer;
-    QSettings settings;
-
-    QHash<QString, std::shared_ptr<Server>> serverMap;
+    QString activeNick_;
+    QTimer reconnectTimer_;
+    QTimer pingTimer_;
+    QSettings settings_;
 
 public:
-    HarpoonClient();
+    HarpoonClient(ServerTreeModel& serverTreeModel_);
     ~HarpoonClient();
     void run();
     void reconnect(const QString& username,

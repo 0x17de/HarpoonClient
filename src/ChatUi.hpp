@@ -5,11 +5,11 @@
 #include <list>
 #include <memory>
 #include "SettingsDialog.hpp"
-#include "models/ServerTreeModel.hpp"
 #include "ui_client.h"
 #include "ui_serverConfigurationDialog.h"
 
 
+class ServerTreeModel;
 class Server;
 class Channel;
 class HarpoonClient;
@@ -21,25 +21,25 @@ class QStackedWidget;
 class ChatUi : public QMainWindow {
     Q_OBJECT
 
-    Ui::Client clientUi;
-    Ui::ServerConfigurationDialog bouncerConfigurationDialogUi;
+    Ui::Client clientUi_;
+    Ui::ServerConfigurationDialog bouncerConfigurationDialogUi_;
 
-    QSettings& settings;
-    HarpoonClient& client;
+    QSettings& settings_;
+    HarpoonClient& client_;
 
-    ServerTreeModel serverTreeModel;
-    QLineEdit* topicView;
-    QTreeView* channelView;
-    QStackedWidget* userViews;
-    QStackedWidget* backlogViews;
-    QLineEdit* messageInputView;
-    Channel* activeChannel;
+    ServerTreeModel& serverTreeModel_;
+    QLineEdit* topicView_;
+    QTreeView* channelView_;
+    QStackedWidget* userViews_;
+    QStackedWidget* backlogViews_;
+    QLineEdit* messageInputView_;
+    Channel* activeChannel_;
 
-    QDialog bouncerConfigurationDialog;
-    SettingsDialog settingsDialog;
+    QDialog bouncerConfigurationDialog_;
+    SettingsDialog settingsDialog_;
 
 public:
-    ChatUi(HarpoonClient& client);
+    ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel_);
     virtual ~ChatUi();
 
 private:
