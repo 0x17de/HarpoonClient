@@ -76,7 +76,7 @@ void HarpoonClient::onDisconnected() {
     pingTimer_.stop();
     qDebug() << "disconnected";
     std::list<std::shared_ptr<Server>> empty;
-    emit resetServers(empty);
+    serverTreeModel_.resetServers(empty);
     if (!shutdown_)
         reconnectTimer_.start(3000);
 }
@@ -218,7 +218,6 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
 
     auto server = std::make_shared<Server>("", serverId, name, true);
     serverTreeModel_.newServer(server);
-    emit newServer(server);
 }
 
 void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
@@ -228,7 +227,6 @@ void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
 
     QString serverId = serverIdValue.toString();
     serverTreeModel_.deleteServer(serverId);
-    emit deleteServer(serverId);
 }
 
 void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
@@ -256,7 +254,6 @@ void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
     Server* server = serverTreeModel_.getServer(serverId);
     auto host = std::make_shared<Host>(server, hostName, port);
     server->getHostModel().newHost(host);
-    emit newHost(host);
 }
 
 void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
@@ -273,7 +270,6 @@ void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
     int port = hostValue.toInt();
 
     serverTreeModel_.getServer(serverId)->getHostModel().deleteHost(host, port);
-    emit deleteHost(serverId, host, port);
 }
 
 void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
@@ -327,7 +323,8 @@ void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
         if (!userEntry.isString()) return;
         userList.push_back(std::make_shared<User>(userEntry.toString()));
     }
-    emit resetUsers(serverId, channelName, userList);
+    Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
+    // TODO: reset users
 }
 
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
@@ -559,9 +556,6 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
 
             currentChannel->resetUsers(userList);
         }
-
-        serverTreeModel_.newServer(currentServer);
     }
-
-    emit resetServers(serverList);
+    serverTreeModel_.resetServers(serverList);
 }

@@ -50,7 +50,7 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
         });
 
     // channel list events
-    connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
+    //connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(channelView_, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&serverTreeModel_, &ServerTreeModel::expand, this, &ChatUi::expandServer);
     //connect(&serverTreeModel_, &ServerTreeModel::channelConnected, this, &ChatUi::channelConnected);
@@ -86,13 +86,13 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                 }
             });
 
-    connect(&client, &HarpoonClient::resetUsers, [this](const QString& serverId,
+    /*connect(&client, &HarpoonClient::resetUsers, [this](const QString& serverId,
                                                         const QString& channelName,
                                                         std::list<std::shared_ptr<User>>& users) {
                 Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
                 channel->getUserTreeModel()->resetUsers(users);
-            });
+                });*/
 
     connect(&client, &HarpoonClient::chatMessage, [this](size_t id,
                                                          const QString& serverId,

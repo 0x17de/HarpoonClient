@@ -77,14 +77,6 @@ public Q_SLOTS:
     void backlogRequest(Channel* channel);
 
 signals:
-    void resetServers(std::list<std::shared_ptr<Server>>& servers);
-    void resetUsers(const QString& serverId,
-                    const QString& channelName,
-                    std::list<std::shared_ptr<User>>& userList);
-    void newServer(std::shared_ptr<Server> server);
-    void deleteServer(const QString& serverId);
-    void newHost(std::shared_ptr<Host> host);
-    void deleteHost(const QString& serverId, const QString& host, int port);
     void joinChannel(size_t id,
                      const QString& serverId,
                      const QString& channelName,
