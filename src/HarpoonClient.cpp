@@ -530,6 +530,7 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
         if (!channelsValue.isObject()) return;
 
         auto currentServer = std::make_shared<Server>(activeNick, serverId, serverName, false); // TODO: server needs to send if status is disabled
+        serverList.push_back(currentServer);
 
         QJsonObject channels = channelsValue.toObject();
         for (auto cit = channels.begin(); cit != channels.end(); ++cit) {

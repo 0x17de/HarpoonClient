@@ -255,10 +255,12 @@ void ChatUi::activateChannel(Channel* channel) {
     if (channel != nullptr) {
         setWindowTitle(QString("Harpoon - ") + channel->getName());
         activeChannel_ = channel;
-        if (channel->getUserTreeView()->parentWidget() != nullptr)
-            userViews_->setCurrentWidget(channel->getUserTreeView());
-        if (channel->getBacklogView()->parentWidget() != nullptr)
-            backlogViews_->setCurrentWidget(channel->getBacklogView());
+        if (channel->getUserTreeView()->parentWidget() == nullptr)
+            userViews_->addWidget(channel->getUserTreeView());
+        userViews_->setCurrentWidget(channel->getUserTreeView());
+        if (channel->getBacklogView()->parentWidget() == nullptr)
+            backlogViews_->addWidget(channel->getBacklogView());
+        backlogViews_->setCurrentWidget(channel->getBacklogView());
         topicView_->setText(channel->getTopic());
         channel->activate();
     } else {
