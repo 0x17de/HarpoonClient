@@ -12,6 +12,8 @@ SettingsDialog::SettingsDialog(HarpoonClient& client, ServerTreeModel& channelTr
 
     settingsDialogUi_.protocolSettings->addWidget(&ircSettingsWidget_);
     ircSettingsUi_.serverList->setModel(&channelTreeModel);
+
+    connect(ircSettingsUi_.serverList, &QListView::clicked, this, &SettingsDialog::onIrcServerSelected);
 }
 
 SettingsDialog::~SettingsDialog() {
@@ -22,4 +24,12 @@ SettingsDialog::~SettingsDialog() {
 
 void SettingsDialog::show() {
     settingsDialog_.show();
+}
+
+void SettingsDialog::onIrcServerSelected(const QModelIndex& index) {
+    auto* item = static_cast<TreeEntry*>(index.internalPointer());
+    if (item->getTreeEntryType() == 's') {
+        Server* server = static_cast<Server*>(item);
+        ircSettingsUi_.hostsList->setModel(&server->getHostModel());
+    }
 }

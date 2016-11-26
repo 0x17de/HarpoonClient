@@ -27,6 +27,8 @@ public:
     void show();
 
 public Q_SLOTS:
+    void onIrcServerSelected(const QModelIndex& index);
+
 signals:
 
 };
