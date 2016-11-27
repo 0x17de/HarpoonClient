@@ -49,10 +49,12 @@ public:
     void setDisabled(bool disabled);
     void addUser(std::shared_ptr<User> user);
     void resetUsers(std::list<std::shared_ptr<User>>& users);
-    User* getUser(QString nick);
+    User* getUser(const QString& nick);
+    void setTopic(size_t id, double timestamp, const QString& nick, const QString& topic);
+    void addMessage(size_t id, double timestamp, const QString& nick, const QString& message, bool notice);
     BacklogView* getBacklogView();
     QTreeView* getUserTreeView();
-    UserTreeModel* getUserTreeModel();
+    UserTreeModel& getUserModel();
     void activate();
 
 public Q_SLOTS:

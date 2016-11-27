@@ -87,12 +87,6 @@ signals:
                      const QString& channelName,
                      double timestamp,
                      const QString& nick);
-    void topicChanged(size_t id,
-                      const QString& serverId,
-                      const QString& channelName,
-                      double timestamp,
-                      const QString& nick,
-                      const QString& topic);
     void nickChange(size_t id,
                     const QString& serverId,
                     double timestamp,
@@ -109,13 +103,6 @@ signals:
                     const QString& nick,
                     const QString& target,
                     const QString& reason);
-    void chatMessage(size_t id,
-                     const QString& serverId,
-                     const QString& channelName,
-                     double timestamp,
-                     const QString& nick,
-                     const QString& message,
-                     bool notice);
     void chatAction(size_t id,
                     const QString& serverId,
                     const QString& channelName,

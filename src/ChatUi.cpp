@@ -55,20 +55,6 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
     connect(&serverTreeModel_, &ServerTreeModel::expand, this, &ChatUi::expandServer);
     //connect(&serverTreeModel_, &ServerTreeModel::channelConnected, this, &ChatUi::channelConnected);
 
-    connect(&client, &HarpoonClient::topicChanged, [this](size_t id,
-                                                          const QString& serverId,
-                                                          const QString& channelName,
-                                                          double timestamp,
-                                                          const QString& nick,
-                                                          const QString& topic) {
-                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
-                if (channel == nullptr) return;
-                if (channel == activeChannel_)
-                    topicView_->setText(topic);
-                channel->setTopic(topic);
-                channel->getBacklogView()->addMessage(id, timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
-            });
-
     connect(&client, &HarpoonClient::nickChange, [this](size_t id,
                                                         const QString& serverId,
                                                         double timestamp,
@@ -81,7 +67,7 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                     server->setActiveNick(newNick);
 
                 for (auto& channel : server->getChannelModel().getChannels()) {
-                    if (channel->getUserTreeModel()->renameUser(User::stripNick(nick), newNick))
+                    if (channel->getUserModel().renameUser(User::stripNick(nick), newNick))
                         channel->getBacklogView()->addMessage(id, timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick, MessageColor::Event);
                 }
             });
@@ -91,21 +77,8 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                                                         std::list<std::shared_ptr<User>>& users) {
                 Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
-                channel->getUserTreeModel()->resetUsers(users);
+                channel->getUserModel().resetUsers(users);
                 });*/
-
-    connect(&client, &HarpoonClient::chatMessage, [this](size_t id,
-                                                         const QString& serverId,
-                                                         const QString& channelName,
-                                                         double timestamp,
-                                                         const QString& nick,
-                                                         const QString& message,
-                                                         bool notice) {
-                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
-                if (channel == nullptr) return;
-                auto sNick = User::stripNick(nick);
-                channel->getBacklogView()->addMessage(id, timestamp, notice ? '['+sNick+']' : '<'+sNick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
-            });
 
     connect(&client, &HarpoonClient::chatAction, [this](size_t id,
                                                         const QString& serverId,
@@ -134,7 +107,7 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                 } else {
                     Channel* channel = server->getChannelModel().getChannel(channelName);
                     if (channel == nullptr) return;
-                    channel->getUserTreeModel()->addUser(std::make_shared<User>(nick));
+                    channel->getUserModel().addUser(std::make_shared<User>(nick));
                     channel->getBacklogView()->addMessage(id, timestamp, "-->", nick + " joined the channel", MessageColor::Event);
                 }
             });
@@ -155,7 +128,7 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                 } else {
                     Channel* channel = server->getChannelModel().getChannel(channelName);
                     if (channel == nullptr) return;
-                    channel->getUserTreeModel()->removeUser(User::stripNick(nick));
+                    channel->getUserModel().removeUser(User::stripNick(nick));
                     channel->getBacklogView()->addMessage(id, timestamp, "<--", nick + " left the channel", MessageColor::Event);
                 }
             });
@@ -167,7 +140,7 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                                                         const QString& nick) {
                 Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
                 if (channel == nullptr) return;
-                channel->getUserTreeModel()->removeUser(User::stripNick(nick));
+                channel->getUserModel().removeUser(User::stripNick(nick));
                 channel->getBacklogView()->addMessage(id, timestamp, "<--", nick + " was kicked from the channel", MessageColor::Event);
             });
 
@@ -177,7 +150,7 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                                                         const QString& nick) {
                 for (auto& server : serverTreeModel_.getServers()) {
                     for (auto& channel : server->getChannelModel().getChannels()) {
-                        if (channel->getUserTreeModel()->removeUser(User::stripNick(nick)))
+                        if (channel->getUserModel().removeUser(User::stripNick(nick)))
                             channel->getBacklogView()->addMessage(id, timestamp, "<--", nick + " has quit", MessageColor::Event);
                     }
                 }

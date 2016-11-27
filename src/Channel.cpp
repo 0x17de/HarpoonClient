@@ -1,4 +1,5 @@
 #include "Channel.hpp"
+#include "User.hpp"
 
 #include <QStackedWidget>
 #include <QGraphicsTextItem>
@@ -80,8 +81,8 @@ BacklogView* Channel::getBacklogView() {
     return &backlogCanvas_;
 }
 
-UserTreeModel* Channel::getUserTreeModel() {
-    return &userTreeModel_;
+UserTreeModel& Channel::getUserModel() {
+    return userTreeModel_;
 }
 
 QTreeView* Channel::getUserTreeView() {
@@ -96,6 +97,15 @@ void Channel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     userTreeModel_.resetUsers(users);
 }
 
-User* Channel::getUser(QString nick) {
+User* Channel::getUser(const QString& nick) {
     return userTreeModel_.getUser(nick);
+}
+
+void Channel::setTopic(size_t id, double timestamp, const QString& nick, const QString& topic) {
+    backlogCanvas_.addMessage(id, timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
+}
+
+void Channel::addMessage(size_t id, double timestamp, const QString& nick, const QString& message, bool notice) {
+    auto sNick = User::stripNick(nick);
+    backlogCanvas_.addMessage(id, timestamp, notice ? '['+sNick+']' : '<'+sNick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
 }

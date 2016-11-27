@@ -295,7 +295,7 @@ void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
     QString nick = nickValue.toString();
     QString topic = topicValue.toString();
 
-    emit topicChanged(id, serverId, channelName, time, nick, topic);
+    serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName)->setTopic(id, time, nick, topic);
 }
 
 void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
@@ -323,8 +323,8 @@ void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
         if (!userEntry.isString()) return;
         userList.push_back(std::make_shared<User>(userEntry.toString()));
     }
-    Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
-    // TODO: reset users
+
+    serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName)->getUserModel().resetUsers(userList);
 }
 
 void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
@@ -468,7 +468,7 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root, bool notice) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    emit chatMessage(id, serverId, channelName, time, nick, message, notice);
+    serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName)->addMessage(id, time, nick, message, notice);
 }
 
 void HarpoonClient::irc_handleAction(const QJsonObject& root) {
