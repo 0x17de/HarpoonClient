@@ -54,10 +54,6 @@ QString Channel::getName() const {
     return name_;
 }
 
-void Channel::setTopic(const QString& topic) {
-    topic_ = topic;
-}
-
 QString Channel::getTopic() const {
     return topic_;
 }
@@ -102,6 +98,7 @@ User* Channel::getUser(const QString& nick) {
 }
 
 void Channel::setTopic(size_t id, double timestamp, const QString& nick, const QString& topic) {
+    topic_ = topic;
     backlogCanvas_.addMessage(id, timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
 }
 

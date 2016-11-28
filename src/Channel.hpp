@@ -43,7 +43,6 @@ public:
     size_t getFirstId() const;
     Server* getServer() const;
     QString getName() const;
-    void setTopic(const QString& topic);
     QString getTopic() const;
     bool getDisabled() const;
     void setDisabled(bool disabled);

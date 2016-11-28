@@ -295,7 +295,9 @@ void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
     QString nick = nickValue.toString();
     QString topic = topicValue.toString();
 
-    serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName)->setTopic(id, time, nick, topic);
+    auto* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
+    channel->setTopic(id, time, nick, topic);
+    emit topicChanged(channel, topic);
 }
 
 void HarpoonClient::irc_handleUserList(const QJsonObject& root) {

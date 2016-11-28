@@ -50,10 +50,13 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
         });
 
     // channel list events
-    //connect(&client, &HarpoonClient::resetServers, this, &ChatUi::resetServers);
     connect(channelView_, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
     connect(&serverTreeModel_, &ServerTreeModel::expand, this, &ChatUi::expandServer);
-    //connect(&serverTreeModel_, &ServerTreeModel::channelConnected, this, &ChatUi::channelConnected);
+
+    connect(&client, &HarpoonClient::topicChanged, [this](Channel* channel, const QString& topic) {
+            if (activeChannel_ == channel)
+                topicView_->setText(topic);
+        });
 
     connect(&client, &HarpoonClient::nickChange, [this](size_t id,
                                                         const QString& serverId,
@@ -71,14 +74,6 @@ ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
                         channel->getBacklogView()->addMessage(id, timestamp, "<->", User::stripNick(nick) + " is now known as " + newNick, MessageColor::Event);
                 }
             });
-
-    /*connect(&client, &HarpoonClient::resetUsers, [this](const QString& serverId,
-                                                        const QString& channelName,
-                                                        std::list<std::shared_ptr<User>>& users) {
-                Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
-                if (channel == nullptr) return;
-                channel->getUserModel().resetUsers(users);
-                });*/
 
     connect(&client, &HarpoonClient::chatAction, [this](size_t id,
                                                         const QString& serverId,

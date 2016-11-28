@@ -77,6 +77,7 @@ public Q_SLOTS:
     void backlogRequest(Channel* channel);
 
 signals:
+    void topicChanged(Channel* channel, const QString& topic);
     void joinChannel(size_t id,
                      const QString& serverId,
                      const QString& channelName,
