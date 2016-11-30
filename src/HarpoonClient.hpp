@@ -78,38 +78,6 @@ public Q_SLOTS:
 
 signals:
     void topicChanged(Channel* channel, const QString& topic);
-    void joinChannel(size_t id,
-                     const QString& serverId,
-                     const QString& channelName,
-                     double timestamp,
-                     const QString& nick);
-    void partChannel(size_t id,
-                     const QString& serverId,
-                     const QString& channelName,
-                     double timestamp,
-                     const QString& nick);
-    void nickChange(size_t id,
-                    const QString& serverId,
-                    double timestamp,
-                    const QString& nick,
-                    const QString& newNick);
-    void quitServer(size_t id,
-                    const QString& serverId,
-                    double timestamp,
-                    const QString& nick);
-    void userKicked(size_t id,
-                    const QString& serverId,
-                    const QString& channelName,
-                    double timestamp,
-                    const QString& nick,
-                    const QString& target,
-                    const QString& reason);
-    void chatAction(size_t id,
-                    const QString& serverId,
-                    const QString& channelName,
-                    double timestamp,
-                    const QString& nick,
-                    const QString& action);
 };
 
 #endif

@@ -50,7 +50,7 @@ public:
     void resetUsers(std::list<std::shared_ptr<User>>& users);
     User* getUser(const QString& nick);
     void setTopic(size_t id, double timestamp, const QString& nick, const QString& topic);
-    void addMessage(size_t id, double timestamp, const QString& nick, const QString& message, bool notice);
+    void addMessage(size_t id, double timestamp, const QString& nick, const QString& message, MessageColor color);
     BacklogView* getBacklogView();
     QTreeView* getUserTreeView();
     UserTreeModel& getUserModel();

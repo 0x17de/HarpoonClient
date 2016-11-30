@@ -349,7 +349,20 @@ void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    emit joinChannel(id, serverId, channelName, time, nick);
+    Server* server = serverTreeModel_.getServer(serverId);
+    auto& channelModel = server->getChannelModel();
+    Channel* channel = channelModel.getChannel(channelName);
+
+    if (server->getActiveNick() == User::stripNick(nick)) {
+        if (channel != nullptr) {
+            channel->setDisabled(false);
+        } else {
+            std::shared_ptr<Channel> channelPtr{std::make_shared<Channel>(0 /* backlog last id */, server, channelName, false)};
+            channel = channelPtr.get();
+            channelModel.newChannel(channelPtr);
+        }
+    }
+    channel->addMessage(id, time, "-->", User::stripNick(nick) + " joined the channel", MessageColor::Event);
 }
 
 void HarpoonClient::irc_handlePart(const QJsonObject& root) {
@@ -372,7 +385,20 @@ void HarpoonClient::irc_handlePart(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    emit partChannel(id, serverId, channelName, time, nick);
+    Server* server = serverTreeModel_.getServer(serverId);
+    auto& channelModel = server->getChannelModel();
+    Channel* channel = channelModel.getChannel(channelName);
+
+    if (server->getActiveNick() == User::stripNick(nick)) {
+        if (channel != nullptr) {
+            channel->setDisabled(true);
+        } else {
+            std::shared_ptr<Channel> channelPtr{std::make_shared<Channel>(0 /* backlog last id */, server, channelName, true)};
+            channel = channelPtr.get();
+            channelModel.newChannel(channelPtr);
+        }
+    }
+    channel->addMessage(id, time, "<--", User::stripNick(nick) + " left the channel", MessageColor::Event);
 }
 
 void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
@@ -395,7 +421,16 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
     QString newNick = newNickValue.toString();
     QString serverId = serverIdValue.toString();
 
-    emit nickChange(id, serverId, time, nick, newNick);
+    Server* server = serverTreeModel_.getServer(serverId);
+    if (server == nullptr) return;
+
+    if (server->getActiveNick() == nick)
+        server->setActiveNick(newNick);
+
+    for (auto& channel : server->getChannelModel().getChannels()) {
+        if (channel->getUserModel().renameUser(User::stripNick(nick), newNick))
+            channel->getBacklogView()->addMessage(id, time, "<->", User::stripNick(nick) + " is now known as " + newNick, MessageColor::Event);
+    }
 }
 
 void HarpoonClient::irc_handleKick(const QJsonObject& root) {
@@ -424,7 +459,10 @@ void HarpoonClient::irc_handleKick(const QJsonObject& root) {
     QString target = targetValue.toString();
     QString reason = reasonValue.toString();
 
-    emit userKicked(id, serverId, channelName, time, nick, target, reason);
+    Channel* channel = serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName);
+    if (channel == nullptr) return;
+    channel->getUserModel().removeUser(User::stripNick(nick));
+    channel->getBacklogView()->addMessage(id, time, "<--", nick + " was kicked (Reason: " + reason + ")", MessageColor::Event);
 }
 
 void HarpoonClient::irc_handleQuit(const QJsonObject& root) {
@@ -444,7 +482,12 @@ void HarpoonClient::irc_handleQuit(const QJsonObject& root) {
     QString nick = nickValue.toString();
     QString serverId = serverIdValue.toString();
 
-    emit quitServer(id, serverId, time, nick);
+    for (auto& server : serverTreeModel_.getServers()) {
+        for (auto& channel : server->getChannelModel().getChannels()) {
+            if (channel->getUserModel().removeUser(User::stripNick(nick)))
+                channel->getBacklogView()->addMessage(id, time, "<--", nick + " has quit", MessageColor::Event);
+        }
+    }
 }
 
 void HarpoonClient::irc_handleChat(const QJsonObject& root, bool notice) {
@@ -470,7 +513,11 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root, bool notice) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    serverTreeModel_.getServer(serverId)->getChannelModel().getChannel(channelName)->addMessage(id, time, nick, message, notice);
+    Server* server = serverTreeModel_.getServer(serverId);
+    if (!server) return;
+    Channel* channel = server->getChannelModel().getChannel(channelName);
+    if (!channel) return;
+    channel->addMessage(id, time, '<'+User::stripNick(nick)+'>', message, MessageColor::Default);
 }
 
 void HarpoonClient::irc_handleAction(const QJsonObject& root) {
@@ -496,7 +543,11 @@ void HarpoonClient::irc_handleAction(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
 
-    emit chatAction(id, serverId, channelName, time, nick, message);
+    Server* server = serverTreeModel_.getServer(serverId);
+    if (!server) return;
+    Channel* channel = server->getChannelModel().getChannel(channelName);
+    if (!channel) return;
+    channel->addMessage(id, time, "*", User::stripNick(nick) + " " + message, MessageColor::Action);
 }
 
 void HarpoonClient::irc_handleChatList(const QJsonObject& root) {

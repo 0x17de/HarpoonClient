@@ -102,7 +102,6 @@ void Channel::setTopic(size_t id, double timestamp, const QString& nick, const Q
     backlogCanvas_.addMessage(id, timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
 }
 
-void Channel::addMessage(size_t id, double timestamp, const QString& nick, const QString& message, bool notice) {
-    auto sNick = User::stripNick(nick);
-    backlogCanvas_.addMessage(id, timestamp, notice ? '['+sNick+']' : '<'+sNick+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
+void Channel::addMessage(size_t id, double timestamp, const QString& nick, const QString& message, MessageColor color) {
+    backlogCanvas_.addMessage(id, timestamp, nick, message, color);
 }
