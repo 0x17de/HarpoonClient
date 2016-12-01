@@ -24,6 +24,7 @@ set(SRC_CLIENT
     src/models/ChannelTreeModel.cpp src/models/ChannelTreeModel.hpp
     src/models/UserTreeModel.cpp src/models/UserTreeModel.hpp
     src/models/HostTreeModel.cpp src/models/HostTreeModel.hpp
+    src/models/SettingsTypeModel.cpp src/models/SettingsTypeModel.hpp
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
@@ -31,6 +32,7 @@ qt5_wrap_cpp(SERVERTREEMODEL_SRC src/models/ServerTreeModel.hpp)
 qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/models/ChannelTreeModel.hpp)
 qt5_wrap_cpp(USERTREEMODEL_SRC src/models/UserTreeModel.hpp)
 qt5_wrap_cpp(HOSTTREEMODEL_SRC src/models/HostTreeModel.hpp)
+qt5_wrap_cpp(SETTINGSTYPEMODEL_SRC src/models/SettingsTypeModel.hpp)
 qt5_wrap_cpp(HARPOONCLIENT_SRC src/HarpoonClient.hpp)
 qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
 qt5_wrap_cpp(HOST_SRC src/Host.hpp)
@@ -53,6 +55,7 @@ add_executable(HarpoonClient
     ${CHANNELTREEMODEL_SRC}
     ${USERTREEMODEL_SRC}
     ${HOSTTREEMODEL_SRC}
+    ${SETTINGSTYPEMODEL_SRC}
     ${HARPOONCLIENT_SRC}
     ${SERVER_SRC}
     ${HOST_SRC}
