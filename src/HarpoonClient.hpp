@@ -15,6 +15,7 @@ class QJsonObject;
 class QJsonDocument;
 class Server;
 class ServerTreeModel;
+class SettingsTypeModel;
 class Host;
 class Channel;
 class User;
@@ -26,6 +27,7 @@ class HarpoonClient : public QObject {
     bool shutdown_;
 
     ServerTreeModel& serverTreeModel_;
+    SettingsTypeModel& settingsTypeModel_;
 
     QUrl harpoonUrl_;
     QString username_;
@@ -39,7 +41,8 @@ class HarpoonClient : public QObject {
     QSettings settings_;
 
 public:
-    HarpoonClient(ServerTreeModel& serverTreeModel_);
+    HarpoonClient(ServerTreeModel& serverTreeModel,
+                  SettingsTypeModel& settingsTypeModel);
     ~HarpoonClient();
     void run();
     void reconnect(const QString& username,

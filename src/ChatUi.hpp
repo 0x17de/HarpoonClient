@@ -10,6 +10,7 @@
 
 
 class ServerTreeModel;
+class SettingsTypeModel;
 class Server;
 class Channel;
 class HarpoonClient;
@@ -17,6 +18,7 @@ class QTreeView;
 class QTableView;
 class QLineEdit;
 class QStackedWidget;
+
 
 class ChatUi : public QMainWindow {
     Q_OBJECT
@@ -28,6 +30,8 @@ class ChatUi : public QMainWindow {
     HarpoonClient& client_;
 
     ServerTreeModel& serverTreeModel_;
+    SettingsTypeModel& settingsTypeModel_;
+
     QLineEdit* topicView_;
     QTreeView* channelView_;
     QStackedWidget* userViews_;
@@ -39,7 +43,9 @@ class ChatUi : public QMainWindow {
     SettingsDialog settingsDialog_;
 
 public:
-    ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel_);
+    ChatUi(HarpoonClient& client,
+           ServerTreeModel& serverTreeModel,
+           SettingsTypeModel& settingsTypeModel);
     virtual ~ChatUi();
 
 private:

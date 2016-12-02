@@ -17,9 +17,11 @@
 QT_USE_NAMESPACE
 
 
-HarpoonClient::HarpoonClient(ServerTreeModel& serverTreeModel)
+HarpoonClient::HarpoonClient(ServerTreeModel& serverTreeModel,
+                             SettingsTypeModel& settingsTypeModel)
     : shutdown_{false}
     , serverTreeModel_{serverTreeModel}
+    , settingsTypeModel_{settingsTypeModel}
     , settings_("_0x17de", "HarpoonClient")
 {
     connect(&ws_, &QWebSocket::connected, this, &HarpoonClient::onConnected);

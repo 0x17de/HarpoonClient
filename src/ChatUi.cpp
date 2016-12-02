@@ -11,9 +11,12 @@
 #include "User.hpp"
 
 
-ChatUi::ChatUi(HarpoonClient& client, ServerTreeModel& serverTreeModel)
+ChatUi::ChatUi(HarpoonClient& client,
+               ServerTreeModel& serverTreeModel,
+               SettingsTypeModel& settingsTypeModel)
     : client_{client}
     , serverTreeModel_{serverTreeModel}
+    , settingsTypeModel_{settingsTypeModel}
     , settings_{client.getSettings()}
     , settingsDialog_{client, serverTreeModel}
 {
