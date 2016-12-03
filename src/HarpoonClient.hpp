@@ -56,7 +56,9 @@ private:
     void onTextMessage(const QString& message);
     void onBinaryMessage(const QByteArray& data);
     void handleCommand(const QJsonDocument& doc);
+    void handleLogin(const QJsonObject& root);
 
+    void irc_handleSettings(const QJsonObject& root);
     void irc_handleChatList(const QJsonObject& root);
     void irc_handleUserList(const QJsonObject& root);
     void irc_handleTopic(const QJsonObject& root);

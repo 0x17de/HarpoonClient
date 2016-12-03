@@ -168,7 +168,7 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
     qDebug() << type << ":" << cmd;
     if (type == "") {
         if (cmd == "login") {
-            // TODO: ...
+            handleLogin(root);
         }
     } if (type == "irc") {
         if (cmd == "chatlist") {
@@ -199,8 +199,72 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleJoin(root);
         } else if (cmd == "part") {
             irc_handlePart(root);
+        } else if (cmd == "settings") {
+            irc_handleSettings(root);
         } else if (cmd == "quit") {
             irc_handleQuit(root);
+        }
+    }
+}
+
+void HarpoonClient::handleLogin(const QJsonObject& root) {
+    auto successValue = root.value("success");
+    if (!successValue.isBool()) return;
+    bool success = successValue.toBool();
+    if (success) {
+        QJsonObject newRoot;
+        newRoot["cmd"] = "querysettings";
+        QString json = QJsonDocument{newRoot}.toJson(QJsonDocument::JsonFormat::Compact);
+        ws_.sendTextMessage(json);
+    } else {
+        // TODO
+    }
+}
+
+void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
+    // TODO: nicks, hasPassword, ipv6, ssl
+
+    auto dataValue = root["data"];
+    if (!dataValue.isObject()) return;
+    QJsonObject data = dataValue.toObject();
+
+    auto serversValue = data["servers"];
+    if (!serversValue.isObject()) return;
+    auto servers = serversValue.toObject();
+
+    for (auto serverIt = servers.begin(); serverIt != servers.end(); ++serverIt) {
+        QString serverId = serverIt.key();
+        auto serverDataValue = serverIt.value();
+        if (!serverDataValue.isObject()) return;
+        auto serverData = serverDataValue.toObject();
+
+        Server* server = serverTreeModel_.getServer(serverId);
+
+        auto hostsValue = serverData["hosts"];
+        if (!hostsValue.isObject()) return;
+        auto hosts = hostsValue.toObject();
+
+        for (auto hostIt = hosts.begin(); hostIt != hosts.end(); ++hostIt) {
+            QString hostKey = hostIt.key();
+            auto hostDataValue = hostIt.value();
+            if (!hostDataValue.isObject()) return;
+            auto hostData = hostDataValue.toObject();
+
+            auto hasPasswordValue = hostData["hasPassword"];
+            auto ipv6Value = hostData["ipv6"];
+            auto sslValue = hostData["ssl"];
+
+            if (!hasPasswordValue.isBool()) return;
+            if (!ipv6Value.isBool()) return;
+            if (!sslValue.isBool()) return;
+
+            int colonPosition = hostKey.indexOf(":");
+            if (colonPosition == -1) return;
+            QString hostname = hostKey.left(colonPosition);
+            int port = hostKey.right(hostKey.size() - colonPosition - 1).toInt();
+
+            std::shared_ptr<Host> host{std::make_shared<Host>(server, hostname, port)};
+            server->getHostModel().newHost(host);
         }
     }
 }
