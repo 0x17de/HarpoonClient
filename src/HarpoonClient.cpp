@@ -244,6 +244,8 @@ void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
         if (!hostsValue.isObject()) return;
         auto hosts = hostsValue.toObject();
 
+        std::list<std::shared_ptr<Host>> newHosts;
+
         for (auto hostIt = hosts.begin(); hostIt != hosts.end(); ++hostIt) {
             QString hostKey = hostIt.key();
             auto hostDataValue = hostIt.value();
@@ -263,9 +265,11 @@ void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
             QString hostname = hostKey.left(colonPosition);
             int port = hostKey.right(hostKey.size() - colonPosition - 1).toInt();
 
-            std::shared_ptr<Host> host{std::make_shared<Host>(server, hostname, port)};
-            server->getHostModel().newHost(host);
+            std::shared_ptr<Host> newHost{std::make_shared<Host>(server, hostname, port)};
+            newHosts.push_back(newHost);
         }
+
+        server->getHostModel().resetHosts(newHosts);
     }
 }
 
