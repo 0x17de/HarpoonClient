@@ -20,31 +20,11 @@ QModelIndex ChannelTreeModel::index(int row, int column, const QModelIndex& pare
         auto it = channels_.begin();
         std::advance(it, row);
         return createIndex(row, column, (*it).get());
-    } else {
-        auto* item = static_cast<TreeEntry*>(parent.internalPointer());
-        if (item->getTreeEntryType() == 's') {
-            Server* server = static_cast<Server*>(parent.internalPointer());
-            return createIndex(row, column, server->getChannelModel().getChannel(row));
-        }
     }
     return QModelIndex();
 }
 
 QModelIndex ChannelTreeModel::parent(const QModelIndex& index) const {
-    if (!index.isValid())
-        return QModelIndex();
-
-    auto* ptr = index.internalPointer();
-    auto* item = static_cast<TreeEntry*>(ptr);
-    if (item->getTreeEntryType() == 'c') {
-        Channel* channel = static_cast<Channel*>(ptr);
-        Server* server = channel->getServer();
-
-        int rowIndex = server->getChannelModel().getChannelIndex(channel);
-        if (rowIndex >= 0)
-            return createIndex(rowIndex, 0, server);
-    }
-
     return QModelIndex();
 }
 

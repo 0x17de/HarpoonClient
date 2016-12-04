@@ -20,31 +20,11 @@ QModelIndex HostTreeModel::index(int row, int column, const QModelIndex& parent)
         auto it = hosts_.begin();
         std::advance(it, row);
         return createIndex(row, column, (*it).get());
-    } else {
-        auto* item = static_cast<TreeEntry*>(parent.internalPointer());
-        if (item->getTreeEntryType() == 's') {
-            Server* server = static_cast<Server*>(parent.internalPointer());
-            return createIndex(row, column, server->getHostModel().getHost(row));
-        }
     }
     return QModelIndex();
 }
 
 QModelIndex HostTreeModel::parent(const QModelIndex& index) const {
-    if (!index.isValid())
-        return QModelIndex();
-
-    auto* ptr = index.internalPointer();
-    auto* item = static_cast<TreeEntry*>(ptr);
-    if (item->getTreeEntryType() == 'h') {
-        Host* host = static_cast<Host*>(ptr);
-        Server* server = host->getServer();
-
-        int rowIndex = server->getHostModel().getHostIndex(host);
-        if (rowIndex >= 0)
-            return createIndex(rowIndex, 0, server);
-    }
-
     return QModelIndex();
 }
 
@@ -92,7 +72,7 @@ QVariant HostTreeModel::data(const QModelIndex& index, int role) const {
         if (role != Qt::DisplayRole)
             return QVariant();
 
-        return host->getHost();
+        return host->getHost() + ":" + QString::number(host->getPort());
     }
 
     return QVariant();
