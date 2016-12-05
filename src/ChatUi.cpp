@@ -18,7 +18,7 @@ ChatUi::ChatUi(HarpoonClient& client,
     , serverTreeModel_{serverTreeModel}
     , settingsTypeModel_{settingsTypeModel}
     , settings_{client.getSettings()}
-    , settingsDialog_{client, serverTreeModel}
+    , settingsDialog_{client, serverTreeModel, settingsTypeModel}
 {
     clientUi_.setupUi(this);
     bouncerConfigurationDialogUi_.setupUi(&bouncerConfigurationDialog_);

@@ -10,12 +10,14 @@ QModelIndex SettingsTypeModel::index(int row, int column, const QModelIndex& par
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
+    std::list<Entry>& entries = const_cast<std::list<Entry>&>(settingsWidgets_);
+
     if (!parent.isValid()) {
-        if (row >= settingsWidgets_.size())
+        if (row >= entries.size())
             return QModelIndex();
-        auto it = settingsWidgets_.begin();
+        auto it = entries.begin();
         std::advance(it, row);
-        return createIndex(row, column, &it);
+        return createIndex(row, column, &(*it));
     }
     return QModelIndex();
 }

@@ -1,15 +1,21 @@
 #include "SettingsDialog.hpp"
 #include "models/ServerTreeModel.hpp"
+#include "models/SettingsTypeModel.hpp"
 #include "HarpoonClient.hpp"
 
 
-SettingsDialog::SettingsDialog(HarpoonClient& client, ServerTreeModel& channelTreeModel)
+SettingsDialog::SettingsDialog(HarpoonClient& client,
+                               ServerTreeModel& channelTreeModel,
+                               SettingsTypeModel& settingsTypeModel)
     : channelTreeModel_{channelTreeModel}
+    , settingsTypeModel_{settingsTypeModel}
 {
     // settings dialog
     settingsDialogUi_.setupUi(&settingsDialog_);
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
 
+    settingsTypeModel.newType("irc", &ircSettingsWidget_);
+    settingsDialogUi_.protocolSelection->setModel(&settingsTypeModel);
     settingsDialogUi_.protocolSettings->addWidget(&ircSettingsWidget_);
     ircSettingsUi_.serverList->setModel(&channelTreeModel);
 
