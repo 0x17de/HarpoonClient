@@ -2,6 +2,7 @@
 
 #include "Server.hpp"
 #include "models/ServerTreeModel.hpp"
+#include "models/SettingsTypeModel.hpp"
 #include "Host.hpp"
 #include "Channel.hpp"
 #include "User.hpp"
@@ -77,8 +78,10 @@ void HarpoonClient::onConnected() {
 void HarpoonClient::onDisconnected() {
     pingTimer_.stop();
     qDebug() << "disconnected";
-    std::list<std::shared_ptr<Server>> empty;
-    serverTreeModel_.resetServers(empty);
+    std::list<std::shared_ptr<Server>> emptyServerList;
+    serverTreeModel_.resetServers(emptyServerList);
+    std::list<QString> emptyTypeList;
+    settingsTypeModel_.resetTypes(emptyTypeList);
     if (!shutdown_)
         reconnectTimer_.start(3000);
 }
@@ -271,6 +274,8 @@ void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
 
         server->getHostModel().resetHosts(newHosts);
     }
+
+    settingsTypeModel_.newType("irc");
 }
 
 void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {

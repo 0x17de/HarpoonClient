@@ -10,7 +10,7 @@ QModelIndex SettingsTypeModel::index(int row, int column, const QModelIndex& par
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    std::list<Entry>& entries = const_cast<std::list<Entry>&>(settingsWidgets_);
+    std::list<QString>& entries = const_cast<std::list<QString>&>(typeNames_);
 
     if (!parent.isValid()) {
         if (row >= entries.size())
@@ -31,7 +31,7 @@ int SettingsTypeModel::rowCount(const QModelIndex& parent) const {
         return 0;
 
     if (!parent.isValid())
-        return settingsWidgets_.size();
+        return typeNames_.size();
 
     return 0;
 }
@@ -44,7 +44,7 @@ QVariant SettingsTypeModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    auto* item = static_cast<Entry*>(index.internalPointer());
+    auto* item = static_cast<QString*>(index.internalPointer());
 
     if (role == Qt::DecorationRole)
         return QVariant();
@@ -52,7 +52,7 @@ QVariant SettingsTypeModel::data(const QModelIndex& index, int role) const {
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    return item->name;
+    return *item;
 }
 
 Qt::ItemFlags SettingsTypeModel::flags(const QModelIndex& index) const {
@@ -70,9 +70,17 @@ QVariant SettingsTypeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-void SettingsTypeModel::newType(const QString& name, QWidget* widget) {
+void SettingsTypeModel::newType(const QString& name) {
     int rowIndex = 0;
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
-    settingsWidgets_.push_back({name, widget});
+    typeNames_.push_back(name);
     endInsertRows();
+}
+
+void SettingsTypeModel::resetTypes(const std::list<QString>& types) {
+    beginResetModel();
+    typeNames_.clear();
+    for (auto& name : types)
+        typeNames_.push_back(name);
+    endResetModel();
 }

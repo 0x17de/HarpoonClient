@@ -3,6 +3,7 @@
 
 
 #include <QObject>
+#include <QHash>
 
 #include "Server.hpp"
 #include "HarpoonClient.hpp"
@@ -22,6 +23,7 @@ class SettingsDialog : public QObject {
     Ui::IrcSettings ircSettingsUi_;
     QDialog settingsDialog_;
     QWidget ircSettingsWidget_;
+    QHash<QString, QWidget*> widgetMap_;
 
 public:
     SettingsDialog(HarpoonClient& client,
@@ -31,6 +33,7 @@ public:
     void show();
 
 public Q_SLOTS:
+    void onProtocolSelected(const QString& text);
     void onIrcServerSelected(const QModelIndex& index);
 
 signals:

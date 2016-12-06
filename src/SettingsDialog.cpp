@@ -14,11 +14,12 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
     settingsDialogUi_.setupUi(&settingsDialog_);
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
 
-    settingsTypeModel.newType("irc", &ircSettingsWidget_);
+    widgetMap_.insert("irc", &ircSettingsWidget_);
     settingsDialogUi_.protocolSelection->setModel(&settingsTypeModel);
     settingsDialogUi_.protocolSettings->addWidget(&ircSettingsWidget_);
     ircSettingsUi_.serverList->setModel(&channelTreeModel);
 
+    connect(settingsDialogUi_.protocolSelection, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated), this, &SettingsDialog::onProtocolSelected);
     connect(ircSettingsUi_.serverList, &QListView::clicked, this, &SettingsDialog::onIrcServerSelected);
 }
 
@@ -31,6 +32,12 @@ SettingsDialog::~SettingsDialog() {
 
 void SettingsDialog::show() {
     settingsDialog_.show();
+}
+
+void SettingsDialog::onProtocolSelected(const QString& text) {
+    auto it = widgetMap_.find(text);
+    if (it == widgetMap_.end()) return;
+    settingsDialogUi_.protocolSettings->setCurrentWidget(*it);
 }
 
 void SettingsDialog::onIrcServerSelected(const QModelIndex& index) {

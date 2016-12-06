@@ -9,12 +9,7 @@
 class SettingsTypeModel : public QAbstractItemModel {
     Q_OBJECT
 
-    struct Entry {
-        QString name;
-        QWidget* widget;
-    };
-
-    std::list<Entry> settingsWidgets_;
+    std::list<QString> typeNames_;
 
 public:
     explicit SettingsTypeModel(QObject* parent = 0);
@@ -29,7 +24,8 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    void newType(const QString& name, QWidget* widget);
+    void newType(const QString& name);
+    void resetTypes(const std::list<QString>& types);
 };
 
 #endif
