@@ -93,48 +93,6 @@ QVariant HostTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-std::list<std::shared_ptr<Host>> HostTreeModel::getHosts() {
-    return hosts_;
-}
-
-Host* HostTreeModel::getHost(const QString& hostName) {
-    auto it = find_if(hosts_.begin(), hosts_.end(), [&hostName](std::shared_ptr<Host> host) {
-            return host->getHost() == hostName;
-        });
-    if (it == hosts_.end()) return nullptr;
-    return it->get();
-}
-
-Host* HostTreeModel::getHost(int row) {
-    return static_cast<Host*>(index(row, 0).internalPointer());
-}
-
-int HostTreeModel::getHostIndex(Host* host) {
-    int rowIndex = 0;
-    for (auto s : hosts_) {
-        if (s.get() == host)
-            return rowIndex;
-        ++rowIndex;
-    }
-    return -1;
-}
-
-int HostTreeModel::getHostIndex(const QString& hostName) {
-    int rowIndex = 0;
-    for (auto host : hosts_) {
-        if (host->getHost() == hostName)
-            return rowIndex;
-        ++rowIndex;
-    }
-    return -1;
-}
-
-void HostTreeModel::hostDataChanged(Host* host) {
-    auto rowIndex = getHostIndex(host);
-    auto modelIndex = createIndex(rowIndex, 0, host);
-    emit dataChanged(modelIndex, modelIndex);
-}
-
 void HostTreeModel::resetHosts(std::list<std::shared_ptr<Host>>& hosts) {
     beginResetModel();
     hosts_.clear();

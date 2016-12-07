@@ -1,17 +1,18 @@
-#ifndef HOSTTREEMODEL_H
-#define HOSTTREEMODEL_H
+#ifndef NICKMODEL_H
+#define NICKMODEL_H
 
 #include <QAbstractItemModel>
 #include <list>
 #include <memory>
 
 
-class Host;
-class HostTreeModel : public QAbstractItemModel {
+class NickTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
+    std::list<QString> nicks_;
+
 public:
-    explicit HostTreeModel(QObject* parent = 0);
+    explicit NickTreeModel(QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
@@ -27,12 +28,9 @@ signals:
     void expand(const QModelIndex& index);
 
 public Q_SLOTS:
-    void resetHosts(std::list<std::shared_ptr<Host>>& servers);
-    void newHost(std::shared_ptr<Host> server);
-    void deleteHost(const QString& host, int port);
-
-private:
-    std::list<std::shared_ptr<Host>> hosts_;
+    void resetNicks(std::list<QString>& nicks);
+    void newNick(const QString& nick);
+    void deleteNick(const QString& host, int port);
 };
 
 #endif
