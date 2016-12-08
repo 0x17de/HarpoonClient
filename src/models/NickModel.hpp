@@ -6,13 +6,13 @@
 #include <memory>
 
 
-class NickTreeModel : public QAbstractItemModel {
+class NickModel : public QAbstractItemModel {
     Q_OBJECT
 
     std::list<QString> nicks_;
 
 public:
-    explicit NickTreeModel(QObject* parent = 0);
+    explicit NickModel(QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;

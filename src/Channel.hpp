@@ -15,6 +15,7 @@
 #include "ChatLine.hpp"
 #include "TreeEntry.hpp"
 #include "models/UserTreeModel.hpp"
+#include "models/NickModel.hpp"
 
 
 class Server;
@@ -28,6 +29,7 @@ class Channel : public TreeEntry {
     QString name_;
     QString topic_;
     UserTreeModel userTreeModel_;
+    NickModel nickModel_;
     bool disabled_;
     QTreeView userTreeView_;
     QGraphicsScene backlogScene_; // TODO: create own class + chat line class
