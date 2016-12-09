@@ -9,6 +9,7 @@
 #include "TreeEntry.hpp"
 #include "models/ChannelTreeModel.hpp"
 #include "models/HostTreeModel.hpp"
+#include "models/NickModel.hpp"
 
 
 class Server : public TreeEntry {
@@ -16,6 +17,7 @@ class Server : public TreeEntry {
 
     ChannelTreeModel channelModel_;
     HostTreeModel hostModel_;
+    NickModel nickModel_;
     QString id_;
     QString name_;
     QString nick_;
@@ -29,6 +31,7 @@ public:
 
     ChannelTreeModel& getChannelModel();
     HostTreeModel& getHostModel();
+    NickModel& getNickModel();
     QString getId() const;
     QString getName() const;
     QString getActiveNick() const;

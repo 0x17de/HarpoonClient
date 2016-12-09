@@ -22,6 +22,10 @@ HostTreeModel& Server::getHostModel() {
     return hostModel_;
 }
 
+NickModel& Server::getNickModel() {
+    return nickModel_;
+}
+
 QString Server::getId() const {
     return id_;
 }
