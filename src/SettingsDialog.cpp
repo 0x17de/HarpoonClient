@@ -45,5 +45,6 @@ void SettingsDialog::onIrcServerSelected(const QModelIndex& index) {
     if (item->getTreeEntryType() == 's') {
         Server* server = static_cast<Server*>(item);
         ircSettingsUi_.hostsList->setModel(&server->getHostModel());
+        ircSettingsUi_.nickList->setModel(&server->getNickModel());
     }
 }

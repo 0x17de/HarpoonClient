@@ -244,10 +244,14 @@ void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
         Server* server = serverTreeModel_.getServer(serverId);
 
         auto hostsValue = serverData["hosts"];
+        auto nicksValue = serverData["nicks"];
         if (!hostsValue.isObject()) return;
+        if (!nicksValue.isArray()) return;
         auto hosts = hostsValue.toObject();
+        auto nicks = nicksValue.toArray();
 
         std::list<std::shared_ptr<Host>> newHosts;
+        std::list<QString> newNicks;
 
         for (auto hostIt = hosts.begin(); hostIt != hosts.end(); ++hostIt) {
             QString hostKey = hostIt.key();
@@ -272,7 +276,14 @@ void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
             newHosts.push_back(newHost);
         }
 
+        for (auto nickIt = nicks.begin(); nickIt != nicks.end(); ++nickIt) {
+            auto nickValue = *nickIt;
+            if (!nickValue.isString()) return;
+            newNicks.push_back(nickValue.toString());
+        }
+
         server->getHostModel().resetHosts(newHosts);
+        server->getNickModel().resetNicks(newNicks);
     }
 
     settingsTypeModel_.newType("irc");
