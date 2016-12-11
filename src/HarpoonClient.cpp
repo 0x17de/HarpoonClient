@@ -178,17 +178,19 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleChatList(root);
         } else if (cmd == "chat") {
             irc_handleChat(root, false);
-        } else if (cmd == "models") {
+        } else if (cmd == "userlist") {
             irc_handleUserList(root);
         } else if (cmd == "nickchange") {
             irc_handleNickChange(root);
+        } else if (cmd == "nickmodified") {
+            irc_handleNickModified(root);
         } else if (cmd == "serveradded") {
             irc_handleServerAdded(root);
         } else if (cmd == "serverremoved") {
             irc_handleServerDeleted(root);
         } else if (cmd == "hostadded") {
             irc_handleHostAdded(root);
-        } else if (cmd == "hostremoved") {
+        } else if (cmd == "hostdeleted") {
             irc_handleHostDeleted(root);
         } else if (cmd == "topic") {
             irc_handleTopic(root);
@@ -517,6 +519,35 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
         if (channel->getUserModel().renameUser(User::stripNick(nick), newNick))
             channel->getBacklogView()->addMessage(id, time, "<->", User::stripNick(nick) + " is now known as " + newNick, MessageColor::Event);
     }
+}
+
+void HarpoonClient::irc_handleNickModified(const QJsonObject& root) {
+    auto idValue = root.value("id");
+    auto timeValue = root.value("time");
+    auto serverIdValue = root.value("server");
+    auto oldNickValue = root.value("oldnick");
+    auto newNickValue = root.value("newnick");
+
+    if (!idValue.isString()) return;
+    if (!timeValue.isDouble()) return;
+    if (!serverIdValue.isString()) return;
+    if (!oldNickValue.isString()) return;
+    if (!newNickValue.isString()) return;
+
+    size_t id;
+    std::istringstream(idValue.toString().toStdString()) >> id;
+    double time = timeValue.toDouble();
+    QString serverId = serverIdValue.toString();
+    QString oldNick = oldNickValue.toString();
+    QString newNick = newNickValue.toString();
+
+    Server* server = serverTreeModel_.getServer(serverId);
+    if (server == nullptr) return;
+
+    if (server->getActiveNick() == oldNick)
+        server->setActiveNick(newNick);
+
+    server->getNickModel().modifyNick(oldNick, newNick);
 }
 
 void HarpoonClient::irc_handleKick(const QJsonObject& root) {

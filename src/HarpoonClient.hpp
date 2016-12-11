@@ -67,6 +67,7 @@ private:
     void irc_handleJoin(const QJsonObject& root);
     void irc_handlePart(const QJsonObject& root);
     void irc_handleNickChange(const QJsonObject& root);
+    void irc_handleNickModified(const QJsonObject& root);
     void irc_handleQuit(const QJsonObject& root);
     void irc_handleKick(const QJsonObject& root);
     void irc_handleServerAdded(const QJsonObject& root);

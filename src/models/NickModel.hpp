@@ -30,7 +30,8 @@ signals:
 public Q_SLOTS:
     void resetNicks(std::list<QString>& nicks);
     void newNick(const QString& nick);
-    void deleteNick(const QString& host, int port);
+    void deleteNick(const QString& host);
+    void modifyNick(const QString& oldNick, const QString& newNick);
 };
 
 #endif

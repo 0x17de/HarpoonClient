@@ -80,7 +80,7 @@ void NickModel::newNick(const QString& nick) {
     endInsertRows();
 }
 
-void NickModel::deleteNick(const QString& nickName, int port) {
+void NickModel::deleteNick(const QString& nickName) {
     int rowIndex = 0;
     decltype(nicks_)::iterator it;
     for (it = nicks_.begin(); it != nicks_.end(); ++it, ++rowIndex) {
@@ -91,4 +91,27 @@ void NickModel::deleteNick(const QString& nickName, int port) {
     beginRemoveRows(QModelIndex{}, rowIndex, rowIndex+1);
     nicks_.erase(it);
     endRemoveRows();
+}
+
+void NickModel::modifyNick(const QString& oldNick, const QString& newNick) {
+    if (newNick == "") {
+        this->deleteNick(oldNick);
+        return;
+    } else if (oldNick == "") {
+        this->newNick(newNick);
+        return;
+    }
+
+    // modify existing entry
+    int rowIndex = 0;
+    decltype(nicks_)::iterator it;
+    for (it = nicks_.begin(); it != nicks_.end(); ++it, ++rowIndex) {
+        if (*it == oldNick)
+            break;
+    }
+    if (it == nicks_.end()) return;
+
+    *it = newNick;
+    auto index = createIndex(rowIndex, 0, &(*it));
+    emit dataChanged(index, index);
 }
