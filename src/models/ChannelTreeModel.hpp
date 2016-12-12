@@ -6,6 +6,7 @@
 #include <memory>
 
 
+class Server;
 class Channel;
 class ChannelTreeModel : public QAbstractItemModel {
     Q_OBJECT
@@ -33,6 +34,11 @@ public:
 signals:
     void expand(const QModelIndex& index);
     void channelConnected(Channel* channel);
+
+    void beginInsertChannel(Server* channel, int row);
+    void endInsertChannel();
+    void beginRemoveChannel(Server* channel, int row);
+    void endRemoveChannel();
 
 public Q_SLOTS:
     void channelDataChanged(Channel* channel);

@@ -148,8 +148,10 @@ void ChannelTreeModel::resetChannels(std::list<std::shared_ptr<Channel>>& channe
 void ChannelTreeModel::newChannel(std::shared_ptr<Channel> channel) {
     int rowIndex = channels_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
+    emit beginInsertChannel(channel->getServer(), rowIndex);
     channels_.push_back(channel);
     endInsertRows();
+    emit endInsertChannel();
 }
 
 void ChannelTreeModel::deleteChannel(const QString& channelName) {
@@ -161,6 +163,8 @@ void ChannelTreeModel::deleteChannel(const QString& channelName) {
     }
     if (it == channels_.end()) return;
     beginRemoveRows(QModelIndex{}, rowIndex, rowIndex+1);
+    emit beginRemoveChannel((*it)->getServer(), rowIndex);
     channels_.erase(it);
     endRemoveRows();
+    emit endRemoveChannel();
 }

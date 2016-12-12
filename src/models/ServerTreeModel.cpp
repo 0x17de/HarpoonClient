@@ -138,17 +138,28 @@ int ServerTreeModel::getServerIndex(Server* server) {
     return -1;
 }
 
+void ServerTreeModel::connectServer(Server* server) {
+    ChannelTreeModel& channelTreeModel = server->getChannelModel();
+    connect(&channelTreeModel, &ChannelTreeModel::beginInsertChannel, [this](Server* server, int where) {
+            beginInsertRows(index(getServerIndex(server), 0), where, where);
+        });
+    connect(&channelTreeModel, &ChannelTreeModel::endInsertChannel, [this]() {
+            endInsertRows();
+        });
+    connect(&channelTreeModel, &ChannelTreeModel::beginRemoveChannel, [this](Server* server, int where) {
+            beginRemoveRows(index(getServerIndex(server), 0), where, where);
+        });
+    connect(&channelTreeModel, &ChannelTreeModel::endRemoveChannel, [this]() {
+            endRemoveRows();
+        });
+}
+
 void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
     beginResetModel();
     servers_.clear();
     servers_.insert(servers_.begin(), servers.begin(), servers.end());
-    /*
-    for (auto& server : servers_) {
-        connectServer(server.get());
-        for (auto& channel : server->getChannelModel().getChannels())
-            connectChannel(channel.get());
-    }
-    */
+    for(auto s : servers_)
+        connectServer(s.get());
     endResetModel();
 
     // autoexpand servers
@@ -162,6 +173,9 @@ void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) 
 void ServerTreeModel::newServer(std::shared_ptr<Server> server) {
     int rowIndex = servers_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
+
+    connectServer(server.get());
+
     servers_.push_back(server);
     endInsertRows();
 }

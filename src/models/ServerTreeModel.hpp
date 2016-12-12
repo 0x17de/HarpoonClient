@@ -29,7 +29,6 @@ public:
     Server* getServer(const QString& serverId);
     int getServerIndex(Server* server);
     void connectServer(Server* server);
-    void connectChannel(Channel* channel);
     void reconnectEvents();
 
 signals:
