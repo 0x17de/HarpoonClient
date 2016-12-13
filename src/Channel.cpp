@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "User.hpp"
+#include "Server.hpp"
 
 #include <QStackedWidget>
 #include <QGraphicsTextItem>
@@ -65,7 +66,11 @@ bool Channel::getDisabled() const {
 void Channel::setDisabled(bool disabled) {
     if (disabled_ != disabled) {
         disabled_ = disabled;
-        emit channelDataChanged(this);
+
+        std::list<std::shared_ptr<User>> newUsers;
+        userTreeModel_.resetUsers(newUsers);
+
+        server_->getChannelModel().channelDataChanged(this);
     }
 }
 

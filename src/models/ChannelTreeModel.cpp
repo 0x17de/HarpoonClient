@@ -136,6 +136,7 @@ void ChannelTreeModel::channelDataChanged(Channel* channel) {
     auto rowIndex = getChannelIndex(channel);
     auto modelIndex = createIndex(rowIndex, 0, channel);
     emit dataChanged(modelIndex, modelIndex);
+    emit channelDataChanged(channel->getServer(), rowIndex);
 }
 
 void ChannelTreeModel::resetChannels(std::list<std::shared_ptr<Channel>>& channels) {

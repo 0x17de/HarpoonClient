@@ -442,7 +442,7 @@ void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
     auto& channelModel = server->getChannelModel();
     Channel* channel = channelModel.getChannel(channelName);
 
-    if (User::stripNick(nick) == "") {
+    if (User::stripNick(nick) == server->getActiveNick()) {
         if (channel != nullptr) {
             channel->setDisabled(false);
         } else {
@@ -480,7 +480,7 @@ void HarpoonClient::irc_handlePart(const QJsonObject& root) {
     auto& channelModel = server->getChannelModel();
     Channel* channel = channelModel.getChannel(channelName);
 
-    if (User::stripNick(nick) == "") {
+    if (User::stripNick(nick) == server->getActiveNick()) {
         if (channel != nullptr) {
             channel->setDisabled(true);
         } else {

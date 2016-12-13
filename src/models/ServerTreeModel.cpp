@@ -152,6 +152,10 @@ void ServerTreeModel::connectServer(Server* server) {
     connect(&channelTreeModel, &ChannelTreeModel::endRemoveChannel, [this]() {
             endRemoveRows();
         });
+    connect(&channelTreeModel, static_cast<void (ChannelTreeModel::*)(Server*, int)>(&ChannelTreeModel::channelDataChanged), [this](Server* server, int where) {
+            auto modelIndex = index(where, 0, index(getServerIndex(server), 0));
+            emit dataChanged(modelIndex, modelIndex);
+        });
 }
 
 void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
