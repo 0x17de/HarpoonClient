@@ -17,6 +17,7 @@ class Host; // will be added in server.hpp
 class SettingsDialog : public QObject {
     Q_OBJECT
 
+    HarpoonClient& client_;
     ServerTreeModel& channelTreeModel_;
     SettingsTypeModel& settingsTypeModel_;
     Ui::SettingsDialog settingsDialogUi_;

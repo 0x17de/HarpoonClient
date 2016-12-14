@@ -136,7 +136,9 @@ void ChannelTreeModel::channelDataChanged(Channel* channel) {
     auto rowIndex = getChannelIndex(channel);
     auto modelIndex = createIndex(rowIndex, 0, channel);
     emit dataChanged(modelIndex, modelIndex);
-    emit channelDataChanged(channel->getServer(), rowIndex);
+    auto server = channel->getServer().lock();
+    if (!server) return;
+    emit channelDataChanged(server, rowIndex);
 }
 
 void ChannelTreeModel::resetChannels(std::list<std::shared_ptr<Channel>>& channels) {
@@ -149,7 +151,8 @@ void ChannelTreeModel::resetChannels(std::list<std::shared_ptr<Channel>>& channe
 void ChannelTreeModel::newChannel(std::shared_ptr<Channel> channel) {
     int rowIndex = channels_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
-    emit beginInsertChannel(channel->getServer(), rowIndex);
+    auto server = channel->getServer().lock();
+    emit beginInsertChannel(server, rowIndex);
     channels_.push_back(channel);
     endInsertRows();
     emit endInsertChannel();
@@ -164,7 +167,8 @@ void ChannelTreeModel::deleteChannel(const QString& channelName) {
     }
     if (it == channels_.end()) return;
     beginRemoveRows(QModelIndex{}, rowIndex, rowIndex+1);
-    emit beginRemoveChannel((*it)->getServer(), rowIndex);
+    auto server = (*it)->getServer().lock();
+    emit beginRemoveChannel(server, rowIndex);
     channels_.erase(it);
     endRemoveRows();
     emit endRemoveChannel();

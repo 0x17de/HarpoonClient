@@ -7,7 +7,8 @@
 SettingsDialog::SettingsDialog(HarpoonClient& client,
                                ServerTreeModel& channelTreeModel,
                                SettingsTypeModel& settingsTypeModel)
-    : channelTreeModel_{channelTreeModel}
+    : client_{client}
+    , channelTreeModel_{channelTreeModel}
     , settingsTypeModel_{settingsTypeModel}
 {
     // settings dialog
@@ -21,6 +22,9 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
 
     connect(settingsDialogUi_.protocolSelection, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated), this, &SettingsDialog::onProtocolSelected);
     connect(ircSettingsUi_.serverList, &QListView::clicked, this, &SettingsDialog::onIrcServerSelected);
+    connect(ircSettingsUi_.btnReconnect, &QPushButton::clicked, [this]() {
+            //client_.restartServer(serverId);
+        });
 }
 
 SettingsDialog::~SettingsDialog() {

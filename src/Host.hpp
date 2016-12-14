@@ -8,18 +8,18 @@ class Server;
 class Host : public TreeEntry {
     Q_OBJECT
 
-    Server* server;
+    std::weak_ptr<Server> server;
     QString host;
     int port;
 
 public:
-    Host(Server* server,
+    Host(std::weak_ptr<Server> server,
          const QString& host,
          int port);
 
     QString getHost() const;
     int getPort() const;
-    Server* getServer() const;
+    std::weak_ptr<Server> getServer() const;
 
 public Q_SLOTS:
 signals:

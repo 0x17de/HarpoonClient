@@ -25,8 +25,8 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    std::list<std::shared_ptr<Server>> getServers();
-    Server* getServer(const QString& serverId);
+    std::list<std::shared_ptr<Server>>& getServers();
+    std::shared_ptr<Server> getServer(const QString& serverId);
     int getServerIndex(Server* server);
     void connectServer(Server* server);
     void reconnectEvents();

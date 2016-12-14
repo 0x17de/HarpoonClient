@@ -38,11 +38,12 @@ QModelIndex ServerTreeModel::parent(const QModelIndex& index) const {
     auto* item = static_cast<TreeEntry*>(ptr);
     if (item->getTreeEntryType() == 'c') {
         Channel* channel = static_cast<Channel*>(ptr);
-        Server* server = channel->getServer();
+        std::shared_ptr<Server> server = channel->getServer().lock();
+        if (!server) return QModelIndex();
 
         int rowIndex = server->getChannelModel().getChannelIndex(channel);
         if (rowIndex >= 0)
-            return createIndex(rowIndex, 0, server);
+            return createIndex(rowIndex, 0, server.get());
     }
 
     return QModelIndex();
@@ -116,16 +117,16 @@ QVariant ServerTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-std::list<std::shared_ptr<Server>> ServerTreeModel::getServers() {
+std::list<std::shared_ptr<Server>>& ServerTreeModel::getServers() {
     return servers_;
 }
 
-Server* ServerTreeModel::getServer(const QString& serverId) {
+std::shared_ptr<Server> ServerTreeModel::getServer(const QString& serverId) {
     auto it = find_if(servers_.begin(), servers_.end(), [&serverId](std::shared_ptr<Server> server){
             return server->getId() == serverId;
         });
     if (it == servers_.end()) return nullptr;
-    return it->get();
+    return *it;
 }
 
 int ServerTreeModel::getServerIndex(Server* server) {
@@ -140,20 +141,20 @@ int ServerTreeModel::getServerIndex(Server* server) {
 
 void ServerTreeModel::connectServer(Server* server) {
     ChannelTreeModel& channelTreeModel = server->getChannelModel();
-    connect(&channelTreeModel, &ChannelTreeModel::beginInsertChannel, [this](Server* server, int where) {
-            beginInsertRows(index(getServerIndex(server), 0), where, where);
+    connect(&channelTreeModel, &ChannelTreeModel::beginInsertChannel, [this](std::shared_ptr<Server> server, int where) {
+            beginInsertRows(index(getServerIndex(server.get()), 0), where, where);
         });
     connect(&channelTreeModel, &ChannelTreeModel::endInsertChannel, [this]() {
             endInsertRows();
         });
-    connect(&channelTreeModel, &ChannelTreeModel::beginRemoveChannel, [this](Server* server, int where) {
-            beginRemoveRows(index(getServerIndex(server), 0), where, where);
+    connect(&channelTreeModel, &ChannelTreeModel::beginRemoveChannel, [this](std::shared_ptr<Server> server, int where) {
+            beginRemoveRows(index(getServerIndex(server.get()), 0), where, where);
         });
     connect(&channelTreeModel, &ChannelTreeModel::endRemoveChannel, [this]() {
             endRemoveRows();
         });
-    connect(&channelTreeModel, static_cast<void (ChannelTreeModel::*)(Server*, int)>(&ChannelTreeModel::channelDataChanged), [this](Server* server, int where) {
-            auto modelIndex = index(where, 0, index(getServerIndex(server), 0));
+    connect(&channelTreeModel, static_cast<void (ChannelTreeModel::*)(std::shared_ptr<Server>, int)>(&ChannelTreeModel::channelDataChanged), [this](std::shared_ptr<Server> server, int where) {
+            auto modelIndex = index(where, 0, index(getServerIndex(server.get()), 0));
             emit dataChanged(modelIndex, modelIndex);
         });
 }

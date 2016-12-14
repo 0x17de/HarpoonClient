@@ -1,6 +1,6 @@
 #include "Host.hpp"
 
-Host::Host(Server* server,
+Host::Host(std::weak_ptr<Server> server,
            const QString& host,
            int port)
     : TreeEntry('h')
@@ -18,6 +18,6 @@ int Host::getPort() const {
     return port;
 }
 
-Server* Host::getServer() const {
+std::weak_ptr<Server> Host::getServer() const {
     return server;
 }

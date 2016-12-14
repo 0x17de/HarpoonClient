@@ -10,7 +10,7 @@
 
 
 Channel::Channel(size_t firstId,
-                 Server* server,
+                 std::weak_ptr<Server> server,
                  const QString& name,
                  bool disabled)
     : TreeEntry('c')
@@ -47,7 +47,7 @@ size_t Channel::getFirstId() const {
     return firstId_;
 }
 
-Server* Channel::getServer() const {
+std::weak_ptr<Server> Channel::getServer() const {
     return server_;
 }
 
@@ -70,7 +70,8 @@ void Channel::setDisabled(bool disabled) {
         std::list<std::shared_ptr<User>> newUsers;
         userTreeModel_.resetUsers(newUsers);
 
-        server_->getChannelModel().channelDataChanged(this);
+        if (auto s = server_.lock())
+            s->getChannelModel().channelDataChanged(this);
     }
 }
 

@@ -24,7 +24,7 @@ class Channel : public TreeEntry {
     bool backlogRequested;
 
     size_t firstId_;
-    Server* server_;
+    std::weak_ptr<Server> server_;
     QString name_;
     QString topic_;
     UserTreeModel userTreeModel_;
@@ -35,13 +35,13 @@ class Channel : public TreeEntry {
 
 public:
     Channel(size_t firstId,
-            Server* server,
+            std::weak_ptr<Server> server,
             const QString& name,
             bool disabled);
     virtual ~Channel();
 
     size_t getFirstId() const;
-    Server* getServer() const;
+    std::weak_ptr<Server> getServer() const;
     QString getName() const;
     QString getTopic() const;
     bool getDisabled() const;

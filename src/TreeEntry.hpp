@@ -2,9 +2,10 @@
 #define TREEENTRY_H
 
 #include <QObject>
+#include <memory>
 
 
-class TreeEntry : public QObject {
+class TreeEntry : public QObject, public std::enable_shared_from_this<TreeEntry> {
     char entryType;
 public:
     TreeEntry(char entryType);

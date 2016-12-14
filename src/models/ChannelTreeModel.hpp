@@ -35,11 +35,11 @@ signals:
     void expand(const QModelIndex& index);
     void channelConnected(Channel* channel);
 
-    void beginInsertChannel(Server* server, int row);
+    void beginInsertChannel(std::shared_ptr<Server> server, int row);
     void endInsertChannel();
-    void beginRemoveChannel(Server* server, int row);
+    void beginRemoveChannel(std::shared_ptr<Server> server, int row);
     void endRemoveChannel();
-    void channelDataChanged(Server* server, int row);
+    void channelDataChanged(std::shared_ptr<Server> server, int row);
 
 public Q_SLOTS:
     void channelDataChanged(Channel* channel);
