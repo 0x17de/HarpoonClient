@@ -54,7 +54,7 @@ private:
     void showConfigureBouncerDialog();
 
 signals:
-    void sendMessage(Channel* channel, const QString& message);
+    void sendMessage(Server* server, Channel* channel, const QString& message);
 
 public Q_SLOTS:
     void onChannelViewSelection(const QModelIndex& index);

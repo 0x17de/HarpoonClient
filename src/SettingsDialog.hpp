@@ -2,6 +2,8 @@
 #define SETTINGSDIALOG_H
 
 
+#include <memory>
+
 #include <QObject>
 #include <QHash>
 
@@ -25,6 +27,10 @@ class SettingsDialog : public QObject {
     QDialog settingsDialog_;
     QWidget ircSettingsWidget_;
     QHash<QString, QWidget*> widgetMap_;
+
+    std::shared_ptr<Server> getSelectedServer();
+    std::shared_ptr<Host> getSelectedHost();
+    QString getSelectedNick();
 
 public:
     SettingsDialog(HarpoonClient& client,

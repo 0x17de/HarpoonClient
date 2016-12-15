@@ -161,7 +161,10 @@ void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {
 
 void ChatUi::messageReturnPressed() {
     if (activeChannel_ != nullptr) {
-        emit sendMessage(activeChannel_, messageInputView_->text());
-        messageInputView_->clear();
+        auto server = activeChannel_->getServer().lock();
+        if (server) {
+            emit sendMessage(server.get(), activeChannel_, messageInputView_->text());
+            messageInputView_->clear();
+        }
     }
 }

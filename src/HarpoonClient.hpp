@@ -79,7 +79,7 @@ private:
     void onPingTimer();
 
 public Q_SLOTS:
-    void sendMessage(Channel* channel, const QString& message);
+    void sendMessage(Server* server, Channel* channel, const QString& message);
     void backlogRequest(Channel* channel);
 
 signals:

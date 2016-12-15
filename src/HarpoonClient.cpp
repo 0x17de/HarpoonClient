@@ -103,15 +103,19 @@ void HarpoonClient::backlogRequest(Channel* channel) {
     size_t firstId = channel->getFirstId();
 }
 
-void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
-    std::shared_ptr<Server> server = channel->getServer().lock();
+void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString& message) {
     if (!server) return;
 
     // TODO: only irc works yet.
     if (message.count() == 0)
         return;
+
     QJsonObject root;
+
+    // server commands
+
     if (message.at(0) != '/' || (message.count() > 2 && message.at(1) == '/')) {
+        if (!channel) return;
         root["cmd"] = "chat";
         root["protocol"] = "irc";
         root["server"] = server->getId();
@@ -123,38 +127,53 @@ void HarpoonClient::sendMessage(Channel* channel, const QString& message) {
         if (cmd == "")
             return;
 
-        if (cmd == "me") {
-            root["cmd"] = "action";
+        if (cmd == "reconnect") {
+            root["cmd"] = "reconnect";
             root["protocol"] = "irc";
             root["server"] = server->getId();
-            root["channel"] = channel->getName();
-            root["msg"] = message.mid(cmd.count()+2);
-        } else if (cmd == "nick") {
-            if (parts.count() < 2)
+        }
+
+        if (channel != nullptr) {
+            if (cmd == "me") {
+                root["cmd"] = "action";
+                root["protocol"] = "irc";
+                root["server"] = server->getId();
+                root["channel"] = channel->getName();
+                root["msg"] = message.mid(cmd.count()+2);
+            } else if (cmd == "nick") {
+                if (parts.count() < 2)
+                    return;
+                root["cmd"] = "nick";
+                root["protocol"] = "irc";
+                root["server"] = server->getId();
+                root["nick"] = parts.at(1);
+            } else if (cmd == "reconnect") {
+                if (parts.count() < 2)
+                    return;
+                root["cmd"] = "nick";
+                root["protocol"] = "irc";
+                root["server"] = server->getId();
+                root["nick"] = parts.at(1);
+            } else if (cmd == "join") {
+                // TODO: join stub
+                if (parts.count() < 2)
+                    return;
+                QString channelName = parts.at(1);
+                root["cmd"] = "join";
+                root["protocol"] = "irc";
+                root["server"] = server->getId();
+                root["channel"] = channelName;
+                root["password"] = parts.count() == 3 ? parts.at(2) : "";
+            } else if (cmd == "part") {
+                // TODO: part stub
+                QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
+                root["cmd"] = "part";
+                root["protocol"] = "irc";
+                root["server"] = server->getId();
+                root["channel"] = channelName;
+            } else {
                 return;
-            root["cmd"] = "nick";
-            root["protocol"] = "irc";
-            root["server"] = server->getId();
-            root["nick"] = parts.at(1);
-        } else if (cmd == "join") {
-            // TODO: join stub
-            if (parts.count() < 2)
-                return;
-            QString channelName = parts.at(1);
-            root["cmd"] = "join";
-            root["protocol"] = "irc";
-            root["server"] = server->getId();
-            root["channel"] = channelName;
-            root["password"] = parts.count() == 3 ? parts.at(2) : "";
-        } else if (cmd == "part") {
-            // TODO: part stub
-            QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
-            root["cmd"] = "part";
-            root["protocol"] = "irc";
-            root["server"] = server->getId();
-            root["channel"] = channelName;
-        } else {
-            return;
+            }
         }
     }
     QString json = QJsonDocument{root}.toJson(QJsonDocument::JsonFormat::Compact);
