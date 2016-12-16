@@ -57,6 +57,7 @@ signals:
     void sendMessage(Server* server, Channel* channel, const QString& message);
 
 public Q_SLOTS:
+    void showChannelContextMenu(const QPoint&);
     void onChannelViewSelection(const QModelIndex& index);
     void expandServer(const QModelIndex& index);
     void channelConnected(Channel* channel);

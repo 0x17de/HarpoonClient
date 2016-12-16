@@ -61,6 +61,9 @@ ChatUi::ChatUi(HarpoonClient& client,
                 topicView_->setText(topic);
         });
 
+    channelView_->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(channelView_, &QWidget::customContextMenuRequested, this, &ChatUi::showChannelContextMenu);
+
     // input event
     connect(messageInputView_, &QLineEdit::returnPressed, this, &ChatUi::messageReturnPressed);
     connect(this, &ChatUi::sendMessage, &client, &HarpoonClient::sendMessage);
@@ -100,6 +103,42 @@ ChatUi::~ChatUi() {
     }
 
     channelView_->setModel(0);
+}
+
+void ChatUi::showChannelContextMenu(const QPoint&) {
+    auto index = channelView_->selectionModel()->currentIndex();
+    auto* item = static_cast<TreeEntry*>(index.internalPointer());
+
+    std::shared_ptr<Server> server;
+    std::shared_ptr<Channel> channel;
+
+    if (item->getTreeEntryType() == 's') {
+        server = std::static_pointer_cast<Server>(item->shared_from_this());
+    } else if (item->getTreeEntryType() == 'c') {
+        channel = std::static_pointer_cast<Channel>(item->shared_from_this());
+        server = channel->getServer().lock();
+    }
+
+    if (channel == nullptr) return;
+
+    QMenu menu(this);
+
+    QAction *join = nullptr, *part = nullptr;
+
+    if (channel->getDisabled()) {
+        join = menu.addAction("Join");
+    } else {
+        part = menu.addAction("Part");
+    }
+
+    QAction* selected = menu.exec(QCursor::pos());
+    if (selected == nullptr) return;
+
+    if (selected == join) {
+        client_.sendMessage(server.get(), channel.get(), "/join "+channel->getName());
+    } else if (selected == part) {
+        client_.sendMessage(server.get(), channel.get(), "/part "+channel->getName());
+    }
 }
 
 void ChatUi::showConfigureBouncerDialog() {
