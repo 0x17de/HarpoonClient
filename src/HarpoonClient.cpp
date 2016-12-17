@@ -171,6 +171,13 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
                 root["protocol"] = "irc";
                 root["server"] = server->getId();
                 root["channel"] = channelName;
+            } else if (cmd == "delete") {
+                // TODO: part stub
+                QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
+                root["cmd"] = "delete";
+                root["protocol"] = "irc";
+                root["server"] = server->getId();
+                root["channel"] = channelName;
             } else {
                 return;
             }

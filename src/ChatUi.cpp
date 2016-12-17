@@ -123,21 +123,24 @@ void ChatUi::showChannelContextMenu(const QPoint&) {
 
     QMenu menu(this);
 
-    QAction *join = nullptr, *part = nullptr;
+    QAction *actionJoin = nullptr, *actionPart = nullptr, *actionDelete = nullptr;
 
     if (channel->getDisabled()) {
-        join = menu.addAction("Join");
+        actionJoin = menu.addAction("Join");
     } else {
-        part = menu.addAction("Part");
+        actionPart = menu.addAction("Part");
     }
+    actionDelete = menu.addAction("Delete");
 
     QAction* selected = menu.exec(QCursor::pos());
     if (selected == nullptr) return;
 
-    if (selected == join) {
+    if (selected == actionJoin) {
         client_.sendMessage(server.get(), channel.get(), "/join "+channel->getName());
-    } else if (selected == part) {
+    } else if (selected == actionPart) {
         client_.sendMessage(server.get(), channel.get(), "/part "+channel->getName());
+    } else if (selected == actionDelete) {
+        client_.sendMessage(server.get(), channel.get(), "/delete "+channel->getName());
     }
 }
 
