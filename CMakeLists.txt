@@ -29,6 +29,7 @@ set(SRC_CLIENT
     )
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
+
 qt5_wrap_cpp(SERVERTREEMODEL_SRC src/models/ServerTreeModel.hpp)
 qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/models/ChannelTreeModel.hpp)
 qt5_wrap_cpp(USERTREEMODEL_SRC src/models/UserTreeModel.hpp)
@@ -42,7 +43,9 @@ qt5_wrap_cpp(BACKLOGVIEW_SRC src/BacklogView.hpp)
 qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
 qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
 qt5_wrap_cpp(SETTINGSDIALOG_SRC src/SettingsDialog.hpp)
+
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
+qt5_wrap_ui(EDITSERVERENTRY_HEADERS ui_forms/editServerEntry.ui)
 qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
 qt5_wrap_ui(SETTINGSUI_HEADERS ui_forms/settings.ui)
 qt5_wrap_ui(IRCCONFIGUI_HEADERS ui_forms/ircSettings.ui)
@@ -51,6 +54,7 @@ add_executable(HarpoonClient
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
     ${CHATUI_SRC}
+    ${EDITSERVERENTRY_HEADERS}
     ${SETTINGSDIALOG_SRC}
     ${SETTINGSUI_HEADERS}
     ${SERVERTREEMODEL_SRC}

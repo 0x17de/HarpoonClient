@@ -11,6 +11,7 @@
 #include "HarpoonClient.hpp"
 #include "ui_settings.h"
 #include "ui_ircSettings.h"
+#include "ui_editServerEntry.h"
 
 
 class SettingsTypeModel;
@@ -27,6 +28,9 @@ class SettingsDialog : public QObject {
     QDialog settingsDialog_;
     QWidget ircSettingsWidget_;
     QHash<QString, QWidget*> widgetMap_;
+
+    Ui::EditServerEntry editServerEntryUi_;
+    QDialog editServerEntryDialog_;
 
     std::shared_ptr<Server> getSelectedServer();
     std::shared_ptr<Host> getSelectedHost();

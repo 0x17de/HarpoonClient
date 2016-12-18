@@ -15,6 +15,7 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
     // settings dialog
     settingsDialogUi_.setupUi(&settingsDialog_);
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
+    editServerEntryUi_.setupUi(&editServerEntryDialog_);
 
     widgetMap_.insert("irc", &ircSettingsWidget_);
     settingsDialogUi_.protocolSelection->setModel(&settingsTypeModel);
@@ -23,10 +24,35 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
 
     connect(settingsDialogUi_.protocolSelection, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated), this, &SettingsDialog::onProtocolSelected);
     connect(ircSettingsUi_.serverList, &QListView::clicked, this, &SettingsDialog::onIrcServerSelected);
+
+    // edit servers
+    connect(ircSettingsUi_.btnNewServer, &QPushButton::clicked, [this]() {
+            editServerEntryDialog_.show();
+        });
+    connect(ircSettingsUi_.btnEditServer, &QPushButton::clicked, [this]() {
+        });
+    connect(ircSettingsUi_.btnDeleteServer, &QPushButton::clicked, [this]() {
+        });
     connect(ircSettingsUi_.btnReconnect, &QPushButton::clicked, [this]() {
             auto server = getSelectedServer();
             QString serverId = getSelectedServer()->getId();
             client_.sendMessage(server.get(), nullptr, "/reconnect");
+        });
+
+    // edit hosts
+    connect(ircSettingsUi_.btnNewHost, &QPushButton::clicked, [this]() {
+        });
+    connect(ircSettingsUi_.btnEditHost, &QPushButton::clicked, [this]() {
+        });
+    connect(ircSettingsUi_.btnDeleteHost, &QPushButton::clicked, [this]() {
+        });
+
+    // edit nicks
+    connect(ircSettingsUi_.btnNewNick, &QPushButton::clicked, [this]() {
+        });
+    connect(ircSettingsUi_.btnEditNick, &QPushButton::clicked, [this]() {
+        });
+    connect(ircSettingsUi_.btnDeleteNick, &QPushButton::clicked, [this]() {
         });
 }
 
