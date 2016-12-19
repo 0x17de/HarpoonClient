@@ -29,6 +29,7 @@ class SettingsDialog : public QObject {
     QWidget ircSettingsWidget_;
     QHash<QString, QWidget*> widgetMap_;
 
+    std::weak_ptr<Server> editServer_selectedServer;
     Ui::EditServerEntry editServerEntryUi_;
     QDialog editServerEntryDialog_;
 

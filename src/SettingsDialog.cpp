@@ -27,16 +27,33 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
 
     // edit servers
     connect(ircSettingsUi_.btnNewServer, &QPushButton::clicked, [this]() {
+            editServer_selectedServer.reset();;
+            editServerEntryUi_.serverName->setText("");
             editServerEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnEditServer, &QPushButton::clicked, [this]() {
+            auto server = getSelectedServer();
+            if (!server) return;
+            editServer_selectedServer = server;
+            editServerEntryUi_.serverName->setText(server->getName());
+            editServerEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnDeleteServer, &QPushButton::clicked, [this]() {
+            auto server = getSelectedServer();
+            client_.sendMessage(server.get(), nullptr, "/deleteserver");
         });
     connect(ircSettingsUi_.btnReconnect, &QPushButton::clicked, [this]() {
             auto server = getSelectedServer();
-            QString serverId = getSelectedServer()->getId();
             client_.sendMessage(server.get(), nullptr, "/reconnect");
+        });
+    connect(editServerEntryUi_.buttonBox, &QDialogButtonBox::accepted, [this]() {
+            QString serverName = editServerEntryUi_.serverName->text();
+            auto server = editServer_selectedServer.lock();
+            if (server) {
+                client_.sendMessage(server.get(), nullptr, "/editserver "+serverName);
+            } else {
+                client_.sendMessage(nullptr, nullptr, "/addserver "+serverName);
+            }
         });
 
     // edit hosts

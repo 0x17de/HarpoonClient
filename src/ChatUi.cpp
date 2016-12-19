@@ -140,7 +140,7 @@ void ChatUi::showChannelContextMenu(const QPoint&) {
     } else if (selected == actionPart) {
         client_.sendMessage(server.get(), channel.get(), "/part "+channel->getName());
     } else if (selected == actionDelete) {
-        client_.sendMessage(server.get(), channel.get(), "/delete "+channel->getName());
+        client_.sendMessage(server.get(), channel.get(), "/deletechannel "+channel->getName());
     }
 }
 

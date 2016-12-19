@@ -104,18 +104,16 @@ void HarpoonClient::backlogRequest(Channel* channel) {
 }
 
 void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString& message) {
-    if (!server) return;
-
     // TODO: only irc works yet.
     if (message.count() == 0)
-        return;
+        return; // don't send empty messages
 
     QJsonObject root;
 
-    // server commands
-
     if (message.at(0) != '/' || (message.count() > 2 && message.at(1) == '/')) {
-        if (!channel) return;
+        if (!(server || channel))
+            return; // regular messages are only available in channels
+
         root["cmd"] = "chat";
         root["protocol"] = "irc";
         root["server"] = server->getId();
@@ -127,62 +125,75 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
         if (cmd == "")
             return;
 
-        if (cmd == "reconnect") {
+        if (cmd == "reconnect") { // reconnect to server
             root["cmd"] = "reconnect";
             root["protocol"] = "irc";
+            QString serverId = parts.count() >= 2 ? parts.at(1) : server->getId();
             root["server"] = server->getId();
-        }
+        } else if (cmd == "deleteserver") { // remove server
+            root["cmd"] = "deleteserver";
+            root["protocol"] = "irc";
+            QString serverId = parts.count() >= 2 ? parts.at(1) : server->getId();
+            root["server"] = server->getId();
+        } else if (cmd == "editserver") { // add new server
+            if (parts.count() < 2)
+                return;
 
-        if (channel != nullptr) {
+            root["cmd"] = "editserver";
+            root["protocol"] = "irc";
+            QString serverId = parts.count() >= 3 ? parts.at(1) : server->getId();
+            QString serverName = parts.count() >= 3 ? parts.at(2) : parts.at(1);
+            root["server"] = server->getId();
+            root["name"] = serverName;
+        } else if (cmd == "addserver") { // add new server
+            if (parts.count() < 2)
+                return;
+
+            root["cmd"] = "addserver";
+            root["protocol"] = "irc";
+            root["name"] = parts.at(1);
+        } else if (channel != nullptr) { // channel commands
             if (cmd == "me") {
                 root["cmd"] = "action";
                 root["protocol"] = "irc";
                 root["server"] = server->getId();
                 root["channel"] = channel->getName();
                 root["msg"] = message.mid(cmd.count()+2);
-            } else if (cmd == "nick") {
+            } else if (cmd == "nick") { // change nick
                 if (parts.count() < 2)
                     return;
+
                 root["cmd"] = "nick";
                 root["protocol"] = "irc";
                 root["server"] = server->getId();
                 root["nick"] = parts.at(1);
-            } else if (cmd == "reconnect") {
-                if (parts.count() < 2)
-                    return;
-                root["cmd"] = "nick";
-                root["protocol"] = "irc";
-                root["server"] = server->getId();
-                root["nick"] = parts.at(1);
-            } else if (cmd == "join") {
-                // TODO: join stub
-                if (parts.count() < 2)
-                    return;
-                QString channelName = parts.at(1);
+            } else if (cmd == "join") { // join channel
+                QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
                 root["cmd"] = "join";
                 root["protocol"] = "irc";
                 root["server"] = server->getId();
                 root["channel"] = channelName;
                 root["password"] = parts.count() == 3 ? parts.at(2) : "";
-            } else if (cmd == "part") {
-                // TODO: part stub
+            } else if (cmd == "part") { // leave channel
                 QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
                 root["cmd"] = "part";
                 root["protocol"] = "irc";
                 root["server"] = server->getId();
                 root["channel"] = channelName;
-            } else if (cmd == "delete") {
-                // TODO: part stub
+            } else if (cmd == "deletechannel") { // delete channel
                 QString channelName = parts.count() >= 2 ? parts.at(1) : channel->getName();
-                root["cmd"] = "delete";
+                root["cmd"] = "deletechannel";
                 root["protocol"] = "irc";
                 root["server"] = server->getId();
                 root["channel"] = channelName;
             } else {
-                return;
+                return; // nothing is sent
             }
+        } else {
+            return; // nothing is sent
         }
     }
+
     QString json = QJsonDocument{root}.toJson(QJsonDocument::JsonFormat::Compact);
     ws_.sendTextMessage(json);
 }
