@@ -12,6 +12,7 @@
 #include "ui_settings.h"
 #include "ui_ircSettings.h"
 #include "ui_editServerEntry.h"
+#include "ui_editHostEntry.h"
 
 
 class SettingsTypeModel;
@@ -32,6 +33,9 @@ class SettingsDialog : public QObject {
     std::weak_ptr<Server> editServer_selectedServer;
     Ui::EditServerEntry editServerEntryUi_;
     QDialog editServerEntryDialog_;
+    std::weak_ptr<Host> editHost_selectedHost;
+    Ui::EditHostEntry editHostEntryUi_;
+    QDialog editHostEntryDialog_;
 
     std::shared_ptr<Server> getSelectedServer();
     std::shared_ptr<Host> getSelectedHost();

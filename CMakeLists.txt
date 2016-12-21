@@ -46,6 +46,7 @@ qt5_wrap_cpp(SETTINGSDIALOG_SRC src/SettingsDialog.hpp)
 
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 qt5_wrap_ui(EDITSERVERENTRY_HEADERS ui_forms/editServerEntry.ui)
+qt5_wrap_ui(EDITHOSTENTRY_HEADERS ui_forms/editHostEntry.ui)
 qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
 qt5_wrap_ui(SETTINGSUI_HEADERS ui_forms/settings.ui)
 qt5_wrap_ui(IRCCONFIGUI_HEADERS ui_forms/ircSettings.ui)
@@ -55,6 +56,7 @@ add_executable(HarpoonClient
     ${CHATUI_HEADERS}
     ${CHATUI_SRC}
     ${EDITSERVERENTRY_HEADERS}
+    ${EDITHOSTENTRY_HEADERS}
     ${SETTINGSDIALOG_SRC}
     ${SETTINGSUI_HEADERS}
     ${SERVERTREEMODEL_SRC}

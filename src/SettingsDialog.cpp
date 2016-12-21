@@ -16,6 +16,7 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
     settingsDialogUi_.setupUi(&settingsDialog_);
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
     editServerEntryUi_.setupUi(&editServerEntryDialog_);
+    editHostEntryUi_.setupUi(&editHostEntryDialog_);
 
     widgetMap_.insert("irc", &ircSettingsWidget_);
     settingsDialogUi_.protocolSelection->setModel(&settingsTypeModel);
@@ -58,10 +59,36 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
 
     // edit hosts
     connect(ircSettingsUi_.btnNewHost, &QPushButton::clicked, [this]() {
+            editHost_selectedHost.reset();;
+            editHostEntryUi_.hostname->setText("");
+            editHostEntryUi_.port->setText("");
+            editHostEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnEditHost, &QPushButton::clicked, [this]() {
+            auto host = getSelectedHost();
+            if (!host) return;
+            editHost_selectedHost = host;
+            editHostEntryUi_.hostname->setText(host->getHost());
+            editHostEntryUi_.port->setText(QString::number(host->getPort()));
+            editHostEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnDeleteHost, &QPushButton::clicked, [this]() {
+            auto host = getSelectedHost();
+            auto server = host->getServer().lock();
+            if (!server) return;
+            client_.sendMessage(server.get(), nullptr, "/deletehost "+host->getHost()+":"+host->getPort());
+        });
+    connect(editHostEntryUi_.buttonBox, &QDialogButtonBox::accepted, [this]() {
+            QString hostname = editHostEntryUi_.hostname->text();
+            QString port = editHostEntryUi_.port->text();
+            auto host = editHost_selectedHost.lock();
+            if (!host) {
+                client_.sendMessage(nullptr, nullptr, "/addhost "+hostname+":"+port);
+                return;
+            }
+            auto server = host->getServer().lock();
+            if (!server) return;
+            client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+":"+host->getPort()+" "+hostname+":"+port);
         });
 
     // edit nicks
