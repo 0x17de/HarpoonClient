@@ -17,6 +17,7 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
     ircSettingsUi_.setupUi(&ircSettingsWidget_);
     editServerEntryUi_.setupUi(&editServerEntryDialog_);
     editHostEntryUi_.setupUi(&editHostEntryDialog_);
+    editNickEntryUi_.setupUi(&editNickEntryDialog_);
 
     widgetMap_.insert("irc", &ircSettingsWidget_);
     settingsDialogUi_.protocolSelection->setModel(&settingsTypeModel);
@@ -93,10 +94,38 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
 
     // edit nicks
     connect(ircSettingsUi_.btnNewNick, &QPushButton::clicked, [this]() {
+            auto server = getSelectedServer();
+            if (!server) return;
+            editNick_selectedServer = server;
+            editNick_selectedNick = "";
+            editNickEntryUi_.nick->setText("");
+            editNickEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnEditNick, &QPushButton::clicked, [this]() {
+            auto server = getSelectedServer();
+            if (!server) return;
+            editNick_selectedServer = server;
+            QString nick = getSelectedNick();
+            if (nick == "") return;
+            editNick_selectedNick = nick;
+            editNickEntryUi_.nick->setText(nick);
+            editNickEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnDeleteNick, &QPushButton::clicked, [this]() {
+            auto server = getSelectedServer();
+            auto nick = getSelectedNick();
+            client_.sendMessage(server.get(), nullptr, "/deletenick "+nick);
+        });
+    connect(editNickEntryUi_.buttonBox, &QDialogButtonBox::accepted, [this]() {
+            auto server = editNick_selectedServer.lock();
+            if (!server) return;
+            QString nick = editNickEntryUi_.nick->text();
+            QString oldNick = editNick_selectedNick;
+            if (oldNick != "") {
+                client_.sendMessage(server.get(), nullptr, "/editnick "+oldNick+" "+nick);
+            } else {
+                client_.sendMessage(nullptr, nullptr, "/addnick "+nick);
+            }
         });
 }
 
@@ -147,7 +176,7 @@ std::shared_ptr<Host> SettingsDialog::getSelectedHost() {
 }
 
 QString SettingsDialog::getSelectedNick() {
-    auto index = ircSettingsUi_.serverList->selectionModel()->currentIndex();
+    auto index = ircSettingsUi_.nickList->selectionModel()->currentIndex();
     if (index.isValid())
         return *static_cast<QString*>(index.internalPointer());
     return "";
