@@ -126,32 +126,47 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             return;
 
         if (cmd == "reconnect") { // reconnect to server
+            // cmd [serverId]
             root["cmd"] = "reconnect";
             root["protocol"] = "irc";
             QString serverId = parts.count() >= 2 ? parts.at(1) : server->getId();
             root["server"] = server->getId();
         } else if (cmd == "deleteserver") { // remove server
+            // cmd [serverId]
             root["cmd"] = "deleteserver";
             root["protocol"] = "irc";
             QString serverId = parts.count() >= 2 ? parts.at(1) : server->getId();
             root["server"] = server->getId();
         } else if (cmd == "editserver") { // add new server
-            if (parts.count() < 2)
+            if (parts.count() < 2) // cmd [oldname] newname
                 return;
 
             root["cmd"] = "editserver";
             root["protocol"] = "irc";
             QString serverId = parts.count() >= 3 ? parts.at(1) : server->getId();
             QString serverName = parts.count() >= 3 ? parts.at(2) : parts.at(1);
-            root["server"] = server->getId();
+            root["server"] = serverId;
             root["name"] = serverName;
         } else if (cmd == "addserver") { // add new server
-            if (parts.count() < 2)
+            if (parts.count() < 2) // cmd name
                 return;
 
             root["cmd"] = "addserver";
             root["protocol"] = "irc";
             root["name"] = parts.at(1);
+        } else if (cmd == "editnick") { // modify nick
+            if (parts.count() < 3) // cmd [serverId] oldnick newnick
+                return;
+
+            QString serverId = parts.count() == 4 ? parts.at(1) : server->getId();
+            QString oldNick = parts.at(parts.count() == 3 ? 1 : 2);
+            QString newNick = parts.at(parts.count() == 3 ? 2 : 3);
+
+            root["cmd"] = "modifynick";
+            root["protocol"] = "irc";
+            root["server"] = serverId;
+            root["oldnick"] = oldNick;
+            root["newnick"] = newNick;
         } else if (channel != nullptr) { // channel commands
             if (cmd == "me") {
                 root["cmd"] = "action";
