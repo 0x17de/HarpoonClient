@@ -8,7 +8,7 @@
 class TreeEntry : public QObject, public std::enable_shared_from_this<TreeEntry> {
     char entryType;
 public:
-    TreeEntry(char entryType);
+    explicit TreeEntry(char entryType);
     char getTreeEntryType() const;
 };
 

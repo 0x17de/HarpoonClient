@@ -100,7 +100,7 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
 
 void HarpoonClient::backlogRequest(Channel* channel) {
     // TODO: handle backlog request
-    size_t firstId = channel->getFirstId();
+    //size_t firstId = channel->getFirstId();
 }
 
 void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString& message) {
@@ -111,7 +111,7 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
     QJsonObject root;
 
     if (message.at(0) != '/' || (message.count() > 2 && message.at(1) == '/')) {
-        if (!(server || channel))
+        if (!server || !channel)
             return; // regular messages are only available in channels
 
         root["cmd"] = "chat";
@@ -375,24 +375,26 @@ void HarpoonClient::irc_handleServerDeleted(const QJsonObject& root) {
 void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
     auto serverIdValue = root.value("server");
     auto hostValue = root.value("host");
-    auto hasPasswordValue = root.value("hasPassword");
+    //auto hasPasswordValue = root.value("hasPassword");
     auto portValue = root.value("port");
-    auto ipv6Value = root.value("ipv6");
-    auto sslValue = root.value("ssl");
+    //auto ipv6Value = root.value("ipv6");
+    //auto sslValue = root.value("ssl");
 
     if (!serverIdValue.isString()) return;
     if (!hostValue.isString()) return;
-    if (!hasPasswordValue.isString()) return;
+    //if (!hasPasswordValue.isString()) return;
     if (!portValue.isString()) return;
-    if (!ipv6Value.isString()) return;
-    if (!sslValue.isString()) return;
+    //if (!ipv6Value.isString()) return;
+    //if (!sslValue.isString()) return;
 
     QString serverId = serverIdValue.toString();
     QString hostName = hostValue.toString();
-    bool hasPassword = hostValue.toBool();
+    //bool hasPassword = hasPasswordValue.toBool();
     int port = hostValue.toInt();
-    bool ipv6 = hostValue.toBool();
-    bool ssl = hostValue.toBool();
+    //bool ipv6 = hostValue.toBool();
+    //bool ssl = hostValue.toBool();
+
+    // TODO: has password, ipv6, ssl
 
     std::shared_ptr<Server> server = serverTreeModel_.getServer(serverId);
     auto host = std::make_shared<Host>(server, hostName, port);
@@ -447,20 +449,20 @@ void HarpoonClient::irc_handleTopic(const QJsonObject& root) {
 
 void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
     //auto idValue = root.value("id");
-    auto timeValue = root.value("time");
+    //auto timeValue = root.value("time");
     auto serverIdValue = root.value("server");
     auto channelNameValue = root.value("channel");
     auto usersValue = root.value("users");
 
     //if (!idValue.isString()) return;
-    if (!timeValue.isDouble()) return;
+    //if (!timeValue.isDouble()) return;
     if (!serverIdValue.isString()) return;
     if (!channelNameValue.isString()) return;
     if (!usersValue.isArray()) return;
 
     //size_t id;
     //std::istringstream(idValue.toString().toStdString()) >> id;
-    double time = timeValue.toDouble();
+    //double time = timeValue.toDouble();
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
     auto users = usersValue.toArray();
@@ -583,20 +585,20 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
 
 void HarpoonClient::irc_handleNickModified(const QJsonObject& root) {
     auto idValue = root.value("id");
-    auto timeValue = root.value("time");
+    //auto timeValue = root.value("time");
     auto serverIdValue = root.value("server");
     auto oldNickValue = root.value("oldnick");
     auto newNickValue = root.value("newnick");
 
     if (!idValue.isString()) return;
-    if (!timeValue.isDouble()) return;
+    //if (!timeValue.isDouble()) return;
     if (!serverIdValue.isString()) return;
     if (!oldNickValue.isString()) return;
     if (!newNickValue.isString()) return;
 
     size_t id;
     std::istringstream(idValue.toString().toStdString()) >> id;
-    double time = timeValue.toDouble();
+    //double time = timeValue.toDouble();
     QString serverId = serverIdValue.toString();
     QString oldNick = oldNickValue.toString();
     QString newNick = newNickValue.toString();

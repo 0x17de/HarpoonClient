@@ -29,9 +29,8 @@ void BacklogView::updateLayout() {
     qreal messageWidth = splitting_[2] * width;
 
     int top = 0;
-    int left = 0;
     for (auto& line : chatLines_) {
-        left = 0;
+        int left = 0;
         auto* timestampGfx = line.getTimestampGfx();
         auto* whoGfx = line.getWhoGfx();
         auto* messageGfx = line.getMessageGfx();

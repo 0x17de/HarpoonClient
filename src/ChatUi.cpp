@@ -14,10 +14,10 @@
 ChatUi::ChatUi(HarpoonClient& client,
                ServerTreeModel& serverTreeModel,
                SettingsTypeModel& settingsTypeModel)
-    : client_{client}
+    : settings_{client.getSettings()}
+    , client_{client}
     , serverTreeModel_{serverTreeModel}
     , settingsTypeModel_{settingsTypeModel}
-    , settings_{client.getSettings()}
     , settingsDialog_{client, serverTreeModel, settingsTypeModel}
 {
     clientUi_.setupUi(this);

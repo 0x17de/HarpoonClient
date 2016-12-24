@@ -15,7 +15,7 @@ class UserGroup : public TreeEntry {
     QString name_;
     bool expanded_;
 public:
-    UserGroup(const QString& name);
+    explicit UserGroup(const QString& name);
 
     void addUser(std::shared_ptr<User> channel);
     void removeUser(User* user);

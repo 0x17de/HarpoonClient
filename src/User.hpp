@@ -12,7 +12,7 @@ class User : public TreeEntry {
     UserGroup* userGroup_;
     QString nick_;
 public:
-    User(const QString& nick);
+    explicit User(const QString& nick);
 
     static QString stripNick(const QString& nick);
     void setUserGroup(UserGroup* userGroup);

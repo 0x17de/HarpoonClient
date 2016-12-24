@@ -24,7 +24,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent* event);
 
 public:
-    BacklogView(QGraphicsScene* scene);
+    explicit BacklogView(QGraphicsScene* scene);
 
     void addMessage(size_t id,
                     double time,
