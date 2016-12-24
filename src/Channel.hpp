@@ -35,7 +35,7 @@ class Channel : public TreeEntry {
 
 public:
     Channel(size_t firstId,
-            std::weak_ptr<Server> server,
+            const std::weak_ptr<Server>& server,
             const QString& name,
             bool disabled);
     virtual ~Channel();

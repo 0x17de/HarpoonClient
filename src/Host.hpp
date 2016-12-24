@@ -13,7 +13,7 @@ class Host : public TreeEntry {
     int port;
 
 public:
-    Host(std::weak_ptr<Server> server,
+    Host(const std::weak_ptr<Server>& server,
          const QString& host,
          int port);
 

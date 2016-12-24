@@ -10,7 +10,7 @@
 
 
 Channel::Channel(size_t firstId,
-                 std::weak_ptr<Server> server,
+                 const std::weak_ptr<Server>& server,
                  const QString& name,
                  bool disabled)
     : TreeEntry('c')
