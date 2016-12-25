@@ -84,12 +84,12 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
             QString port = editHostEntryUi_.port->text();
             auto host = editHost_selectedHost.lock();
             if (!host) {
-                client_.sendMessage(nullptr, nullptr, "/addhost "+hostname+":"+port);
+                client_.sendMessage(nullptr, nullptr, "/addhost "+hostname+" "+port);
                 return;
             }
             auto server = host->getServer().lock();
             if (!server) return;
-            client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+":"+host->getPort()+" "+hostname+":"+port);
+            client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+" "+host->getPort()+" "+hostname+" "+port);
         });
 
     // edit nicks

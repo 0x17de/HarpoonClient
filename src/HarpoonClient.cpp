@@ -154,6 +154,21 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             root["cmd"] = "addserver";
             root["protocol"] = "irc";
             root["name"] = parts.at(1);
+        } else if (cmd == "addhost") {
+            if (parts.count() < 3) // cmd name
+                return;
+
+            root["cmd"] = "addserver";
+            root["protocol"] = "irc";
+
+            QString serverId = server->getId();
+            QString host = parts.at(1);
+            QString port = parts.at(2);
+            root["server"] = serverId;
+            root["host"] = host;
+            root["port"] = port.toInt();
+            root["ipv6"] = false; // TODO: extend dialog
+            root["ssl"] = false; // TODO: extend dialog
         } else if (cmd == "editnick") { // modify nick
             if (parts.count() < 3) // cmd [serverId] oldnick newnick
                 return;
