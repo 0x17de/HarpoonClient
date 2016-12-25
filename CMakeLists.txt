@@ -78,3 +78,21 @@ add_executable(HarpoonClient
     )
 target_include_directories(HarpoonClient PUBLIC src)
 target_link_libraries(HarpoonClient Qt5::Widgets Qt5::WebSockets)
+
+
+
+INSTALL(TARGETS HarpoonClient
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib/static)
+include(InstallRequiredSystemLibraries)
+
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "2")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+SET(CPACK_MONOLITHIC_INSTALL 1)
+SET(CPACK_GENERATOR "DEB;TGZ")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Manuel Herrmann")
+SET(CPACK_PACKAGE_EXECUTABLES "HarpoonClient" "HarpoonClient")
+
+INCLUDE(CPack)
