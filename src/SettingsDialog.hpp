@@ -36,6 +36,7 @@ class SettingsDialog : public QObject {
     Ui::EditServerEntry editServerEntryUi_;
     QDialog editServerEntryDialog_;
     // host
+    std::weak_ptr<Server> editHost_selectedServer;
     std::weak_ptr<Host> editHost_selectedHost;
     Ui::EditHostEntry editHostEntryUi_;
     QDialog editHostEntryDialog_;

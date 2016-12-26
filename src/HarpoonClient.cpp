@@ -155,20 +155,38 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             root["protocol"] = "irc";
             root["name"] = parts.at(1);
         } else if (cmd == "addhost") {
-            if (parts.count() < 3) // cmd name
+            if (parts.count() < 5) // cmd name
                 return;
 
-            root["cmd"] = "addserver";
+            root["cmd"] = "addhost";
             root["protocol"] = "irc";
 
             QString serverId = server->getId();
             QString host = parts.at(1);
             QString port = parts.at(2);
+            QString ssl = parts.at(3);
+            QString ipv6 = parts.at(4);
+
             root["server"] = serverId;
             root["host"] = host;
             root["port"] = port.toInt();
-            root["ipv6"] = false; // TODO: extend dialog
-            root["ssl"] = false; // TODO: extend dialog
+            root["ssl"] = ssl != "false" && ssl != "0";
+            root["ipv6"] = ipv6 != "false" && ipv6 != "0";
+        } else if (cmd == "deletehost") {
+            if (parts.count() < 3) // cmd name
+                return;
+
+            root["cmd"] = "deletehost";
+            root["protocol"] = "irc";
+
+            QString serverId = server->getId();
+            QString host = parts.at(1);
+            QString port = parts.at(2);
+            qDebug() << "PORT " << parts;
+
+            root["server"] = serverId;
+            root["host"] = host;
+            root["port"] = port.toInt();
         } else if (cmd == "editnick") { // modify nick
             if (parts.count() < 3) // cmd [serverId] oldnick newnick
                 return;
@@ -344,7 +362,10 @@ void HarpoonClient::irc_handleSettings(const QJsonObject& root) {
             QString hostname = hostKey.left(colonPosition);
             int port = hostKey.right(hostKey.size() - colonPosition - 1).toInt();
 
-            std::shared_ptr<Host> newHost{std::make_shared<Host>(server, hostname, port)};
+            bool ssl = sslValue.toBool();
+            bool ipv6 = ipv6Value.toBool();
+
+            std::shared_ptr<Host> newHost{std::make_shared<Host>(server, hostname, port, ssl, ipv6)};
             newHosts.push_back(newHost);
         }
 
@@ -392,27 +413,27 @@ void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
     auto hostValue = root.value("host");
     //auto hasPasswordValue = root.value("hasPassword");
     auto portValue = root.value("port");
-    //auto ipv6Value = root.value("ipv6");
-    //auto sslValue = root.value("ssl");
+    auto sslValue = root.value("ssl");
+    auto ipv6Value = root.value("ipv6");
 
     if (!serverIdValue.isString()) return;
     if (!hostValue.isString()) return;
     //if (!hasPasswordValue.isString()) return;
     if (!portValue.isString()) return;
-    //if (!ipv6Value.isString()) return;
-    //if (!sslValue.isString()) return;
+    if (!sslValue.isString()) return;
+    if (!ipv6Value.isString()) return;
 
     QString serverId = serverIdValue.toString();
     QString hostName = hostValue.toString();
     //bool hasPassword = hasPasswordValue.toBool();
     int port = hostValue.toInt();
-    //bool ipv6 = hostValue.toBool();
-    //bool ssl = hostValue.toBool();
+    bool ssl = hostValue.toBool();
+    bool ipv6 = hostValue.toBool();
 
-    // TODO: has password, ipv6, ssl
+    // TODO: has password
 
     std::shared_ptr<Server> server = serverTreeModel_.getServer(serverId);
-    auto host = std::make_shared<Host>(server, hostName, port);
+    auto host = std::make_shared<Host>(server, hostName, port, ssl, ipv6);
     server->getHostModel().newHost(host);
 }
 

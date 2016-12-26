@@ -60,36 +60,48 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
 
     // edit hosts
     connect(ircSettingsUi_.btnNewHost, &QPushButton::clicked, [this]() {
-            editHost_selectedHost.reset();;
+            auto server = getSelectedServer();
+            if (!server) return;
+            editHost_selectedServer = server;
+            editHost_selectedHost.reset();
             editHostEntryUi_.hostname->setText("");
             editHostEntryUi_.port->setText("");
+            editHostEntryUi_.cbSsl->setChecked(true);
+            editHostEntryUi_.cbIpv6->setChecked(false);
             editHostEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnEditHost, &QPushButton::clicked, [this]() {
             auto host = getSelectedHost();
             if (!host) return;
             editHost_selectedHost = host;
+            editHost_selectedServer = host->getServer();
             editHostEntryUi_.hostname->setText(host->getHost());
             editHostEntryUi_.port->setText(QString::number(host->getPort()));
+            editHostEntryUi_.cbSsl->setChecked(host->getSsl());
+            editHostEntryUi_.cbIpv6->setChecked(host->getIpv6());
             editHostEntryDialog_.show();
         });
     connect(ircSettingsUi_.btnDeleteHost, &QPushButton::clicked, [this]() {
             auto host = getSelectedHost();
             auto server = host->getServer().lock();
             if (!server) return;
-            client_.sendMessage(server.get(), nullptr, "/deletehost "+host->getHost()+":"+host->getPort());
+            client_.sendMessage(server.get(), nullptr, "/deletehost "+host->getHost()+" "+QString::number(host->getPort()));
         });
     connect(editHostEntryUi_.buttonBox, &QDialogButtonBox::accepted, [this]() {
             QString hostname = editHostEntryUi_.hostname->text();
             QString port = editHostEntryUi_.port->text();
+            bool ssl = editHostEntryUi_.cbSsl->isChecked();
+            bool ipv6 = editHostEntryUi_.cbIpv6->isChecked();
+            auto server = editHost_selectedServer.lock();
+            if (!server) return;
             auto host = editHost_selectedHost.lock();
             if (!host) {
-                client_.sendMessage(nullptr, nullptr, "/addhost "+hostname+" "+port);
-                return;
+                client_.sendMessage(server.get(), nullptr, "/addhost "+hostname+" "+port+" "+(ssl?"true":"false")+" "+(ipv6?"true":"false"));
+            } else {
+                auto server = host->getServer().lock();
+                if (!server) return;
+                client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+" "+host->getPort()+" "+hostname+" "+port+" "+(ssl?"true":"false")+" "+(ipv6?"true":"false"));
             }
-            auto server = host->getServer().lock();
-            if (!server) return;
-            client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+" "+host->getPort()+" "+hostname+" "+port);
         });
 
     // edit nicks

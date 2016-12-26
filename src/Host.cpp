@@ -2,22 +2,34 @@
 
 Host::Host(const std::weak_ptr<Server>& server,
            const QString& host,
-           int port)
+           int port,
+           bool ssl,
+           bool ipv6)
     : TreeEntry('h')
-    , server{server}
-    , host{host}
-    , port{port}
+    , server_{server}
+    , host_{host}
+    , port_{port}
+    , ssl_{ssl}
+    , ipv6_{ipv6}
 {
 }
 
 QString Host::getHost() const {
-    return host;
+    return host_;
 }
 
 int Host::getPort() const {
-    return port;
+    return port_;
+}
+
+bool Host::getSsl() const {
+    return ssl_;
+}
+
+bool Host::getIpv6() const {
+    return ipv6_;
 }
 
 std::weak_ptr<Server> Host::getServer() const {
-    return server;
+    return server_;
 }
