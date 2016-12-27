@@ -172,6 +172,28 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             root["port"] = port.toInt();
             root["ssl"] = ssl != "false" && ssl != "0";
             root["ipv6"] = ipv6 != "false" && ipv6 != "0";
+        } else if (cmd == "edithost") {
+            if (parts.count() < 7) // cmd name
+                return;
+
+            root["cmd"] = "addhost";
+            root["protocol"] = "irc";
+
+            QString serverId = server->getId();
+            QString oldHost = parts.at(1);
+            QString oldPort = parts.at(2);
+            QString host = parts.at(3);
+            QString port = parts.at(4);
+            QString ssl = parts.at(5) ;
+            QString ipv6 = parts.at(6);
+
+            root["server"] = serverId;
+            root["oldhost"] = oldHost;
+            root["oldport"] = oldPort.toInt();
+            root["host"] = host;
+            root["port"] = port.toInt();
+            root["ssl"] = ssl != "false" && ssl != "0";
+            root["ipv6"] = ipv6 != "false" && ipv6 != "0";
         } else if (cmd == "deletehost") {
             if (parts.count() < 3) // cmd name
                 return;
