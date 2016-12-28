@@ -95,12 +95,13 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
             auto server = editHost_selectedServer.lock();
             if (!server) return;
             auto host = editHost_selectedHost.lock();
+
             if (!host) {
                 client_.sendMessage(server.get(), nullptr, "/addhost "+hostname+" "+port+" "+(ssl?"true":"false")+" "+(ipv6?"true":"false"));
             } else {
                 auto server = host->getServer().lock();
                 if (!server) return;
-                client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+" "+host->getPort()+" "+hostname+" "+port+" "+(ssl?"true":"false")+" "+(ipv6?"true":"false"));
+                client_.sendMessage(server.get(), nullptr, "/edithost "+host->getHost()+" "+QString::number(host->getPort())+" "+hostname+" "+port+" "+(ssl?"true":"false")+" "+(ipv6?"true":"false"));
             }
         });
 

@@ -176,7 +176,7 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             if (parts.count() < 7) // cmd name
                 return;
 
-            root["cmd"] = "addhost";
+            root["cmd"] = "modifyhost";
             root["protocol"] = "irc";
 
             QString serverId = server->getId();
@@ -441,16 +441,16 @@ void HarpoonClient::irc_handleHostAdded(const QJsonObject& root) {
     if (!serverIdValue.isString()) return;
     if (!hostValue.isString()) return;
     //if (!hasPasswordValue.isString()) return;
-    if (!portValue.isString()) return;
-    if (!sslValue.isString()) return;
-    if (!ipv6Value.isString()) return;
+    if (!portValue.isDouble()) return;
+    if (!sslValue.isBool()) return;
+    if (!ipv6Value.isBool()) return;
 
     QString serverId = serverIdValue.toString();
     QString hostName = hostValue.toString();
     //bool hasPassword = hasPasswordValue.toBool();
-    int port = hostValue.toInt();
-    bool ssl = hostValue.toBool();
-    bool ipv6 = hostValue.toBool();
+    int port = portValue.toInt();
+    bool ssl = sslValue.toBool();
+    bool ipv6 = ipv6Value.toBool();
 
     // TODO: has password
 
@@ -466,11 +466,11 @@ void HarpoonClient::irc_handleHostDeleted(const QJsonObject& root) {
 
     if (!serverIdValue.isString()) return;
     if (!hostValue.isString()) return;
-    if (!portValue.isString()) return;
+    if (!portValue.isDouble()) return;
 
     QString serverId = serverIdValue.toString();
     QString host = hostValue.toString();
-    int port = hostValue.toInt();
+    int port = portValue.toInt();
 
     auto server = serverTreeModel_.getServer(serverId);
     server->getHostModel().deleteHost(host, port);
