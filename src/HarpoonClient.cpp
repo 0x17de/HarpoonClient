@@ -209,6 +209,30 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             root["server"] = serverId;
             root["host"] = host;
             root["port"] = port.toInt();
+        } else if (cmd == "addnick") { // add nick
+            if (parts.count() < 2) // cmd [serverId] oldnick newnick
+                return;
+
+            QString serverId = parts.count() == 3 ? parts.at(1) : server->getId();
+            QString newNick = parts.at(parts.count() == 2 ? 1 : 2);
+
+            root["cmd"] = "modifynick";
+            root["protocol"] = "irc";
+            root["server"] = serverId;
+            root["oldnick"] = "";
+            root["newnick"] = newNick;
+        } else if (cmd == "deletenick") { // delete nick
+            if (parts.count() < 2) // cmd [serverId] oldnick newnick
+                return;
+
+            QString serverId = parts.count() == 3 ? parts.at(1) : server->getId();
+            QString deleteNick = parts.at(parts.count() == 2 ? 1 : 2);
+
+            root["cmd"] = "modifynick";
+            root["protocol"] = "irc";
+            root["server"] = serverId;
+            root["oldnick"] = deleteNick;
+            root["newnick"] = "";
         } else if (cmd == "editnick") { // modify nick
             if (parts.count() < 3) // cmd [serverId] oldnick newnick
                 return;

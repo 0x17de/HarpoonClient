@@ -137,7 +137,7 @@ SettingsDialog::SettingsDialog(HarpoonClient& client,
             if (oldNick != "") {
                 client_.sendMessage(server.get(), nullptr, "/editnick "+oldNick+" "+nick);
             } else {
-                client_.sendMessage(nullptr, nullptr, "/addnick "+nick);
+                client_.sendMessage(server.get(), nullptr, "/addnick "+nick);
             }
         });
 }
