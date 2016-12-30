@@ -1,4 +1,5 @@
 #include "ServerTreeModel.hpp"
+#include "moc_ServerTreeModel.cpp"
 #include "../Server.hpp"
 #include "../Channel.hpp"
 

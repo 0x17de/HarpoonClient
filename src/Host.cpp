@@ -1,4 +1,5 @@
 #include "Host.hpp"
+#include "moc_Host.cpp"
 
 Host::Host(const std::weak_ptr<Server>& server,
            const QString& host,

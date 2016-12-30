@@ -1,4 +1,5 @@
 #include "SettingsTypeModel.hpp"
+#include "moc_SettingsTypeModel.cpp"
 
 
 SettingsTypeModel::SettingsTypeModel(QObject* parent)

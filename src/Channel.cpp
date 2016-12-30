@@ -1,4 +1,5 @@
 #include "Channel.hpp"
+#include "moc_Channel.cpp"
 #include "User.hpp"
 #include "Server.hpp"
 

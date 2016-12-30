@@ -1,4 +1,5 @@
 #include "SettingsDialog.hpp"
+#include "moc_SettingsDialog.cpp"
 #include "models/ServerTreeModel.hpp"
 #include "models/SettingsTypeModel.hpp"
 #include "HarpoonClient.hpp"

@@ -1,4 +1,5 @@
 #include "NickModel.hpp"
+#include "moc_NickModel.cpp"
 
 
 NickModel::NickModel(QObject* parent)

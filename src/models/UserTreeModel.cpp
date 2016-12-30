@@ -1,4 +1,5 @@
 #include "UserTreeModel.hpp"
+#include "moc_UserTreeModel.cpp"
 #include "../User.hpp"
 #include "../UserGroup.hpp"
 

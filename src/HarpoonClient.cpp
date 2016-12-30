@@ -1,4 +1,5 @@
 #include "HarpoonClient.hpp"
+#include "moc_HarpoonClient.cpp"
 
 #include "Server.hpp"
 #include "models/ServerTreeModel.hpp"

@@ -1,4 +1,5 @@
 #include "HostTreeModel.hpp"
+#include "moc_HostTreeModel.cpp"
 #include "../Server.hpp"
 #include "../Host.hpp"
 

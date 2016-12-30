@@ -1,4 +1,5 @@
 #include "BacklogView.hpp"
+#include "moc_BacklogView.cpp"
 
 #include <QTextBlockFormat>
 #include <QTextCursor>

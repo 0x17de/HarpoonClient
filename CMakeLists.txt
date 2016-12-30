@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(HarpoonClient)
 
+set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -40,20 +41,6 @@ set(SRC_CLIENT
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
 
-qt5_wrap_cpp(SERVERTREEMODEL_SRC src/models/ServerTreeModel.hpp)
-qt5_wrap_cpp(CHANNELTREEMODEL_SRC src/models/ChannelTreeModel.hpp)
-qt5_wrap_cpp(USERTREEMODEL_SRC src/models/UserTreeModel.hpp)
-qt5_wrap_cpp(HOSTTREEMODEL_SRC src/models/HostTreeModel.hpp)
-qt5_wrap_cpp(NICKMODEL_SRC src/models/NickModel.hpp)
-qt5_wrap_cpp(SETTINGSTYPEMODEL_SRC src/models/SettingsTypeModel.hpp)
-qt5_wrap_cpp(HARPOONCLIENT_SRC src/HarpoonClient.hpp)
-qt5_wrap_cpp(SERVER_SRC src/Server.hpp)
-qt5_wrap_cpp(HOST_SRC src/Host.hpp)
-qt5_wrap_cpp(BACKLOGVIEW_SRC src/BacklogView.hpp)
-qt5_wrap_cpp(CHANNEL_SRC src/Channel.hpp)
-qt5_wrap_cpp(CHATUI_SRC src/ChatUi.hpp)
-qt5_wrap_cpp(SETTINGSDIALOG_SRC src/SettingsDialog.hpp)
-
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 qt5_wrap_ui(EDITSERVERENTRY_HEADERS ui_forms/editServerEntry.ui)
 qt5_wrap_ui(EDITHOSTENTRY_HEADERS ui_forms/editHostEntry.ui)
@@ -65,23 +52,10 @@ qt5_wrap_ui(IRCCONFIGUI_HEADERS ui_forms/ircSettings.ui)
 add_executable(HarpoonClient
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
-    ${CHATUI_SRC}
     ${EDITSERVERENTRY_HEADERS}
     ${EDITHOSTENTRY_HEADERS}
     ${EDITNICKENTRY_HEADERS}
-    ${SETTINGSDIALOG_SRC}
     ${SETTINGSUI_HEADERS}
-    ${SERVERTREEMODEL_SRC}
-    ${CHANNELTREEMODEL_SRC}
-    ${USERTREEMODEL_SRC}
-    ${HOSTTREEMODEL_SRC}
-    ${NICKMODEL_SRC}
-    ${SETTINGSTYPEMODEL_SRC}
-    ${HARPOONCLIENT_SRC}
-    ${SERVER_SRC}
-    ${HOST_SRC}
-    ${BACKLOGVIEW_SRC}
-    ${CHANNEL_SRC}
     ${ICONS_SRC}
     ${SERVERCONFIGUI_HEADERS}
     ${IRCCONFIGUI_HEADERS}
