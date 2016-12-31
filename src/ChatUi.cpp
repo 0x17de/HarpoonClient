@@ -1,6 +1,7 @@
 #include "ChatUi.hpp"
 #include "moc_ChatUi.cpp"
 
+#include <QCoreApplication>
 #include <QTreeWidget>
 #include <QStackedWidget>
 #include "HarpoonClient.hpp"
@@ -37,6 +38,11 @@ ChatUi::ChatUi(HarpoonClient& client,
     messageInputView_ = clientUi_.message;
 
     QSplitter* chatSplitter = clientUi_.chatSplitter;
+
+    // quit action
+    connect(clientUi_.actionQuit, &QAction::triggered, []{
+            QCoreApplication::quit();
+        });
 
     // network configuration
     connect(clientUi_.actionConfigure_Networks, &QAction::triggered, [this] { showConfigureNetworksDialog(); });
