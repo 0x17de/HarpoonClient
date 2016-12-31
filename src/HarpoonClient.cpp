@@ -10,7 +10,7 @@
 
 #include <algorithm>
 #include <sstream>
-#include <QtCore/QDebug>
+#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -667,20 +667,16 @@ void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
 }
 
 void HarpoonClient::irc_handleNickModified(const QJsonObject& root) {
-    auto idValue = root.value("id");
     //auto timeValue = root.value("time");
     auto serverIdValue = root.value("server");
     auto oldNickValue = root.value("oldnick");
     auto newNickValue = root.value("newnick");
 
-    if (!idValue.isString()) return;
     //if (!timeValue.isDouble()) return;
     if (!serverIdValue.isString()) return;
     if (!oldNickValue.isString()) return;
     if (!newNickValue.isString()) return;
 
-    size_t id;
-    std::istringstream(idValue.toString().toStdString()) >> id;
     //double time = timeValue.toDouble();
     QString serverId = serverIdValue.toString();
     QString oldNick = oldNickValue.toString();
