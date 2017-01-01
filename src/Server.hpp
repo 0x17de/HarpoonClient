@@ -12,6 +12,7 @@
 #include "models/NickModel.hpp"
 
 
+class Channel;
 class Server : public TreeEntry {
     Q_OBJECT
 
@@ -22,6 +23,7 @@ class Server : public TreeEntry {
     QString name_;
     QString nick_;
     bool disabled_;
+    std::shared_ptr<Channel> backlog_;
 
 public:
     Server(const QString& activeNick,
@@ -36,6 +38,7 @@ public:
     QString getName() const;
     QString getActiveNick() const;
     void setActiveNick(const QString& nick);
+    Channel* getBacklog();
 };
 
 

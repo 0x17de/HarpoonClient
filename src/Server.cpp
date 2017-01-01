@@ -42,3 +42,9 @@ QString Server::getActiveNick() const {
 void Server::setActiveNick(const QString& nick) {
     nick_ = nick;
 }
+
+Channel* Server::getBacklog() {
+    if (!backlog_)
+        backlog_ = std::make_shared<Channel>(0, std::static_pointer_cast<Server>(shared_from_this()), "["+name_+"]", false);
+    return backlog_.get();
+}

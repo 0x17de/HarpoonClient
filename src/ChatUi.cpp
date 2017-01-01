@@ -171,9 +171,14 @@ void ChatUi::channelConnected(Channel* channel) {
 
 void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
-    if (item->getTreeEntryType() == 'c') { // channel selected
+    auto type = item->getTreeEntryType();
+    if (type == 'c') { // channel selected
         Channel* channel = static_cast<Channel*>(item);
         activateChannel(channel);
+        messageInputView_->setFocus();
+    } else if (type == 's') {
+        Server* server = static_cast<Server*>(item);
+        activateChannel(server->getBacklog());
         messageInputView_->setFocus();
     }
 }
