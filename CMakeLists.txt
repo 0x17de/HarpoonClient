@@ -26,6 +26,7 @@ set(SRC_CLIENT
     src/Host.cpp src/Host.hpp
     src/Channel.cpp src/Channel.hpp
     src/BacklogView.cpp src/BacklogView.hpp
+    src/GraphicsHandle.cpp src/GraphicsHandle.hpp
     src/UserGroup.cpp src/UserGroup.hpp
     src/User.cpp src/User.hpp
     src/ChatLine.cpp src/ChatLine.hpp

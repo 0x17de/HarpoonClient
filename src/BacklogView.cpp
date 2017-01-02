@@ -10,18 +10,41 @@ BacklogView::BacklogView(QGraphicsScene* scene)
     : QGraphicsView(scene)
     , splitting_{75, 0.2, 0.8}
 {
+    for (auto& handle : handles)
+        scene->addItem(&handle);
+
+    connect(&handles[0], &GraphicsHandle::positionChanged, [this](qreal xpos) {
+            splitting_[0] = xpos;
+            updateLayout(false, true);
+        });
+    connect(&handles[1], &GraphicsHandle::positionChanged, [this](qreal xpos) {
+            auto contentsRect = this->contentsRect();
+            qreal width = contentsRect.width();
+            qreal timeWidth = splitting_[0]; // time is fixed width
+            width -= splitting_[0];
+            qreal whoWidth = splitting_[1] * width;
+            qreal messageWidth = splitting_[2] * width;
+            qreal pos = xpos - timeWidth;
+            qreal split = pos / (whoWidth + messageWidth);
+
+            splitting_[1] = split;
+            splitting_[2] = 1.0 - split;
+            updateLayout(false, false);
+        });
+
+    setAcceptDrops(true);
 }
 
 void BacklogView::resizeEvent(QResizeEvent* event) {
+    QGraphicsView::resizeEvent(event);
     updateLayout();
 }
 
-void BacklogView::mouseMoveEvent(QMouseEvent* event) {
-    // TODO: update cursor if over resize bar
-    auto mousePosition = event->localPos();
+void BacklogView::mousePressEvent(QMouseEvent* event) {
+    QGraphicsView::mousePressEvent(event);
 }
 
-void BacklogView::updateLayout() {
+void BacklogView::updateLayout(bool moveHandle1, bool moveHandle2) {
     auto contentsRect = this->contentsRect();
     qreal width = contentsRect.width();
     qreal timeWidth = splitting_[0]; // time is fixed width
@@ -55,6 +78,16 @@ void BacklogView::updateLayout() {
         whoGfx->setTextCursor(cursor);
 
         top += std::max({timestampGfx->boundingRect().height(), whoGfx->boundingRect().height(), messageGfx->boundingRect().height()});
+    }
+
+    qreal height = std::max(top, viewport()->height());
+    if (moveHandle1) {
+        handles[0].setRect(QRect(-GraphicsHandle::handleWidth/2, 0, GraphicsHandle::handleWidth/2, height));
+        handles[0].setPos(timeWidth, 0);
+    }
+    if (moveHandle2) {
+        handles[1].setRect(QRect(-GraphicsHandle::handleWidth/2, 0, GraphicsHandle::handleWidth/2, height));
+        handles[1].setPos(timeWidth+whoWidth, 0);
     }
 }
 

@@ -9,6 +9,7 @@
 #include <QResizeEvent>
 
 #include "ChatLine.hpp"
+#include "GraphicsHandle.hpp"
 
 
 class BacklogView : public QGraphicsView {
@@ -17,11 +18,13 @@ class BacklogView : public QGraphicsView {
     std::array<qreal, 3> splitting_;
     std::list<ChatLine> chatLines_;
 
-    void updateLayout();
+    std::array<GraphicsHandle, 2> handles;
+
+    void updateLayout(bool moveHandle1 = true, bool moveHandle2 = true);
 
 protected:
-    virtual void resizeEvent(QResizeEvent* event);
-    virtual void mouseMoveEvent(QMouseEvent* event);
+    virtual void resizeEvent(QResizeEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
 
 public:
     explicit BacklogView(QGraphicsScene* scene);
