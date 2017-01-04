@@ -50,7 +50,7 @@ qt5_wrap_ui(SERVERCONFIGUI_HEADERS ui_forms/serverConfigurationDialog.ui)
 qt5_wrap_ui(SETTINGSUI_HEADERS ui_forms/settings.ui)
 qt5_wrap_ui(IRCCONFIGUI_HEADERS ui_forms/ircSettings.ui)
 
-add_executable(HarpoonClient
+add_executable(HarpoonClient WIN32
     ${SRC_CLIENT}
     ${CHATUI_HEADERS}
     ${EDITSERVERENTRY_HEADERS}
@@ -65,16 +65,13 @@ target_include_directories(HarpoonClient PUBLIC src)
 target_link_libraries(HarpoonClient Qt5::Widgets Qt5::WebSockets)
 
 
-
-INSTALL(TARGETS HarpoonClient
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib/static)
-include(InstallRequiredSystemLibraries)
-install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-    DESTINATION bin COMPONENT runtime)
-
 # OS SPECIFIC INSTALL SETTINGS
 if(WIN32)
+  INSTALL(TARGETS HarpoonClient
+          DESTINATION .)
+  SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION .)
+  include(InstallRequiredSystemLibraries)
+
   # INCLUDE LIBRARIES IF PRESENT
   SET(CPACK_GENERATOR "NSIS")
   FILE(GLOB EXT_DLLS "ext/*.dll")
@@ -86,9 +83,11 @@ if(WIN32)
   SET(CPACK_NSIS_URL_INFO_ABOUT "https://www.manuel-herrmann.de")
 
   SET(CPACK_NSIS_HELP_LINK "https://github.com/HarpoonOrg/HarpoonClient")
-  SET(CPACK_NSIS_MENU_LINKS "bin\\HarpoonClient" "HarpoonClient")
-
+  SET(CPACK_NSIS_MENU_LINKS "HarpoonClient.exe" "HarpoonClient")
+  #SET(CPACK_CREATE_DESKTOP_LINKS "HarpoonClient.exe")
 elseif(UNIX)
+  INSTALL(TARGETS HarpoonClient
+          DESTINATION bin)
   SET(CPACK_GENERATOR "DEB;TGZ")
   SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Manuel Herrmann")
   SET(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
