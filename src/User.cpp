@@ -1,11 +1,13 @@
 #include "User.hpp"
 
 
-User::User(const QString& nick)
+User::User(const QString& nick,
+           const QString& mode)
     : TreeEntry('u')
     , userGroup_{nullptr}
+    , nick_(stripNick(nick))
+    , mode_(stripNick(nick))
 {
-    nick_ = stripNick(nick);
 }
 
 QString User::stripNick(const QString& nick) {
@@ -23,6 +25,10 @@ UserGroup* User::getUserGroup() const {
 
 QString User::getNick() const {
     return nick_;
+}
+
+QString User::getMode() const {
+    return mode_;
 }
 
 void User::rename(const QString& nick) {

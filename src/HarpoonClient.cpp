@@ -541,19 +541,19 @@ void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
     //if (!timeValue.isDouble()) return;
     if (!serverIdValue.isString()) return;
     if (!channelNameValue.isString()) return;
-    if (!usersValue.isArray()) return;
+    if (!usersValue.isObject()) return;
 
     //size_t id;
     //std::istringstream(idValue.toString().toStdString()) >> id;
     //double time = timeValue.toDouble();
     QString serverId = serverIdValue.toString();
     QString channelName = channelNameValue.toString();
-    auto users = usersValue.toArray();
+    auto users = usersValue.toObject();
 
     std::list<std::shared_ptr<User>> userList;
-    for (auto userEntry : users) {
-        if (!userEntry.isString()) return;
-        userList.push_back(std::make_shared<User>(userEntry.toString()));
+    for (auto userEntryIt = users.begin(); userEntryIt != users.end(); ++userEntryIt) {
+        auto username = userEntryIt.key();
+        userList.push_back(std::make_shared<User>(username));
     }
 
     auto server = serverTreeModel_.getServer(serverId);
