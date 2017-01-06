@@ -77,7 +77,7 @@ if(WIN32)
   FILE(GLOB EXT_DLLS "ext/*.dll")
   if(EXT_DLLS)
     install(FILES ${EXT_DLLS}
-            DESTINATION bin)
+            DESTINATION .)
   endif()
   SET(CPACK_NSIS_CONTACT "Manuel Herrmann <m@manuel-herrmann.de>")
   SET(CPACK_NSIS_URL_INFO_ABOUT "https://www.manuel-herrmann.de")
