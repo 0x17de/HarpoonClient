@@ -1,6 +1,7 @@
 #include "ChatUi.hpp"
 #include "moc_ChatUi.cpp"
 
+#include <functional>
 #include <QCoreApplication>
 #include <QTreeWidget>
 #include <QStackedWidget>
