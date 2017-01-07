@@ -4,8 +4,11 @@
 #include <QCoreApplication>
 #include <QTreeWidget>
 #include <QStackedWidget>
+#include <QStringListModel>
+#include <QDesktopServices>
 #include "HarpoonClient.hpp"
 #include "models/ServerTreeModel.hpp"
+#include "version.hpp"
 
 #include "Server.hpp"
 #include "BacklogView.hpp"
@@ -24,6 +27,33 @@ ChatUi::ChatUi(HarpoonClient& client,
 {
     clientUi_.setupUi(this);
     bouncerConfigurationDialogUi_.setupUi(&bouncerConfigurationDialog_);
+
+    using UrlMap = QMap<QString, QUrl>;
+    UrlMap aboutUrls{
+        {"JsonCpp", QUrl("https://github.com/open-source-parsers/jsoncpp")},
+        {"libircclient", QUrl("https://www.ulduzsoft.com/libircclient/")},
+        {"Qt5", QUrl("https://www.qt.io/")},
+        {"SOCI", QUrl("http://soci.sourceforge.net/")},
+        {"OpenSSL", QUrl("https://www.openssl.org/")},
+    };
+    QStringList usedLibraries{
+        "JsonCpp",
+        "libircclient",
+        "Qt5",
+        "SOCI", 
+        "OpenSSL"
+    };
+    aboutDialogUi_.setupUi(&aboutDialog_);
+    aboutDialogUi_.clientVersion->setText(QString("HarpoonClient v")+QString::number(VERSION_MAJOR)+"."+QString::number(VERSION_MINOR)+"."+QString::number(VERSION_PATCH));
+    aboutDialogUi_.libraryList->setEditTriggers(QAbstractItemView::NoEditTriggers); // can't edit the text items
+    aboutDialogUi_.libraryList->setModel(new QStringListModel(usedLibraries, aboutDialogUi_.libraryList));
+    connect(clientUi_.actionAbout, &QAction::triggered, [this]{ aboutDialog_.show(); });
+    connect(aboutDialogUi_.libraryList, &QAbstractItemView::doubleClicked, std::bind([this](const UrlMap& aboutUrls, const QModelIndex& index){
+            QString item = index.data(Qt::DisplayRole).toString();
+            auto it = aboutUrls.find(item);
+            if (it != aboutUrls.end())
+                QDesktopServices::openUrl(it.value());
+            }, std::move(aboutUrls), std::placeholders::_1));
 
     // bouncer configuration
     bouncerConfigurationDialogUi_.username->setText(settings_.value("username", "user").toString());

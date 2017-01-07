@@ -84,7 +84,7 @@
     <addaction name="actionConfigure_Server"/>
     <addaction name="actionConfigure_Networks"/>
     <addaction name="separator"/>
-    <addaction name="actionAbout_2"/>
+    <addaction name="actionAbout"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -107,11 +107,6 @@
    </property>
   </action>
   <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
-  <action name="actionAbout_2">
    <property name="text">
     <string>About</string>
    </property>

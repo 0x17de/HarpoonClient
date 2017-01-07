@@ -6,6 +6,7 @@
 #include <memory>
 #include "SettingsDialog.hpp"
 #include "ui_client.h"
+#include "ui_about.h"
 #include "ui_serverConfigurationDialog.h"
 
 
@@ -41,6 +42,9 @@ class ChatUi : public QMainWindow {
 
     QDialog bouncerConfigurationDialog_;
     SettingsDialog settingsDialog_;
+
+    Ui::AboutDialog aboutDialogUi_;
+    QDialog aboutDialog_;
 
 public:
     ChatUi(HarpoonClient& client,

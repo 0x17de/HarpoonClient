@@ -42,6 +42,7 @@ set(SRC_CLIENT
 
 qt5_add_resources(ICONS_SRC icons/icons.qrc)
 
+qt5_wrap_ui(ABOUT_HEADERS ui_forms/about.ui)
 qt5_wrap_ui(CHATUI_HEADERS ui_forms/client.ui)
 qt5_wrap_ui(EDITSERVERENTRY_HEADERS ui_forms/editServerEntry.ui)
 qt5_wrap_ui(EDITHOSTENTRY_HEADERS ui_forms/editHostEntry.ui)
@@ -52,6 +53,7 @@ qt5_wrap_ui(IRCCONFIGUI_HEADERS ui_forms/ircSettings.ui)
 
 add_executable(HarpoonClient WIN32
     ${SRC_CLIENT}
+    ${ABOUT_HEADERS}
     ${CHATUI_HEADERS}
     ${EDITSERVERENTRY_HEADERS}
     ${EDITHOSTENTRY_HEADERS}
