@@ -6,7 +6,7 @@ User::User(const QString& nick,
     : TreeEntry('u')
     , userGroup_{nullptr}
     , nick_(stripNick(nick))
-    , mode_(stripNick(nick))
+    , mode_(mode)
 {
 }
 

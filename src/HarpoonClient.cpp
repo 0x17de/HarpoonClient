@@ -553,7 +553,10 @@ void HarpoonClient::irc_handleUserList(const QJsonObject& root) {
     std::list<std::shared_ptr<User>> userList;
     for (auto userEntryIt = users.begin(); userEntryIt != users.end(); ++userEntryIt) {
         auto username = userEntryIt.key();
-        userList.push_back(std::make_shared<User>(username));
+        auto modeValue = userEntryIt.value();
+        if (!modeValue.isString()) continue;
+        auto mode = modeValue.toString();
+        userList.push_back(std::make_shared<User>(username, mode));
     }
 
     auto server = serverTreeModel_.getServer(serverId);
@@ -593,8 +596,10 @@ void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
             channelModel.newChannel(channelPtr);
         }
     }
-    if (channel)
+    if (channel) {
         channel->addMessage(id, time, "-->", User::stripNick(nick) + " joined the channel", MessageColor::Event);
+        channel->getUserModel().addUser(std::make_shared<User>(nick));
+    }
 }
 
 void HarpoonClient::irc_handlePart(const QJsonObject& root) {
@@ -630,8 +635,10 @@ void HarpoonClient::irc_handlePart(const QJsonObject& root) {
             channelModel.newChannel(channelPtr);
         }
     }
-    if (channel)
+    if (channel) {
         channel->addMessage(id, time, "<--", User::stripNick(nick) + " left the channel", MessageColor::Event);
+        channel->getUserModel().removeUser(User::stripNick(nick));
+    }
 }
 
 void HarpoonClient::irc_handleNickChange(const QJsonObject& root) {
@@ -862,7 +869,10 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
             QJsonObject users = usersValue.toObject();
             for (auto uit = users.begin(); uit != users.end(); ++uit) {
                 QString nick = uit.key();
-                userList.push_back(std::make_shared<User>(nick));
+                auto modeValue = uit.value();
+                if (!modeValue.isString()) continue;
+                auto mode = modeValue.toString();
+                userList.push_back(std::make_shared<User>(nick, mode));
             }
 
             currentChannel->resetUsers(userList);
