@@ -34,3 +34,28 @@ QString User::getMode() const {
 void User::rename(const QString& nick) {
     nick_ = nick;
 }
+
+char User::getAccessMode() {
+    // to keep order
+    return isOwner() ? 'q' : isAdmin() ? 'a' : isOperator() ? '@' : isHalfOperator() ? '%' : isVoiced() ? 'v' : 0;
+}
+
+bool User::isOwner() {
+    return mode_.contains('q');
+}
+
+bool User::isAdmin() {
+    return mode_.contains('a');
+}
+
+bool User::isOperator() {
+    return mode_.contains('o');
+}
+
+bool User::isHalfOperator() {
+    return mode_.contains('h');
+}
+
+bool User::isVoiced() {
+    return mode_.contains('v');
+}

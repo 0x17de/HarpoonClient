@@ -22,6 +22,13 @@ public:
     QString getNick() const;
     QString getMode() const;
     void rename(const QString& newNick);
+
+    char getAccessMode();
+    bool isOwner();
+    bool isAdmin();
+    bool isOperator();
+    bool isHalfOperator();
+    bool isVoiced();
 };
 
 
