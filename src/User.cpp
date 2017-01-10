@@ -37,7 +37,7 @@ void User::rename(const QString& nick) {
 
 char User::getAccessMode() {
     // to keep order
-    return isOwner() ? 'q' : isAdmin() ? 'a' : isOperator() ? '@' : isHalfOperator() ? '%' : isVoiced() ? 'v' : 0;
+    return isOwner() ? 'q' : isAdmin() ? 'a' : isOperator() ? 'o' : isHalfOperator() ? 'h' : isVoiced() ? 'v' : 0;
 }
 
 bool User::isOwner() {

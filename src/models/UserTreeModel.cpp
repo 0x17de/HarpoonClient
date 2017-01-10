@@ -131,17 +131,48 @@ User* UserTreeModel::getUser(QString nick) {
         });
     return (it == users_.end() ? nullptr : (*it).get());
 }
-
+#include <QDebug>
 void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     beginResetModel();
     groups_.clear();
     users_.swap(users);
 
-    // TODO: create groups depending on access permissions
+    auto groupOwners = std::make_shared<UserGroup>("Owners");
+    auto groupAdmins = std::make_shared<UserGroup>("Admins");
+    auto groupOperators = std::make_shared<UserGroup>("Operators");
+    auto groupHalfOperators = std::make_shared<UserGroup>("HalfOperators");
+    auto groupVoiced = std::make_shared<UserGroup>("Voiced");
     auto groupUsers = std::make_shared<UserGroup>("Users");
-    for (auto& u : users_)
-        groupUsers->addUser(u);
-    groups_.push_back(groupUsers);
+
+    for (auto& u : users_) {
+        char mode = u->getAccessMode();
+        qDebug() << u->getNick() << " MODE " << QString::number(mode);
+        UserGroup* group;
+
+        switch(mode) {
+        case 'q': group = groupOwners.get();        break;
+        case 'a': group = groupAdmins.get();        break;
+        case 'o': group = groupOperators.get();     break;
+        case 'h': group = groupHalfOperators.get(); break;
+        case 'v': group = groupVoiced.get();        break;
+        default: group = groupUsers.get();
+        }
+
+        group->addUser(u);
+    }
+
+    if (groupOwners->getUserCount() > 0)
+        groups_.push_back(groupOwners);
+    if (groupAdmins->getUserCount() > 0)
+        groups_.push_back(groupAdmins);
+    if (groupOperators->getUserCount() > 0)
+        groups_.push_back(groupOperators);
+    if (groupHalfOperators->getUserCount() > 0)
+        groups_.push_back(groupHalfOperators);
+    if (groupVoiced->getUserCount() > 0)
+        groups_.push_back(groupVoiced);
+    if (groupUsers->getUserCount() > 0)
+        groups_.push_back(groupUsers);
 
     endResetModel();
 
