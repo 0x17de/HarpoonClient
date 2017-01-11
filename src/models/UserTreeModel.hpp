@@ -40,6 +40,7 @@ public Q_SLOTS:
     void resetUsers(std::list<std::shared_ptr<User>>& users);
 
 private:
+    std::shared_ptr<UserGroup> groupUsers_;
     std::list<std::shared_ptr<UserGroup>> groups_;
     std::list<std::shared_ptr<User>> users_;
 };

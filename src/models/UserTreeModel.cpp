@@ -142,7 +142,7 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     auto groupOperators = std::make_shared<UserGroup>("Operators");
     auto groupHalfOperators = std::make_shared<UserGroup>("HalfOperators");
     auto groupVoiced = std::make_shared<UserGroup>("Voiced");
-    auto groupUsers = std::make_shared<UserGroup>("Users");
+    groupUsers_ = std::make_shared<UserGroup>("Users");
 
     for (auto& u : users_) {
         char mode = u->getAccessMode();
@@ -155,7 +155,7 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
         case 'o': group = groupOperators.get();     break;
         case 'h': group = groupHalfOperators.get(); break;
         case 'v': group = groupVoiced.get();        break;
-        default: group = groupUsers.get();
+        default: group = groupUsers_.get();
         }
 
         group->addUser(u);
@@ -171,8 +171,8 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
         groups_.push_back(groupHalfOperators);
     if (groupVoiced->getUserCount() > 0)
         groups_.push_back(groupVoiced);
-    if (groupUsers->getUserCount() > 0)
-        groups_.push_back(groupUsers);
+    if (groupUsers_->getUserCount() > 0)
+        groups_.push_back(groupUsers_);
 
     endResetModel();
 
@@ -190,20 +190,14 @@ void UserTreeModel::addUser(std::shared_ptr<User> user) {
         if (groups_.size() > 0) {
             userGroup = groups_.front().get();
         } else
-            return; // TODO: move users into the server
+            return;
     }
-    // TODO: get or create group
-    // if group does not exist yet, insert
-    //if (getUserGroupIndex(userGroup) == -1)
-    //    groups_.push_back(userGroup);
-    auto rowIndex = userGroup->getUserCount();
-    int idx = getUserGroupIndex(userGroup);
-    if (idx == -1)
-        return;
 
+    auto idx = getUserGroupIndex(groupUsers_.get());
+    auto rowIndex = userGroup->getUserCount();
     beginInsertRows(index(idx, 0), rowIndex, rowIndex);
     users_.push_back(user);
-    userGroup->addUser(user);
+    groupUsers_->addUser(user);
     endInsertRows();
 }
 
