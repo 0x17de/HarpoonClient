@@ -171,8 +171,7 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
         groups_.push_back(groupHalfOperators);
     if (groupVoiced->getUserCount() > 0)
         groups_.push_back(groupVoiced);
-    if (groupUsers_->getUserCount() > 0)
-        groups_.push_back(groupUsers_);
+    groups_.push_back(groupUsers_);
 
     endResetModel();
 
