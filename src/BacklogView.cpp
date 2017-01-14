@@ -101,7 +101,7 @@ void BacklogView::addMessage(size_t id,
     bool scrollToBottom = bar != nullptr && bar->sliderPosition() == bar->maximum();
 
     ChatLine* line;
-    if (chatLines_.size() == 0 || id > chatLines_.back().getId()) {
+    if (id == 0 || chatLines_.size() == 0 || id > chatLines_.back().getId()) {
         chatLines_.emplace_back(id, time, nick, message, color);
         line = &chatLines_.back();
     } else if (id < chatLines_.front().getId()) {

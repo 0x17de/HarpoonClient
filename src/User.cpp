@@ -35,6 +35,15 @@ void User::rename(const QString& nick) {
     nick_ = nick;
 }
 
+void User::changeMode(char modeChar, bool add) {
+    if (add) {
+        if (!mode_.contains(modeChar))
+            mode_.append(modeChar);
+    } else {
+        mode_.remove(modeChar);
+    }
+}
+
 char User::getAccessMode() {
     // to keep order
     return isOwner() ? 'q' : isAdmin() ? 'a' : isOperator() ? 'o' : isHalfOperator() ? 'h' : isVoiced() ? 'v' : 0;

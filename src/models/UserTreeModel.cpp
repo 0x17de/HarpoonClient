@@ -131,7 +131,35 @@ User* UserTreeModel::getUser(QString nick) {
         });
     return (it == users_.end() ? nullptr : (*it).get());
 }
-#include <QDebug>
+
+UserGroup* UserTreeModel::getGroup(const QString& name) {
+    auto it = find_if(groups_.begin(), groups_.end(), [&name](const std::shared_ptr<UserGroup>& group){
+            return group->getName() == name;
+        });
+    if (it == groups_.end()) {
+        auto rowIndex = groups_.size();
+        beginInsertRows(QModelIndex(), rowIndex, rowIndex);
+        auto group = std::make_shared<UserGroup>(name);
+        groups_.push_back(group);
+        endInsertRows();
+        return group.get();
+    }
+    return (*it).get();
+}
+
+QString UserTreeModel::modeName(char modeChar) const {
+    QString modeName;
+    switch(modeChar) {
+    case 'q': modeName = "Owners"; break;
+    case 'a': modeName = "Admins"; break;
+    case 'o': modeName = "Operators"; break;
+    case 'h': modeName = "HalfOperators"; break;
+    case 'v': modeName = "Voiced"; break;
+    default: modeName = "Users";
+    }
+    return modeName;
+}
+
 void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
     beginResetModel();
     groups_.clear();
@@ -146,7 +174,6 @@ void UserTreeModel::resetUsers(std::list<std::shared_ptr<User>>& users) {
 
     for (auto& u : users_) {
         char mode = u->getAccessMode();
-        qDebug() << u->getNick() << " MODE " << QString::number(mode);
         UserGroup* group;
 
         switch(mode) {
@@ -187,7 +214,7 @@ void UserTreeModel::addUser(std::shared_ptr<User> user) {
     UserGroup* userGroup = user->getUserGroup();
     if (userGroup == nullptr) {
         if (groups_.size() > 0) {
-            userGroup = groups_.front().get();
+            userGroup = groupUsers_.get();
         } else
             return;
     }
@@ -196,7 +223,7 @@ void UserTreeModel::addUser(std::shared_ptr<User> user) {
     auto rowIndex = userGroup->getUserCount();
     beginInsertRows(index(idx, 0), rowIndex, rowIndex);
     users_.push_back(user);
-    groupUsers_->addUser(user);
+    userGroup->addUser(user);
     endInsertRows();
 }
 
@@ -220,6 +247,21 @@ bool UserTreeModel::removeUser(const QString& nick) {
     endRemoveRows();
 
     return true;
+}
+
+bool UserTreeModel::changeMode(const QString& nick,
+                               char mode,
+                               bool add) {
+    auto it = find_if(users_.begin(), users_.end(), [&nick](const std::shared_ptr<User>& user){
+            return user->getNick() == nick;
+        });
+    if (it == users_.end()) return false;
+
+    std::shared_ptr<User> user = *it;
+    user->changeMode(mode, add);
+    removeUser(nick);
+    user->setUserGroup(getGroup(modeName(user->getAccessMode())));
+    addUser(user);
 }
 
 bool UserTreeModel::renameUser(const QString& nick,

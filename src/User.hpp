@@ -22,6 +22,7 @@ public:
     QString getNick() const;
     QString getMode() const;
     void rename(const QString& newNick);
+    void changeMode(char modeChar, bool add);
 
     char getAccessMode();
     bool isOwner();

@@ -205,7 +205,6 @@ void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString&
             QString serverId = server->getId();
             QString host = parts.at(1);
             QString port = parts.at(2);
-            qDebug() << "PORT " << parts;
 
             root["server"] = serverId;
             root["host"] = host;
@@ -331,6 +330,8 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleTopic(root);
         } else if (cmd == "action") {
             irc_handleAction(root);
+        } else if (cmd == "mode") {
+            irc_handleMode(root);
         } else if (cmd == "kick") {
             irc_handleKick(root);
         } else if (cmd == "notice") {
@@ -812,6 +813,62 @@ void HarpoonClient::irc_handleAction(const QJsonObject& root) {
     Channel* channel = server->getChannelModel().getChannel(channelName);
     if (!channel) return;
     channel->addMessage(id, time, "*", User::stripNick(nick) + " " + message, MessageColor::Action);
+}
+
+void HarpoonClient::irc_handleMode(const QJsonObject& root) {
+    auto idValue = root.value("id");
+    auto timeValue = root.value("time");
+    auto serverIdValue = root.value("server");
+    auto channelNameValue = root.value("channel");
+    auto nickValue = root.value("nick");
+    auto modeValue = root.value("mode");
+    auto argsValue = root.value("args");
+
+    if (!idValue.isString()) return;
+    if (!timeValue.isDouble()) return;
+    if (!serverIdValue.isString()) return;
+    if (!channelNameValue.isString()) return;
+    if (!nickValue.isString()) return;
+    if (!modeValue.isString()) return;
+    if (!argsValue.isArray()) return;
+
+    size_t id;
+    std::istringstream(idValue.toString().toStdString()) >> id;
+    double time = timeValue.toDouble();
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+    QString nick = nickValue.toString();
+    QString mode = modeValue.toString();
+    auto args = argsValue.toArray();
+
+    std::shared_ptr<Server> server = serverTreeModel_.getServer(serverId);
+    Channel* channel = server->getChannelModel().getChannel(channelName);
+    if (!channel) return;
+
+    bool add = true;
+    size_t userIndex = 0;
+    for (QChar c : mode) {
+        char modeChar = c.toLatin1();
+        if (modeChar == '+') {
+            add = true;
+        } else if (modeChar == '-') {
+            add = false;
+        } else {
+            if (userIndex > args.count()) break;
+            auto nickTargetValue = args.at(userIndex);
+            QString nickTarget = nickTargetValue.toString();
+
+            channel->getUserModel().changeMode(nickTarget, modeChar, add);
+            channel->addMessage(id,
+                                time,
+                                "*",
+                                User::stripNick(nick) + " sets mode "
+                                  + (add ? '+' : '-') + QChar(modeChar)
+                                  + " on " + nickTarget,
+                                MessageColor::Event);
+            userIndex += 1;
+        }
+    }
 }
 
 void HarpoonClient::irc_handleChatList(const QJsonObject& root) {

@@ -32,6 +32,13 @@ public:
     bool removeUser(const QString& nick);
     bool renameUser(const QString& nick,
                     const QString& newNick);
+    bool changeMode(const QString& nick,
+                    char mode,
+                    bool add);
+
+private:
+    UserGroup* getGroup(const QString& name);
+    QString modeName(char modeChar) const;
 
 signals:
     void expand(const QModelIndex& index);
