@@ -235,16 +235,27 @@ bool UserTreeModel::removeUser(const QString& nick) {
 
     User* user = (*it).get();
     UserGroup* userGroup = user->getUserGroup();
-    auto rowIndex = userGroup->getUserIndex(user);
 
     int idx = getUserGroupIndex(userGroup);
     if (idx == -1)
         return false;
 
-    beginRemoveRows(index(idx, 0), rowIndex, rowIndex);
-    users_.erase(it);
-    userGroup->removeUser(user);
-    endRemoveRows();
+    if (userGroup == groupUsers_.get() || userGroup->getUserCount() > 1) {
+        auto rowIndex = userGroup->getUserIndex(user);
+        beginRemoveRows(index(idx, 0), rowIndex, rowIndex);
+        users_.erase(it);
+        userGroup->removeUser(user);
+        endRemoveRows();
+    } else {
+        auto rowIndex = getUserGroupIndex(userGroup);
+        beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
+        users_.erase(it);
+        userGroup->removeUser(user);
+        auto it = groups_.begin();
+        advance(it, rowIndex);
+        groups_.erase(it);
+        endRemoveRows();
+    }
 
     return true;
 }
