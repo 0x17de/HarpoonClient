@@ -33,6 +33,7 @@ public:
 
 signals:
     void expand(const QModelIndex& index);
+    void newChannel(std::shared_ptr<Channel> channel);
 
 public Q_SLOTS:
     void resetServers(std::list<std::shared_ptr<Server>>& servers);

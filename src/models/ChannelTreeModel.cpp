@@ -146,15 +146,19 @@ void ChannelTreeModel::resetChannels(std::list<std::shared_ptr<Channel>>& channe
     beginResetModel();
     channels_.clear();
     channels_.insert(channels_.begin(), channels.begin(), channels.end());
+    for (auto& channel : channels) {
+        emit newChannel(channel);
+    }
     endResetModel();
 }
 
-void ChannelTreeModel::newChannel(std::shared_ptr<Channel> channel) {
+void ChannelTreeModel::addChannel(std::shared_ptr<Channel> channel) {
     int rowIndex = channels_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
     auto server = channel->getServer().lock();
     emit beginInsertChannel(server, rowIndex);
     channels_.push_back(channel);
+    emit newChannel(channel);
     endInsertRows();
     emit endInsertChannel();
 }

@@ -76,10 +76,10 @@ private:
     void irc_handleHostAdded(const QJsonObject& root);
     void irc_handleHostDeleted(const QJsonObject& root);
 
+public Q_SLOTS:
     void onReconnectTimer();
     void onPingTimer();
-
-public Q_SLOTS:
+    void onNewChannel(std::shared_ptr<Channel> channel);
     void sendMessage(Server* server, Channel* channel, const QString& message);
     void backlogRequest(Channel* channel);
 

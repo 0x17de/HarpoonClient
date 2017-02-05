@@ -31,6 +31,7 @@ HarpoonClient::HarpoonClient(ServerTreeModel& serverTreeModel,
     connect(&ws_, &QWebSocket::binaryMessageReceived, this, &HarpoonClient::onBinaryMessage);
     connect(&reconnectTimer_, &QTimer::timeout, this, &HarpoonClient::onReconnectTimer);
     connect(&pingTimer_, &QTimer::timeout, this, &HarpoonClient::onPingTimer);
+    connect(&serverTreeModel, &ServerTreeModel::newChannel, this, &HarpoonClient::onNewChannel);
 
     reconnectTimer_.setSingleShot(true);
     username_ = settings_.value("username", "user").toString();
@@ -97,6 +98,10 @@ void HarpoonClient::onBinaryMessage(const QByteArray& data) {
     qDebug() << data;
     QJsonDocument doc = QJsonDocument::fromJson(data);
     handleCommand(doc);
+}
+
+void HarpoonClient::onNewChannel(std::shared_ptr<Channel> channel) {
+    connect(channel.get(), &Channel::backlogRequest, this, &HarpoonClient::backlogRequest);
 }
 
 void HarpoonClient::backlogRequest(Channel* channel) {
@@ -594,7 +599,7 @@ void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
         } else {
             std::shared_ptr<Channel> channelPtr{std::make_shared<Channel>(0 /* backlog last id */, server, channelName, false)};
             channel = channelPtr.get();
-            channelModel.newChannel(channelPtr);
+            channelModel.addChannel(channelPtr);
         }
     }
     if (channel) {
@@ -633,7 +638,7 @@ void HarpoonClient::irc_handlePart(const QJsonObject& root) {
         } else {
             std::shared_ptr<Channel> channelPtr{std::make_shared<Channel>(0 /* backlog last id */, server, channelName, true)};
             channel = channelPtr.get();
-            channelModel.newChannel(channelPtr);
+            channelModel.addChannel(channelPtr);
         }
     }
     if (channel) {
@@ -916,7 +921,7 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
             bool channelDisabled = channelDisabledValue.isBool() && channelDisabledValue.toBool();
 
             auto currentChannel = std::make_shared<Channel>(firstId, currentServer, channelName, channelDisabled);
-            currentServer->getChannelModel().newChannel(currentChannel);
+            currentServer->getChannelModel().addChannel(currentChannel);
 
             QJsonObject channel = channelValue.toObject();
             QJsonValue usersValue = channel.value("users");

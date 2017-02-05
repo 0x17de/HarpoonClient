@@ -145,6 +145,9 @@ void ServerTreeModel::connectServer(Server* server) {
     connect(&channelTreeModel, &ChannelTreeModel::beginInsertChannel, [this](std::shared_ptr<Server> server, int where) {
             beginInsertRows(index(getServerIndex(server.get()), 0), where, where);
         });
+    connect(&channelTreeModel, &ChannelTreeModel::newChannel, [this](std::shared_ptr<Channel> channel) {
+            emit newChannel(channel);
+        });
     connect(&channelTreeModel, &ChannelTreeModel::endInsertChannel, [this]() {
             endInsertRows();
         });
@@ -158,6 +161,9 @@ void ServerTreeModel::connectServer(Server* server) {
             auto modelIndex = index(where, 0, index(getServerIndex(server.get()), 0));
             emit dataChanged(modelIndex, modelIndex);
         });
+    for (auto& channel : server->getChannelModel().getChannels()) {
+        emit newChannel(channel);
+    }
 }
 
 void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {

@@ -64,7 +64,6 @@ public Q_SLOTS:
     void showChannelContextMenu(const QPoint&);
     void onChannelViewSelection(const QModelIndex& index);
     void expandServer(const QModelIndex& index);
-    void channelConnected(Channel* channel);
     void resetServers(std::list<std::shared_ptr<Server>>& servers);
     void messageReturnPressed();
 };

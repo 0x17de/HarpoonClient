@@ -36,6 +36,7 @@ signals:
     void channelConnected(Channel* channel);
 
     void beginInsertChannel(std::shared_ptr<Server> server, int row);
+    void newChannel(std::shared_ptr<Channel> channel);
     void endInsertChannel();
     void beginRemoveChannel(std::shared_ptr<Server> server, int row);
     void endRemoveChannel();
@@ -44,7 +45,7 @@ signals:
 public Q_SLOTS:
     void channelDataChanged(Channel* channel);
     void resetChannels(std::list<std::shared_ptr<Channel>>& servers);
-    void newChannel(std::shared_ptr<Channel> server);
+    void addChannel(std::shared_ptr<Channel> server);
     void deleteChannel(const QString& serverId);
 
 private:

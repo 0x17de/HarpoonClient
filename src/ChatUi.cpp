@@ -194,12 +194,6 @@ void ChatUi::expandServer(const QModelIndex& index) {
     channelView_->setExpanded(index, true);
 }
 
-void ChatUi::channelConnected(Channel* channel) {
-    connect(channel, &Channel::backlogRequest, &client_, &HarpoonClient::backlogRequest);
-    userViews_->addWidget(channel->getUserTreeView());
-    backlogViews_->addWidget(channel->getBacklogView());
-}
-
 void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
     auto type = item->getTreeEntryType();
