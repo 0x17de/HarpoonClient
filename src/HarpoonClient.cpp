@@ -982,11 +982,13 @@ void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
         QJsonValue messageValue = entry.value("msg");
         QJsonValue senderValue = entry.value("sender");
         QJsonValue typeValue = entry.value("type");
+        QJsonValue timeValue = entry.value("time");
 
         if (!idValue.isString()
             || !messageValue.isString()
             || !senderValue.isString()
-            || !typeValue.isString())
+            || !typeValue.isString()
+            || !timeValue.isDouble())
             return;
 
         size_t id;
@@ -994,7 +996,7 @@ void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
         QString message = messageValue.toString();
         QString sender = senderValue.toString();
         QString type = typeValue.toString();
-        double time = 0.0; // TODO: timeValue.toString();
+        double time = timeValue.toDouble();
 
         channel->addMessage(id, time, '<'+User::stripNick(sender)+'>', message, MessageColor::Default);
     }
