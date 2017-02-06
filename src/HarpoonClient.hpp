@@ -75,6 +75,7 @@ private:
     void irc_handleServerDeleted(const QJsonObject& root);
     void irc_handleHostAdded(const QJsonObject& root);
     void irc_handleHostDeleted(const QJsonObject& root);
+    void irc_handleBacklogResponse(const QJsonObject& root);
 
 public Q_SLOTS:
     void onReconnectTimer();

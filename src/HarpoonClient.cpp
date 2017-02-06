@@ -359,6 +359,8 @@ void HarpoonClient::handleCommand(const QJsonDocument& doc) {
             irc_handleSettings(root);
         } else if (cmd == "quit") {
             irc_handleQuit(root);
+        } else if (cmd == "backlogresponse") {
+            irc_handleBacklogResponse(root);
         }
     }
 }
@@ -951,4 +953,49 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
         }
     }
     serverTreeModel_.resetServers(serverList);
+}
+
+void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
+    //QJsonValue firstIdValue = root.value("firstId");
+    QJsonValue serverIdValue = root.value("server");
+    QJsonValue channelNameValue = root.value("channel");
+    QJsonValue linesValue = root.value("lines");
+
+    if (!serverIdValue.isString()
+        || !channelNameValue.isString()
+        || ! linesValue.isArray())
+        return;
+
+    QString serverId = serverIdValue.toString();
+    QString channelName = channelNameValue.toString();
+
+    std::shared_ptr<Server> server = serverTreeModel_.getServer(serverId);
+    Channel* channel = server->getChannelModel().getChannel(channelName);
+    if (!channel) return;
+
+    QJsonArray lines = linesValue.toArray();
+    for (auto line : lines) {
+        if (!line.isObject()) return;
+
+        auto entry = line.toObject();
+        QJsonValue idValue = entry.value("id");
+        QJsonValue messageValue = entry.value("msg");
+        QJsonValue senderValue = entry.value("sender");
+        QJsonValue typeValue = entry.value("type");
+
+        if (!idValue.isString()
+            || !messageValue.isString()
+            || !senderValue.isString()
+            || !typeValue.isString())
+            return;
+
+        size_t id;
+        std::istringstream(idValue.toString().toStdString()) >> id;
+        QString message = messageValue.toString();
+        QString sender = senderValue.toString();
+        QString type = typeValue.toString();
+        double time = 0.0; // TODO: timeValue.toString();
+
+        channel->addMessage(id, time, '<'+User::stripNick(sender)+'>', message, MessageColor::Default);
+    }
 }
