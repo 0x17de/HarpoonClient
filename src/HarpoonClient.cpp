@@ -105,8 +105,18 @@ void HarpoonClient::onNewChannel(std::shared_ptr<Channel> channel) {
 }
 
 void HarpoonClient::backlogRequest(Channel* channel) {
-    // TODO: handle backlog request
-    //size_t firstId = channel->getFirstId();
+    auto server = channel->getServer().lock();
+    if (!server) return;
+
+    QJsonObject root;
+    root["cmd"] = "requestbacklog";
+    root["protocol"] = "irc";
+    root["server"] = server->getId();
+    root["channel"] = channel->getName();
+    //root["from"] = channel->getFirstId();
+
+    QString json = QJsonDocument{root}.toJson(QJsonDocument::JsonFormat::Compact);
+    ws_.sendTextMessage(json);
 }
 
 void HarpoonClient::sendMessage(Server* server, Channel* channel, const QString& message) {
