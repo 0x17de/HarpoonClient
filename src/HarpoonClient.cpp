@@ -746,7 +746,7 @@ void HarpoonClient::irc_handleKick(const QJsonObject& root) {
     Channel* channel = server->getChannelModel().getChannel(channelName);
     if (channel == nullptr) return;
     channel->getUserModel().removeUser(User::stripNick(nick));
-    channel->getBacklogView()->addMessage(id, time, "<--", nick + " was kicked (Reason: " + reason + ")", MessageColor::Event);
+    channel->addMessage(id, time, "<--", nick + " was kicked (Reason: " + reason + ")", MessageColor::Event);
 }
 
 void HarpoonClient::irc_handleQuit(const QJsonObject& root) {
@@ -800,7 +800,7 @@ void HarpoonClient::irc_handleChat(const QJsonObject& root, bool notice) {
     std::shared_ptr<Server> server = serverTreeModel_.getServer(serverId);
     Channel* channel = server->getChannelModel().getChannel(channelName);
     if (!channel) return;
-    channel->addMessage(id, time, '<'+User::stripNick(nick)+'>', message, MessageColor::Default);
+    channel->addMessage(id, time, '<'+User::stripNick(nick)+'>', message, notice ? MessageColor::Notice : MessageColor::Default);
 }
 
 void HarpoonClient::irc_handleAction(const QJsonObject& root) {
@@ -998,6 +998,20 @@ void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
         QString type = typeValue.toString();
         double time = timeValue.toDouble();
 
-        channel->addMessage(id, time, '<'+User::stripNick(sender)+'>', message, MessageColor::Default);
+        if (type == "msg") {
+            channel->addMessage(id, time, '<'+User::stripNick(sender)+'>', message, MessageColor::Default);
+        } else if (type == "join") {
+            channel->addMessage(id, time, "-->", User::stripNick(sender) + " joined the channel", MessageColor::Event);
+        } else if (type == "part") {
+            channel->addMessage(id, time, "<--", User::stripNick(sender) + " left the channel", MessageColor::Event);
+        } else if (type == "quit") {
+            channel->addMessage(id, time, "<--", sender + " has quit", MessageColor::Event);
+        } else if (type == "kick") {
+            channel->addMessage(id, time, "<--", sender + " was kicked (Reason: " + message + ")", MessageColor::Event);
+        } else if (type == "notice") {
+            channel->addMessage(id, time, '<'+User::stripNick(sender)+'>', message, MessageColor::Notice);
+        } else if (type == "action") {
+            channel->addMessage(id, time, "*", User::stripNick(sender) + " " + message, MessageColor::Action);
+        }
     }
 }
