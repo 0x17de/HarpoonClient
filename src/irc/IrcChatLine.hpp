@@ -1,5 +1,5 @@
-#ifndef CHATLINE_H
-#define CHATLINE_H
+#ifndef CHATLINEIRC_H
+#define CHATLINEIRC_H
 
 
 #include <QString>
@@ -13,7 +13,7 @@ enum class MessageColor {
     Action
 };
 
-class ChatLine {
+class IrcChatLine {
     size_t id_;
     double time_;
     QString timestamp_;
@@ -26,7 +26,7 @@ class ChatLine {
     static QString formatTimestamp(double timestamp);
 
 public:
-    ChatLine(size_t id,
+    IrcChatLine(size_t id,
              double time,
              const QString& who,
              const QString& message,

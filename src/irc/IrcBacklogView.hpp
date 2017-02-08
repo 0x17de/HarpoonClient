@@ -1,5 +1,5 @@
-#ifndef BACKLOGVIEW_H
-#define BACKLOGVIEW_H
+#ifndef IRCBACKLOGVIEW_H
+#define IRCBACKLOGVIEW_H
 
 
 #include <list>
@@ -8,15 +8,15 @@
 #include <QMouseEvent>
 #include <QResizeEvent>
 
-#include "ChatLine.hpp"
+#include "irc/IrcChatLine.hpp"
 #include "GraphicsHandle.hpp"
 
 
-class BacklogView : public QGraphicsView {
+class IrcBacklogView : public QGraphicsView {
     Q_OBJECT
 
     std::array<qreal, 3> splitting_;
-    std::list<ChatLine> chatLines_;
+    std::list<IrcChatLine> chatLines_;
 
     std::array<GraphicsHandle, 2> handles;
 
@@ -27,7 +27,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
 
 public:
-    explicit BacklogView(QGraphicsScene* scene);
+    explicit IrcBacklogView(QGraphicsScene* scene);
 
     void addMessage(size_t id,
                     double time,

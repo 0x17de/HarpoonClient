@@ -1,10 +1,10 @@
-#include "ChatLine.hpp"
+#include "IrcChatLine.hpp"
 
 #include <QDateTime>
 #include <QTime>
 
 
-ChatLine::ChatLine(size_t id,
+IrcChatLine::IrcChatLine(size_t id,
                    double time,
                    const QString& who,
                    const QString& message,
@@ -37,50 +37,50 @@ ChatLine::ChatLine(size_t id,
     }
 }
 
-QString ChatLine::formatTimestamp(double timestamp) {
+QString IrcChatLine::formatTimestamp(double timestamp) {
     return QTime{QDateTime{QDateTime::fromTime_t(timestamp/1000)}.time()}.toString("[hh:mm:ss]");
 }
 
-size_t ChatLine::getId() const {
+size_t IrcChatLine::getId() const {
     return id_;
 }
 
-double ChatLine::getTime() const {
+double IrcChatLine::getTime() const {
     return time_;
 }
 
-QString ChatLine::getTimestamp() const {
+QString IrcChatLine::getTimestamp() const {
     return timestamp_;
 }
 
-QString ChatLine::getWho() const {
+QString IrcChatLine::getWho() const {
     return who_;
 }
 
-QString ChatLine::getMessage() const {
+QString IrcChatLine::getMessage() const {
     return message_;
 }
 
-const QString& ChatLine::getTimestampRef() const {
+const QString& IrcChatLine::getTimestampRef() const {
     return timestamp_;
 }
 
-const QString& ChatLine::getWhoRef() const {
+const QString& IrcChatLine::getWhoRef() const {
     return who_;
 }
 
-const QString& ChatLine::getMessageRef() const {
+const QString& IrcChatLine::getMessageRef() const {
     return message_;
 }
 
-QGraphicsTextItem* ChatLine::getTimestampGfx() {
+QGraphicsTextItem* IrcChatLine::getTimestampGfx() {
     return &timestampGfx_;
 }
 
-QGraphicsTextItem* ChatLine::getWhoGfx() {
+QGraphicsTextItem* IrcChatLine::getWhoGfx() {
     return &whoGfx_;
 }
 
-QGraphicsTextItem* ChatLine::getMessageGfx() {
+QGraphicsTextItem* IrcChatLine::getMessageGfx() {
     return &messageGfx_;
 }

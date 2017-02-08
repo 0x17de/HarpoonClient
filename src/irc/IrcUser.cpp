@@ -1,7 +1,7 @@
-#include "User.hpp"
+#include "IrcUser.hpp"
 
 
-User::User(const QString& nick,
+IrcUser::IrcUser(const QString& nick,
            const QString& mode)
     : TreeEntry('u')
     , userGroup_{nullptr}
@@ -10,32 +10,32 @@ User::User(const QString& nick,
 {
 }
 
-QString User::stripNick(const QString& nick) {
+QString IrcUser::stripNick(const QString& nick) {
     auto exclamationMarkPosition = nick.indexOf("!");
     return exclamationMarkPosition == -1 ? nick : nick.left(exclamationMarkPosition);
 }
 
-void User::setUserGroup(UserGroup* userGroup) {
+void IrcUser::setUserGroup(IrcUserGroup* userGroup) {
     userGroup_ = userGroup;
 }
 
-UserGroup* User::getUserGroup() const {
+IrcUserGroup* IrcUser::getUserGroup() const {
     return userGroup_;
 }
 
-QString User::getNick() const {
+QString IrcUser::getNick() const {
     return nick_;
 }
 
-QString User::getMode() const {
+QString IrcUser::getMode() const {
     return mode_;
 }
 
-void User::rename(const QString& nick) {
+void IrcUser::rename(const QString& nick) {
     nick_ = nick;
 }
 
-void User::changeMode(char modeChar, bool add) {
+void IrcUser::changeMode(char modeChar, bool add) {
     if (add) {
         if (!mode_.contains(modeChar))
             mode_.append(modeChar);
@@ -44,27 +44,27 @@ void User::changeMode(char modeChar, bool add) {
     }
 }
 
-char User::getAccessMode() {
+char IrcUser::getAccessMode() {
     // to keep order
     return isOwner() ? 'q' : isAdmin() ? 'a' : isOperator() ? 'o' : isHalfOperator() ? 'h' : isVoiced() ? 'v' : 0;
 }
 
-bool User::isOwner() {
+bool IrcUser::isOwner() {
     return mode_.contains('q');
 }
 
-bool User::isAdmin() {
+bool IrcUser::isAdmin() {
     return mode_.contains('a');
 }
 
-bool User::isOperator() {
+bool IrcUser::isOperator() {
     return mode_.contains('o');
 }
 
-bool User::isHalfOperator() {
+bool IrcUser::isHalfOperator() {
     return mode_.contains('h');
 }
 
-bool User::isVoiced() {
+bool IrcUser::isVoiced() {
     return mode_.contains('v');
 }

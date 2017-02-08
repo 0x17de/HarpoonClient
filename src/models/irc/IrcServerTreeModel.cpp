@@ -1,17 +1,17 @@
-#include "ServerTreeModel.hpp"
-#include "moc_ServerTreeModel.cpp"
-#include "../Server.hpp"
-#include "../Channel.hpp"
+#include "IrcServerTreeModel.hpp"
+#include "moc_IrcServerTreeModel.cpp"
+#include "irc/IrcServer.hpp"
+#include "irc/IrcChannel.hpp"
 
 #include <QIcon>
 
 
-ServerTreeModel::ServerTreeModel(QObject* parent)
+IrcServerTreeModel::IrcServerTreeModel(QObject* parent)
     : QAbstractItemModel(parent)
 {
 }
 
-QModelIndex ServerTreeModel::index(int row, int column, const QModelIndex& parent) const {
+QModelIndex IrcServerTreeModel::index(int row, int column, const QModelIndex& parent) const {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
@@ -24,22 +24,22 @@ QModelIndex ServerTreeModel::index(int row, int column, const QModelIndex& paren
     } else {
         auto* item = static_cast<TreeEntry*>(parent.internalPointer());
         if (item->getTreeEntryType() == 's') {
-            Server* server = static_cast<Server*>(parent.internalPointer());
+            IrcServer* server = static_cast<IrcServer*>(parent.internalPointer());
             return createIndex(row, column, server->getChannelModel().getChannel(row));
         }
     }
     return QModelIndex();
 }
 
-QModelIndex ServerTreeModel::parent(const QModelIndex& index) const {
+QModelIndex IrcServerTreeModel::parent(const QModelIndex& index) const {
     if (!index.isValid())
         return QModelIndex();
 
     auto* ptr = index.internalPointer();
     auto* item = static_cast<TreeEntry*>(ptr);
     if (item->getTreeEntryType() == 'c') {
-        Channel* channel = static_cast<Channel*>(ptr);
-        std::shared_ptr<Server> server = channel->getServer().lock();
+        IrcChannel* channel = static_cast<IrcChannel*>(ptr);
+        std::shared_ptr<IrcServer> server = channel->getServer().lock();
         if (!server) return QModelIndex();
 
         int rowIndex = server->getChannelModel().getChannelIndex(channel);
@@ -50,7 +50,7 @@ QModelIndex ServerTreeModel::parent(const QModelIndex& index) const {
     return QModelIndex();
 }
 
-int ServerTreeModel::rowCount(const QModelIndex& parent) const {
+int IrcServerTreeModel::rowCount(const QModelIndex& parent) const {
     if (parent.column() > 0)
         return 0;
 
@@ -59,7 +59,7 @@ int ServerTreeModel::rowCount(const QModelIndex& parent) const {
     } else {
         auto* item = static_cast<TreeEntry*>(parent.internalPointer());
         if (item->getTreeEntryType() == 's') {
-            Server* server = static_cast<Server*>(parent.internalPointer());
+            IrcServer* server = static_cast<IrcServer*>(parent.internalPointer());
             return server->getChannelModel().rowCount();
         }
     }
@@ -67,11 +67,11 @@ int ServerTreeModel::rowCount(const QModelIndex& parent) const {
     return 0;
 }
 
-int ServerTreeModel::columnCount(const QModelIndex& parent) const {
+int IrcServerTreeModel::columnCount(const QModelIndex& parent) const {
     return 1; // only one column for all data
 }
 
-QVariant ServerTreeModel::data(const QModelIndex& index, int role) const {
+QVariant IrcServerTreeModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid())
         return QVariant();
 
@@ -79,7 +79,7 @@ QVariant ServerTreeModel::data(const QModelIndex& index, int role) const {
     auto* item = static_cast<TreeEntry*>(ptr);
 
     if (item->getTreeEntryType() == 's') {
-        Server* server = static_cast<Server*>(index.internalPointer());
+        IrcServer* server = static_cast<IrcServer*>(index.internalPointer());
 
         if (role == Qt::DecorationRole)
             return QVariant();
@@ -89,7 +89,7 @@ QVariant ServerTreeModel::data(const QModelIndex& index, int role) const {
 
         return server->getName();
     } else {
-        Channel* channel = static_cast<Channel*>(index.internalPointer());
+        IrcChannel* channel = static_cast<IrcChannel*>(index.internalPointer());
 
         if (role == Qt::DecorationRole)
             return QIcon(channel->getDisabled() ? ":icons/channelDisabled.png" : ":icons/channel.png");
@@ -103,14 +103,14 @@ QVariant ServerTreeModel::data(const QModelIndex& index, int role) const {
     return QVariant();
 }
 
-Qt::ItemFlags ServerTreeModel::flags(const QModelIndex& index) const {
+Qt::ItemFlags IrcServerTreeModel::flags(const QModelIndex& index) const {
     if (!index.isValid())
         return 0;
 
     return QAbstractItemModel::flags(index);
 }
 
-QVariant ServerTreeModel::headerData(int section, Qt::Orientation orientation,
+QVariant IrcServerTreeModel::headerData(int section, Qt::Orientation orientation,
                                int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return "Chats";
@@ -118,19 +118,19 @@ QVariant ServerTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-std::list<std::shared_ptr<Server>>& ServerTreeModel::getServers() {
+std::list<std::shared_ptr<IrcServer>>& IrcServerTreeModel::getServers() {
     return servers_;
 }
 
-std::shared_ptr<Server> ServerTreeModel::getServer(const QString& serverId) {
-    auto it = find_if(servers_.begin(), servers_.end(), [&serverId](std::shared_ptr<Server> server){
+std::shared_ptr<IrcServer> IrcServerTreeModel::getServer(const QString& serverId) {
+    auto it = find_if(servers_.begin(), servers_.end(), [&serverId](std::shared_ptr<IrcServer> server){
             return server->getId() == serverId;
         });
     if (it == servers_.end()) return nullptr;
     return *it;
 }
 
-int ServerTreeModel::getServerIndex(Server* server) {
+int IrcServerTreeModel::getServerIndex(IrcServer* server) {
     int rowIndex = 0;
     for (auto s : servers_) {
         if (s.get() == server)
@@ -140,24 +140,24 @@ int ServerTreeModel::getServerIndex(Server* server) {
     return -1;
 }
 
-void ServerTreeModel::connectServer(Server* server) {
-    ChannelTreeModel& channelTreeModel = server->getChannelModel();
-    connect(&channelTreeModel, &ChannelTreeModel::beginInsertChannel, [this](std::shared_ptr<Server> server, int where) {
+void IrcServerTreeModel::connectServer(IrcServer* server) {
+    IrcChannelTreeModel& channelTreeModel = server->getChannelModel();
+    connect(&channelTreeModel, &IrcChannelTreeModel::beginInsertChannel, [this](std::shared_ptr<IrcServer> server, int where) {
             beginInsertRows(index(getServerIndex(server.get()), 0), where, where);
         });
-    connect(&channelTreeModel, &ChannelTreeModel::newChannel, [this](std::shared_ptr<Channel> channel) {
+    connect(&channelTreeModel, &IrcChannelTreeModel::newChannel, [this](std::shared_ptr<IrcChannel> channel) {
             emit newChannel(channel);
         });
-    connect(&channelTreeModel, &ChannelTreeModel::endInsertChannel, [this]() {
+    connect(&channelTreeModel, &IrcChannelTreeModel::endInsertChannel, [this]() {
             endInsertRows();
         });
-    connect(&channelTreeModel, &ChannelTreeModel::beginRemoveChannel, [this](std::shared_ptr<Server> server, int where) {
+    connect(&channelTreeModel, &IrcChannelTreeModel::beginRemoveChannel, [this](std::shared_ptr<IrcServer> server, int where) {
             beginRemoveRows(index(getServerIndex(server.get()), 0), where, where);
         });
-    connect(&channelTreeModel, &ChannelTreeModel::endRemoveChannel, [this]() {
+    connect(&channelTreeModel, &IrcChannelTreeModel::endRemoveChannel, [this]() {
             endRemoveRows();
         });
-    connect(&channelTreeModel, static_cast<void (ChannelTreeModel::*)(std::shared_ptr<Server>, int)>(&ChannelTreeModel::channelDataChanged), [this](std::shared_ptr<Server> server, int where) {
+    connect(&channelTreeModel, static_cast<void (IrcChannelTreeModel::*)(std::shared_ptr<IrcServer>, int)>(&IrcChannelTreeModel::channelDataChanged), [this](std::shared_ptr<IrcServer> server, int where) {
             auto modelIndex = index(where, 0, index(getServerIndex(server.get()), 0));
             emit dataChanged(modelIndex, modelIndex);
         });
@@ -166,7 +166,7 @@ void ServerTreeModel::connectServer(Server* server) {
     }
 }
 
-void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) {
+void IrcServerTreeModel::resetServers(std::list<std::shared_ptr<IrcServer>>& servers) {
     beginResetModel();
     servers_.clear();
     servers_.insert(servers_.begin(), servers.begin(), servers.end());
@@ -182,7 +182,7 @@ void ServerTreeModel::resetServers(std::list<std::shared_ptr<Server>>& servers) 
     }
 }
 
-void ServerTreeModel::newServer(std::shared_ptr<Server> server) {
+void IrcServerTreeModel::newServer(std::shared_ptr<IrcServer> server) {
     int rowIndex = servers_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
 
@@ -192,7 +192,7 @@ void ServerTreeModel::newServer(std::shared_ptr<Server> server) {
     endInsertRows();
 }
 
-void ServerTreeModel::deleteServer(const QString& serverId) {
+void IrcServerTreeModel::deleteServer(const QString& serverId) {
     int rowIndex = 0;
     decltype(servers_)::iterator it;
     for (it = servers_.begin(); it != servers_.end(); ++it, ++rowIndex) {

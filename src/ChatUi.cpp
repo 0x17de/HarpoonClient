@@ -8,17 +8,17 @@
 #include <QStringListModel>
 #include <QDesktopServices>
 #include "HarpoonClient.hpp"
-#include "models/ServerTreeModel.hpp"
+#include "models/irc/IrcServerTreeModel.hpp"
 #include "version.hpp"
 
-#include "Server.hpp"
-#include "BacklogView.hpp"
-#include "Channel.hpp"
-#include "User.hpp"
+#include "irc/IrcServer.hpp"
+#include "irc/IrcBacklogView.hpp"
+#include "irc/IrcChannel.hpp"
+#include "irc/IrcUser.hpp"
 
 
 ChatUi::ChatUi(HarpoonClient& client,
-               ServerTreeModel& serverTreeModel,
+               IrcServerTreeModel& serverTreeModel,
                SettingsTypeModel& settingsTypeModel)
     : settings_{client.getSettings()}
     , client_{client}
@@ -92,9 +92,9 @@ ChatUi::ChatUi(HarpoonClient& client,
 
     // channel list events
     connect(channelView_, &QTreeView::clicked, this, &ChatUi::onChannelViewSelection);
-    connect(&serverTreeModel_, &ServerTreeModel::expand, this, &ChatUi::expandServer);
+    connect(&serverTreeModel_, &IrcServerTreeModel::expand, this, &ChatUi::expandServer);
 
-    connect(&client, &HarpoonClient::topicChanged, [this](Channel* channel, const QString& topic) {
+    connect(&client, &HarpoonClient::topicChanged, [this](IrcChannel* channel, const QString& topic) {
             if (activeChannel_ == channel)
                 topicView_->setText(topic);
         });
@@ -147,13 +147,13 @@ void ChatUi::showChannelContextMenu(const QPoint&) {
     auto index = channelView_->selectionModel()->currentIndex();
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
 
-    std::shared_ptr<Server> server;
-    std::shared_ptr<Channel> channel;
+    std::shared_ptr<IrcServer> server;
+    std::shared_ptr<IrcChannel> channel;
 
     if (item->getTreeEntryType() == 's') {
-        server = std::static_pointer_cast<Server>(item->shared_from_this());
+        server = std::static_pointer_cast<IrcServer>(item->shared_from_this());
     } else if (item->getTreeEntryType() == 'c') {
-        channel = std::static_pointer_cast<Channel>(item->shared_from_this());
+        channel = std::static_pointer_cast<IrcChannel>(item->shared_from_this());
         server = channel->getServer().lock();
     }
 
@@ -198,17 +198,17 @@ void ChatUi::onChannelViewSelection(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
     auto type = item->getTreeEntryType();
     if (type == 'c') { // channel selected
-        Channel* channel = static_cast<Channel*>(item);
+        IrcChannel* channel = static_cast<IrcChannel*>(item);
         activateChannel(channel);
         messageInputView_->setFocus();
     } else if (type == 's') {
-        Server* server = static_cast<Server*>(item);
+        IrcServer* server = static_cast<IrcServer*>(item);
         activateChannel(server->getBacklog());
         messageInputView_->setFocus();
     }
 }
 
-void ChatUi::activateChannel(Channel* channel) {
+void ChatUi::activateChannel(IrcChannel* channel) {
     if (channel != nullptr) {
         setWindowTitle(QString("Harpoon - ") + channel->getName());
         activeChannel_ = channel;
@@ -227,7 +227,7 @@ void ChatUi::activateChannel(Channel* channel) {
     }
 }
 
-void ChatUi::resetServers(std::list<std::shared_ptr<Server>>& servers) {
+void ChatUi::resetServers(std::list<std::shared_ptr<IrcServer>>& servers) {
     for (auto& server : servers) {
         auto* channel = server->getChannelModel().getChannel(0);
         if (channel) {

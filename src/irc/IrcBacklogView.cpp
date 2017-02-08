@@ -1,12 +1,12 @@
-#include "BacklogView.hpp"
-#include "moc_BacklogView.cpp"
+#include "IrcBacklogView.hpp"
+#include "moc_IrcBacklogView.cpp"
 
 #include <QTextBlockFormat>
 #include <QTextCursor>
 #include <QScrollBar>
 
 
-BacklogView::BacklogView(QGraphicsScene* scene)
+IrcBacklogView::IrcBacklogView(QGraphicsScene* scene)
     : QGraphicsView(scene)
     , splitting_{75, 0.2, 0.8}
 {
@@ -35,16 +35,16 @@ BacklogView::BacklogView(QGraphicsScene* scene)
     setAcceptDrops(true);
 }
 
-void BacklogView::resizeEvent(QResizeEvent* event) {
+void IrcBacklogView::resizeEvent(QResizeEvent* event) {
     QGraphicsView::resizeEvent(event);
     updateLayout();
 }
 
-void BacklogView::mousePressEvent(QMouseEvent* event) {
+void IrcBacklogView::mousePressEvent(QMouseEvent* event) {
     QGraphicsView::mousePressEvent(event);
 }
 
-void BacklogView::updateLayout(bool moveHandle1, bool moveHandle2) {
+void IrcBacklogView::updateLayout(bool moveHandle1, bool moveHandle2) {
     auto contentsRect = this->contentsRect();
     qreal width = contentsRect.width();
     qreal timeWidth = splitting_[0]; // time is fixed width
@@ -91,7 +91,7 @@ void BacklogView::updateLayout(bool moveHandle1, bool moveHandle2) {
     }
 }
 
-void BacklogView::addMessage(size_t id,
+void IrcBacklogView::addMessage(size_t id,
                              double time,
                              const QString& nick,
                              const QString& message,
@@ -100,7 +100,7 @@ void BacklogView::addMessage(size_t id,
     QScrollBar* bar = this->verticalScrollBar();
     bool scrollToBottom = bar != nullptr && bar->sliderPosition() == bar->maximum();
 
-    ChatLine* line;
+    IrcChatLine* line;
     if (id == 0 || chatLines_.size() == 0 || id > chatLines_.back().getId()) {
         chatLines_.emplace_back(id, time, nick, message, color);
         line = &chatLines_.back();

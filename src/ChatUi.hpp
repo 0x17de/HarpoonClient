@@ -10,10 +10,10 @@
 #include "ui_serverConfigurationDialog.h"
 
 
-class ServerTreeModel;
+class IrcServerTreeModel;
 class SettingsTypeModel;
-class Server;
-class Channel;
+class IrcServer;
+class IrcChannel;
 class HarpoonClient;
 class QTreeView;
 class QTableView;
@@ -30,7 +30,7 @@ class ChatUi : public QMainWindow {
     QSettings& settings_;
     HarpoonClient& client_;
 
-    ServerTreeModel& serverTreeModel_;
+    IrcServerTreeModel& serverTreeModel_;
     SettingsTypeModel& settingsTypeModel_;
 
     QLineEdit* topicView_;
@@ -38,7 +38,7 @@ class ChatUi : public QMainWindow {
     QStackedWidget* userViews_;
     QStackedWidget* backlogViews_;
     QLineEdit* messageInputView_;
-    Channel* activeChannel_;
+    IrcChannel* activeChannel_;
 
     QDialog bouncerConfigurationDialog_;
     SettingsDialog settingsDialog_;
@@ -48,23 +48,23 @@ class ChatUi : public QMainWindow {
 
 public:
     ChatUi(HarpoonClient& client,
-           ServerTreeModel& serverTreeModel,
+           IrcServerTreeModel& serverTreeModel,
            SettingsTypeModel& settingsTypeModel);
     virtual ~ChatUi();
 
 private:
-    void activateChannel(Channel* channel);
+    void activateChannel(IrcChannel* channel);
     void showConfigureNetworksDialog();
     void showConfigureBouncerDialog();
 
 signals:
-    void sendMessage(Server* server, Channel* channel, const QString& message);
+    void sendMessage(IrcServer* server, IrcChannel* channel, const QString& message);
 
 public Q_SLOTS:
     void showChannelContextMenu(const QPoint&);
     void onChannelViewSelection(const QModelIndex& index);
     void expandServer(const QModelIndex& index);
-    void resetServers(std::list<std::shared_ptr<Server>>& servers);
+    void resetServers(std::list<std::shared_ptr<IrcServer>>& servers);
     void messageReturnPressed();
 };
 

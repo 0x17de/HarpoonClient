@@ -13,12 +13,12 @@
 
 class QJsonObject;
 class QJsonDocument;
-class Server;
-class ServerTreeModel;
+class IrcServer;
+class IrcServerTreeModel;
 class SettingsTypeModel;
-class Host;
-class Channel;
-class User;
+class IrcHost;
+class IrcChannel;
+class IrcUser;
 
 
 class HarpoonClient : public QObject {
@@ -26,7 +26,7 @@ class HarpoonClient : public QObject {
 
     bool shutdown_;
 
-    ServerTreeModel& serverTreeModel_;
+    IrcServerTreeModel& serverTreeModel_;
     SettingsTypeModel& settingsTypeModel_;
 
     QUrl harpoonUrl_;
@@ -41,7 +41,7 @@ class HarpoonClient : public QObject {
     QSettings settings_;
 
 public:
-    HarpoonClient(ServerTreeModel& serverTreeModel,
+    HarpoonClient(IrcServerTreeModel& serverTreeModel,
                   SettingsTypeModel& settingsTypeModel);
     ~HarpoonClient();
     void run();
@@ -80,12 +80,12 @@ private:
 public Q_SLOTS:
     void onReconnectTimer();
     void onPingTimer();
-    void onNewChannel(std::shared_ptr<Channel> channel);
-    void sendMessage(Server* server, Channel* channel, const QString& message);
-    void backlogRequest(Channel* channel);
+    void onNewChannel(std::shared_ptr<IrcChannel> channel);
+    void sendMessage(IrcServer* server, IrcChannel* channel, const QString& message);
+    void backlogRequest(IrcChannel* channel);
 
 signals:
-    void topicChanged(Channel* channel, const QString& topic);
+    void topicChanged(IrcChannel* channel, const QString& topic);
 };
 
 #endif

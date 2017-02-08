@@ -1,13 +1,13 @@
 #include "SettingsDialog.hpp"
 #include "moc_SettingsDialog.cpp"
-#include "models/ServerTreeModel.hpp"
+#include "models/irc/IrcServerTreeModel.hpp"
 #include "models/SettingsTypeModel.hpp"
 #include "HarpoonClient.hpp"
-#include "Host.hpp"
+#include "irc/IrcHost.hpp"
 
 
 SettingsDialog::SettingsDialog(HarpoonClient& client,
-                               ServerTreeModel& channelTreeModel,
+                               IrcServerTreeModel& channelTreeModel,
                                SettingsTypeModel& settingsTypeModel)
     : client_{client}
     , channelTreeModel_{channelTreeModel}
@@ -163,30 +163,30 @@ void SettingsDialog::onProtocolSelected(const QString& text) {
 void SettingsDialog::onIrcServerSelected(const QModelIndex& index) {
     auto* item = static_cast<TreeEntry*>(index.internalPointer());
     if (item->getTreeEntryType() == 's') {
-        Server* server = static_cast<Server*>(item);
+        IrcServer* server = static_cast<IrcServer*>(item);
         ircSettingsUi_.hostsList->setModel(&server->getHostModel());
         ircSettingsUi_.nickList->setModel(&server->getNickModel());
     }
 }
 
-std::shared_ptr<Server> SettingsDialog::getSelectedServer() {
+std::shared_ptr<IrcServer> SettingsDialog::getSelectedServer() {
     auto index = ircSettingsUi_.serverList->selectionModel()->currentIndex();
     if (index.isValid()) {
         auto* item = static_cast<TreeEntry*>(index.internalPointer());
         if (item->getTreeEntryType() == 's')
-            return std::static_pointer_cast<Server>(static_cast<Server*>(item)->shared_from_this());
+            return std::static_pointer_cast<IrcServer>(static_cast<IrcServer*>(item)->shared_from_this());
     }
-    return std::shared_ptr<Server>();
+    return std::shared_ptr<IrcServer>();
 }
 
-std::shared_ptr<Host> SettingsDialog::getSelectedHost() {
+std::shared_ptr<IrcHost> SettingsDialog::getSelectedHost() {
     auto index = ircSettingsUi_.hostsList->selectionModel()->currentIndex();
     if (index.isValid()) {
         auto* item = static_cast<TreeEntry*>(index.internalPointer());
         if (item->getTreeEntryType() == 'h')
-            return std::static_pointer_cast<Host>(static_cast<Host*>(item)->shared_from_this());
+            return std::static_pointer_cast<IrcHost>(static_cast<IrcHost*>(item)->shared_from_this());
     }
-    return std::shared_ptr<Host>();
+    return std::shared_ptr<IrcHost>();
 }
 
 QString SettingsDialog::getSelectedNick() {

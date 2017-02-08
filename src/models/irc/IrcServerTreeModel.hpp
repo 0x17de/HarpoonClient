@@ -1,19 +1,19 @@
-#ifndef USERTREEMODEL_H
-#define USERTREEMODEL_H
+#ifndef IRCSERVERTREEMODEL_H
+#define IRCSERVERTREEMODEL_H
 
 #include <QAbstractItemModel>
 #include <list>
 #include <memory>
 
 
-class User;
-class UserGroup;
+class IrcServer;
+class IrcChannel;
 
-class UserTreeModel : public QAbstractItemModel {
+class IrcServerTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
-    explicit UserTreeModel(QObject* parent = 0);
+    explicit IrcServerTreeModel(QObject* parent = 0);
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
@@ -25,31 +25,23 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex& parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    User* getUser(QString nick);
-    int getUserGroupIndex(UserGroup* userGroup);
+    std::list<std::shared_ptr<IrcServer>>& getServers();
+    std::shared_ptr<IrcServer> getServer(const QString& serverId);
+    int getServerIndex(IrcServer* server);
+    void connectServer(IrcServer* server);
     void reconnectEvents();
-    void addUser(std::shared_ptr<User> user);
-    bool removeUser(const QString& nick);
-    bool renameUser(const QString& nick,
-                    const QString& newNick);
-    bool changeMode(const QString& nick,
-                    char mode,
-                    bool add);
-
-private:
-    UserGroup* getGroup(const QString& name);
-    QString modeName(char modeChar) const;
 
 signals:
     void expand(const QModelIndex& index);
+    void newChannel(std::shared_ptr<IrcChannel> channel);
 
 public Q_SLOTS:
-    void resetUsers(std::list<std::shared_ptr<User>>& users);
+    void resetServers(std::list<std::shared_ptr<IrcServer>>& servers);
+    void newServer(std::shared_ptr<IrcServer> server);
+    void deleteServer(const QString& serverId);
 
 private:
-    std::shared_ptr<UserGroup> groupUsers_;
-    std::list<std::shared_ptr<UserGroup>> groups_;
-    std::list<std::shared_ptr<User>> users_;
+    std::list<std::shared_ptr<IrcServer>> servers_;
 };
 
 #endif

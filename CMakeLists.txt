@@ -22,21 +22,21 @@ set(SRC_CLIENT
     src/main.cpp
     src/ChatUi.cpp src/ChatUi.hpp
     src/TreeEntry.cpp src/TreeEntry.hpp
-    src/Server.cpp src/Server.hpp
-    src/Host.cpp src/Host.hpp
-    src/Channel.cpp src/Channel.hpp
-    src/BacklogView.cpp src/BacklogView.hpp
+    src/irc/IrcServer.cpp src/irc/IrcServer.hpp
+    src/irc/IrcHost.cpp src/irc/IrcHost.hpp
+    src/irc/IrcChannel.cpp src/irc/IrcChannel.hpp
+    src/irc/IrcBacklogView.cpp src/irc/IrcBacklogView.hpp
     src/GraphicsHandle.cpp src/GraphicsHandle.hpp
-    src/UserGroup.cpp src/UserGroup.hpp
-    src/User.cpp src/User.hpp
-    src/ChatLine.cpp src/ChatLine.hpp
+    src/irc/IrcUserGroup.cpp src/irc/IrcUserGroup.hpp
+    src/irc/IrcUser.cpp src/irc/IrcUser.hpp
+    src/irc/IrcChatLine.cpp src/irc/IrcChatLine.hpp
     src/SettingsDialog.cpp src/SettingsDialog.hpp
     src/HarpoonClient.cpp src/HarpoonClient.hpp
-    src/models/ServerTreeModel.cpp src/models/ServerTreeModel.hpp
-    src/models/ChannelTreeModel.cpp src/models/ChannelTreeModel.hpp
-    src/models/UserTreeModel.cpp src/models/UserTreeModel.hpp
-    src/models/HostTreeModel.cpp src/models/HostTreeModel.hpp
-    src/models/NickModel.cpp src/models/NickModel.hpp
+    src/models/irc/IrcServerTreeModel.cpp src/models/irc/IrcServerTreeModel.hpp
+    src/models/irc/IrcChannelTreeModel.cpp src/models/irc/IrcChannelTreeModel.hpp
+    src/models/irc/IrcUserTreeModel.cpp src/models/irc/IrcUserTreeModel.hpp
+    src/models/irc/IrcHostTreeModel.cpp src/models/irc/IrcHostTreeModel.hpp
+    src/models/irc/IrcNickModel.cpp src/models/irc/IrcNickModel.hpp
     src/models/SettingsTypeModel.cpp src/models/SettingsTypeModel.hpp
     )
 

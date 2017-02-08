@@ -1,7 +1,7 @@
-#include "Host.hpp"
-#include "moc_Host.cpp"
+#include "IrcHost.hpp"
+#include "moc_IrcHost.cpp"
 
-Host::Host(const std::weak_ptr<Server>& server,
+IrcHost::IrcHost(const std::weak_ptr<IrcServer>& server,
            const QString& host,
            int port,
            bool ssl,
@@ -15,22 +15,22 @@ Host::Host(const std::weak_ptr<Server>& server,
 {
 }
 
-QString Host::getHost() const {
+QString IrcHost::getHost() const {
     return host_;
 }
 
-int Host::getPort() const {
+int IrcHost::getPort() const {
     return port_;
 }
 
-bool Host::getSsl() const {
+bool IrcHost::getSsl() const {
     return ssl_;
 }
 
-bool Host::getIpv6() const {
+bool IrcHost::getIpv6() const {
     return ipv6_;
 }
 
-std::weak_ptr<Server> Host::getServer() const {
+std::weak_ptr<IrcServer> IrcHost::getServer() const {
     return server_;
 }

@@ -1,7 +1,7 @@
-#include "Channel.hpp"
-#include "moc_Channel.cpp"
-#include "User.hpp"
-#include "Server.hpp"
+#include "IrcChannel.hpp"
+#include "moc_IrcChannel.cpp"
+#include "IrcUser.hpp"
+#include "IrcServer.hpp"
 
 #include <QStackedWidget>
 #include <QGraphicsTextItem>
@@ -10,8 +10,8 @@
 #include <QScrollBar>
 
 
-Channel::Channel(size_t firstId,
-                 const std::weak_ptr<Server>& server,
+IrcChannel::IrcChannel(size_t firstId,
+                 const std::weak_ptr<IrcServer>& server,
                  const QString& name,
                  bool disabled)
     : TreeEntry('c')
@@ -26,15 +26,15 @@ Channel::Channel(size_t firstId,
     backlogCanvas_.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     backlogCanvas_.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    connect(&userTreeModel_, &UserTreeModel::expand, this, &Channel::expandUserGroup);
+    connect(&userTreeModel_, &IrcUserTreeModel::expand, this, &IrcChannel::expandUserGroup);
     // TODO: connect on resize event => handle chat view
 }
 
-Channel::~Channel() {
+IrcChannel::~IrcChannel() {
     userTreeView_.setModel(0);
 }
 
-void Channel::activate() {
+void IrcChannel::activate() {
     QScrollBar* bar = backlogCanvas_.verticalScrollBar();
     if (bar && bar->sliderPosition() == 0) {
         if (!backlogRequested) {
@@ -44,31 +44,31 @@ void Channel::activate() {
     }
 }
 
-size_t Channel::getFirstId() const {
+size_t IrcChannel::getFirstId() const {
     return firstId_;
 }
 
-std::weak_ptr<Server> Channel::getServer() const {
+std::weak_ptr<IrcServer> IrcChannel::getServer() const {
     return server_;
 }
 
-QString Channel::getName() const {
+QString IrcChannel::getName() const {
     return name_;
 }
 
-QString Channel::getTopic() const {
+QString IrcChannel::getTopic() const {
     return topic_;
 }
 
-bool Channel::getDisabled() const {
+bool IrcChannel::getDisabled() const {
     return disabled_;
 }
 
-void Channel::setDisabled(bool disabled) {
+void IrcChannel::setDisabled(bool disabled) {
     if (disabled_ != disabled) {
         disabled_ = disabled;
 
-        std::list<std::shared_ptr<User>> newUsers;
+        std::list<std::shared_ptr<IrcUser>> newUsers;
         userTreeModel_.resetUsers(newUsers);
 
         if (auto s = server_.lock())
@@ -76,39 +76,39 @@ void Channel::setDisabled(bool disabled) {
     }
 }
 
-void Channel::expandUserGroup(const QModelIndex& index) {
+void IrcChannel::expandUserGroup(const QModelIndex& index) {
     userTreeView_.setExpanded(index, true);
 }
 
-BacklogView* Channel::getBacklogView() {
+IrcBacklogView* IrcChannel::getBacklogView() {
     return &backlogCanvas_;
 }
 
-UserTreeModel& Channel::getUserModel() {
+IrcUserTreeModel& IrcChannel::getUserModel() {
     return userTreeModel_;
 }
 
-QTreeView* Channel::getUserTreeView() {
+QTreeView* IrcChannel::getUserTreeView() {
     return &userTreeView_;
 }
 
-void Channel::addUser(std::shared_ptr<User> user) {
+void IrcChannel::addUser(std::shared_ptr<IrcUser> user) {
     userTreeModel_.addUser(user);
 }
 
-void Channel::resetUsers(std::list<std::shared_ptr<User>>& users) {
+void IrcChannel::resetUsers(std::list<std::shared_ptr<IrcUser>>& users) {
     userTreeModel_.resetUsers(users);
 }
 
-User* Channel::getUser(const QString& nick) {
+IrcUser* IrcChannel::getUser(const QString& nick) {
     return userTreeModel_.getUser(nick);
 }
 
-void Channel::setTopic(size_t id, double timestamp, const QString& nick, const QString& topic) {
+void IrcChannel::setTopic(size_t id, double timestamp, const QString& nick, const QString& topic) {
     topic_ = topic;
-    backlogCanvas_.addMessage(id, timestamp, "!", User::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
+    backlogCanvas_.addMessage(id, timestamp, "!", IrcUser::stripNick(nick) + " changed the topic to: " + topic, MessageColor::Event);
 }
 
-void Channel::addMessage(size_t id, double timestamp, const QString& nick, const QString& message, MessageColor color) {
+void IrcChannel::addMessage(size_t id, double timestamp, const QString& nick, const QString& message, MessageColor color) {
     backlogCanvas_.addMessage(id, timestamp, nick, message, color);
 }

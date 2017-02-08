@@ -1,5 +1,5 @@
-#ifndef USER_H
-#define USER_H
+#ifndef USERIRC_H
+#define USERIRC_H
 
 
 #include <QString>
@@ -7,18 +7,18 @@
 #include "TreeEntry.hpp"
 
 
-class UserGroup;
-class User : public TreeEntry {
-    UserGroup* userGroup_;
+class IrcUserGroup;
+class IrcUser : public TreeEntry {
+    IrcUserGroup* userGroup_;
     QString nick_;
     QString mode_;
 public:
-    explicit User(const QString& nick,
+    explicit IrcUser(const QString& nick,
                   const QString& mode = "");
 
     static QString stripNick(const QString& nick);
-    void setUserGroup(UserGroup* userGroup);
-    UserGroup* getUserGroup() const;
+    void setUserGroup(IrcUserGroup* userGroup);
+    IrcUserGroup* getUserGroup() const;
     QString getNick() const;
     QString getMode() const;
     void rename(const QString& newNick);

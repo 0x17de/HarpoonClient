@@ -1,5 +1,5 @@
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef IRCCHANNEL_H
+#define IRCCHANNEL_H
 
 
 #include <QString>
@@ -11,59 +11,60 @@
 #include <list>
 #include <memory>
 
-#include "BacklogView.hpp"
-#include "ChatLine.hpp"
+#include "irc/IrcBacklogView.hpp"
+#include "irc/IrcChatLine.hpp"
 #include "TreeEntry.hpp"
-#include "models/UserTreeModel.hpp"
+#include "models/irc/IrcUserTreeModel.hpp"
 
 
-class Server;
-class Channel : public TreeEntry {
+class IrcUser;
+class IrcServer;
+class IrcChannel : public TreeEntry {
     Q_OBJECT
 
     bool backlogRequested;
 
     size_t firstId_;
-    std::weak_ptr<Server> server_;
+    std::weak_ptr<IrcServer> server_;
     QString name_;
     QString topic_;
-    UserTreeModel userTreeModel_;
+    IrcUserTreeModel userTreeModel_;
     bool disabled_;
     QTreeView userTreeView_;
     QGraphicsScene backlogScene_; // TODO: create own class + chat line class
-    BacklogView backlogCanvas_;
+    IrcBacklogView backlogCanvas_;
 
 public:
-    Channel(size_t firstId,
-            const std::weak_ptr<Server>& server,
+    IrcChannel(size_t firstId,
+            const std::weak_ptr<IrcServer>& server,
             const QString& name,
             bool disabled);
-    virtual ~Channel();
+    virtual ~IrcChannel();
 
     size_t getFirstId() const;
-    std::weak_ptr<Server> getServer() const;
+    std::weak_ptr<IrcServer> getServer() const;
     QString getName() const;
     QString getTopic() const;
     bool getDisabled() const;
     void setDisabled(bool disabled);
-    void addUser(std::shared_ptr<User> user);
-    void resetUsers(std::list<std::shared_ptr<User>>& users);
-    User* getUser(const QString& nick);
+    void addUser(std::shared_ptr<IrcUser> user);
+    void resetUsers(std::list<std::shared_ptr<IrcUser>>& users);
+    IrcUser* getUser(const QString& nick);
     void setTopic(size_t id, double timestamp, const QString& nick, const QString& topic);
     void addMessage(size_t id, double timestamp, const QString& nick, const QString& message, MessageColor color);
-    BacklogView* getBacklogView();
+    IrcBacklogView* getBacklogView();
     QTreeView* getUserTreeView();
-    UserTreeModel& getUserModel();
+    IrcUserTreeModel& getUserModel();
     void activate();
 
 public Q_SLOTS:
     void expandUserGroup(const QModelIndex& index);
 
 signals:
-    void channelDataChanged(Channel* channel);
-    void beginAddUser(User* user);
+    void channelDataChanged(IrcChannel* channel);
+    void beginAddUser(IrcUser* user);
     void endAddUser();
-    void backlogRequest(Channel* channel);
+    void backlogRequest(IrcChannel* channel);
 };
 
 

@@ -1,17 +1,17 @@
-#include "HostTreeModel.hpp"
-#include "moc_HostTreeModel.cpp"
-#include "../Server.hpp"
-#include "../Host.hpp"
+#include "IrcHostTreeModel.hpp"
+#include "moc_IrcHostTreeModel.cpp"
+#include "irc/IrcServer.hpp"
+#include "irc/IrcHost.hpp"
 
 #include <QIcon>
 
 
-HostTreeModel::HostTreeModel(QObject* parent)
+IrcHostTreeModel::IrcHostTreeModel(QObject* parent)
     : QAbstractItemModel(parent)
 {
 }
 
-QModelIndex HostTreeModel::index(int row, int column, const QModelIndex& parent) const {
+QModelIndex IrcHostTreeModel::index(int row, int column, const QModelIndex& parent) const {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
@@ -25,11 +25,11 @@ QModelIndex HostTreeModel::index(int row, int column, const QModelIndex& parent)
     return QModelIndex();
 }
 
-QModelIndex HostTreeModel::parent(const QModelIndex& index) const {
+QModelIndex IrcHostTreeModel::parent(const QModelIndex& index) const {
     return QModelIndex();
 }
 
-int HostTreeModel::rowCount(const QModelIndex& parent) const {
+int IrcHostTreeModel::rowCount(const QModelIndex& parent) const {
     if (parent.column() > 0)
         return 0;
 
@@ -38,7 +38,7 @@ int HostTreeModel::rowCount(const QModelIndex& parent) const {
     } else {
         auto* item = static_cast<TreeEntry*>(parent.internalPointer());
         if (item->getTreeEntryType() == 's') {
-            Server* server = static_cast<Server*>(parent.internalPointer());
+            IrcServer* server = static_cast<IrcServer*>(parent.internalPointer());
             return server->getHostModel().rowCount();
         }
     }
@@ -46,11 +46,11 @@ int HostTreeModel::rowCount(const QModelIndex& parent) const {
     return 0;
 }
 
-int HostTreeModel::columnCount(const QModelIndex& parent) const {
+int IrcHostTreeModel::columnCount(const QModelIndex& parent) const {
     return 1; // only one column for all data
 }
 
-QVariant HostTreeModel::data(const QModelIndex& index, int role) const {
+QVariant IrcHostTreeModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid())
         return QVariant();
 
@@ -58,7 +58,7 @@ QVariant HostTreeModel::data(const QModelIndex& index, int role) const {
     auto* item = static_cast<TreeEntry*>(ptr);
 
     if (item->getTreeEntryType() == 's') {
-        Server* server = static_cast<Server*>(index.internalPointer());
+        IrcServer* server = static_cast<IrcServer*>(index.internalPointer());
 
         if (role == Qt::DecorationRole)
             return QVariant();
@@ -68,7 +68,7 @@ QVariant HostTreeModel::data(const QModelIndex& index, int role) const {
 
         return server->getName();
     } else {
-        Host* host = static_cast<Host*>(index.internalPointer());
+        IrcHost* host = static_cast<IrcHost*>(index.internalPointer());
 
         if (role != Qt::DisplayRole)
             return QVariant();
@@ -79,14 +79,14 @@ QVariant HostTreeModel::data(const QModelIndex& index, int role) const {
     return QVariant();
 }
 
-Qt::ItemFlags HostTreeModel::flags(const QModelIndex& index) const {
+Qt::ItemFlags IrcHostTreeModel::flags(const QModelIndex& index) const {
     if (!index.isValid())
         return 0;
 
     return QAbstractItemModel::flags(index);
 }
 
-QVariant HostTreeModel::headerData(int section, Qt::Orientation orientation,
+QVariant IrcHostTreeModel::headerData(int section, Qt::Orientation orientation,
                                int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
         return "Chats";
@@ -94,21 +94,21 @@ QVariant HostTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-void HostTreeModel::resetHosts(std::list<std::shared_ptr<Host>>& hosts) {
+void IrcHostTreeModel::resetHosts(std::list<std::shared_ptr<IrcHost>>& hosts) {
     beginResetModel();
     hosts_.clear();
     hosts_.insert(hosts_.begin(), hosts.begin(), hosts.end());
     endResetModel();
 }
 
-void HostTreeModel::newHost(std::shared_ptr<Host> host) {
+void IrcHostTreeModel::newHost(std::shared_ptr<IrcHost> host) {
     int rowIndex = hosts_.size();
     beginInsertRows(QModelIndex{}, rowIndex, rowIndex);
     hosts_.push_back(host);
     endInsertRows();
 }
 
-void HostTreeModel::deleteHost(const QString& hostName, int port) {
+void IrcHostTreeModel::deleteHost(const QString& hostName, int port) {
     int rowIndex = 0;
     decltype(hosts_)::iterator it;
     for (it = hosts_.begin(); it != hosts_.end(); ++it, ++rowIndex) {
