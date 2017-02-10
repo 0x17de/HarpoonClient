@@ -45,6 +45,6 @@ void IrcServer::setActiveNick(const QString& nick) {
 
 IrcChannel* IrcServer::getBacklog() {
     if (!backlog_)
-        backlog_ = std::make_shared<IrcChannel>(0, std::static_pointer_cast<IrcServer>(shared_from_this()), "["+name_+"]", false);
+        backlog_ = std::make_shared<IrcChannel>(std::static_pointer_cast<IrcServer>(shared_from_this()), "["+name_+"]", false);
     return backlog_.get();
 }

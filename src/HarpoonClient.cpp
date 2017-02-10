@@ -8,6 +8,7 @@
 #include "irc/IrcChannel.hpp"
 #include "irc/IrcUser.hpp"
 
+#include <limits>
 #include <algorithm>
 #include <sstream>
 #include <QDebug>
@@ -113,7 +114,9 @@ void HarpoonClient::backlogRequest(IrcChannel* channel) {
     root["protocol"] = "irc";
     root["server"] = server->getId();
     root["channel"] = channel->getName();
-    //root["from"] = channel->getFirstId();
+    auto firstId = channel->getFirstId();
+    if (firstId != std::numeric_limits<size_t>::max())
+        root["from"] = std::to_string(channel->getFirstId()).c_str();
 
     QString json = QJsonDocument{root}.toJson(QJsonDocument::JsonFormat::Compact);
     ws_.sendTextMessage(json);
@@ -457,9 +460,6 @@ void HarpoonClient::irc_handleServerAdded(const QJsonObject& root) {
     QString serverId = serverIdValue.toString();
     QString name = nameValue.toString();
 
-    // no nick yet, also inactive
-    // TODO: firstId for new servers
-
     auto server = std::make_shared<IrcServer>("", serverId, name, true);
     serverTreeModel_.newServer(server);
 }
@@ -609,7 +609,7 @@ void HarpoonClient::irc_handleJoin(const QJsonObject& root) {
         if (channel != nullptr) {
             channel->setDisabled(false);
         } else {
-            std::shared_ptr<IrcChannel> channelPtr{std::make_shared<IrcChannel>(0 /* backlog last id */, server, channelName, false)};
+            std::shared_ptr<IrcChannel> channelPtr{std::make_shared<IrcChannel>(server, channelName, false)};
             channel = channelPtr.get();
             channelModel.addChannel(channelPtr);
         }
@@ -648,7 +648,7 @@ void HarpoonClient::irc_handlePart(const QJsonObject& root) {
         if (channel != nullptr) {
             channel->setDisabled(true);
         } else {
-            std::shared_ptr<IrcChannel> channelPtr{std::make_shared<IrcChannel>(0 /* backlog last id */, server, channelName, true)};
+            std::shared_ptr<IrcChannel> channelPtr{std::make_shared<IrcChannel>(server, channelName, true)};
             channel = channelPtr.get();
             channelModel.addChannel(channelPtr);
         }
@@ -891,11 +891,6 @@ void HarpoonClient::irc_handleMode(const QJsonObject& root) {
 void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
     std::list<std::shared_ptr<IrcServer>> serverList;
 
-    QJsonValue firstIdValue = root.value("firstId");
-    if (!firstIdValue.isString()) return;
-    size_t firstId;
-    std::istringstream(firstIdValue.toString().toStdString()) >> firstId;
-
     QJsonValue serversValue = root.value("servers");
     if (!serversValue.isObject()) return;
 
@@ -932,7 +927,7 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
             auto channelDisabledValue = channelData.value("disabled");
             bool channelDisabled = channelDisabledValue.isBool() && channelDisabledValue.toBool();
 
-            auto currentChannel = std::make_shared<IrcChannel>(firstId, currentServer, channelName, channelDisabled);
+            auto currentChannel = std::make_shared<IrcChannel>(currentServer, channelName, channelDisabled);
             currentServer->getChannelModel().addChannel(currentChannel);
 
             QJsonObject channel = channelValue.toObject();
@@ -956,7 +951,6 @@ void HarpoonClient::irc_handleChatList(const QJsonObject& root) {
 }
 
 void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
-    //QJsonValue firstIdValue = root.value("firstId");
     QJsonValue serverIdValue = root.value("server");
     QJsonValue channelNameValue = root.value("channel");
     QJsonValue linesValue = root.value("lines");
@@ -972,6 +966,8 @@ void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
     std::shared_ptr<IrcServer> server = serverTreeModel_.getServer(serverId);
     IrcChannel* channel = server->getChannelModel().getChannel(channelName);
     if (!channel) return;
+
+    size_t smallestId = std::numeric_limits<size_t>::max();
 
     QJsonArray lines = linesValue.toArray();
     for (auto line : lines) {
@@ -1013,5 +1009,9 @@ void HarpoonClient::irc_handleBacklogResponse(const QJsonObject& root) {
         } else if (type == "action") {
             channel->addMessage(id, time, "*", IrcUser::stripNick(sender) + " " + message, MessageColor::Action);
         }
+
+        if (id < smallestId)
+            smallestId = id;
     }
+    channel->onBacklogResponse(smallestId);
 }

@@ -109,8 +109,11 @@ void IrcBacklogView::addMessage(size_t id,
         line = &chatLines_.front();
     } else {
         auto it = chatLines_.begin();
-        while (id > it->getId())
+        while (it != chatLines_.end() && id > it->getId()) {
             ++it;
+        }
+        if (id == it->getId())
+            return; // message already exists
         chatLines_.emplace(it, id, time, nick, message, color);
     }
 

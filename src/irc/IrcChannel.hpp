@@ -22,7 +22,7 @@ class IrcServer;
 class IrcChannel : public TreeEntry {
     Q_OBJECT
 
-    bool backlogRequested;
+    bool backlogRequested_;
 
     size_t firstId_;
     std::weak_ptr<IrcServer> server_;
@@ -35,12 +35,12 @@ class IrcChannel : public TreeEntry {
     IrcBacklogView backlogCanvas_;
 
 public:
-    IrcChannel(size_t firstId,
-            const std::weak_ptr<IrcServer>& server,
-            const QString& name,
-            bool disabled);
+    IrcChannel(const std::weak_ptr<IrcServer>& server,
+               const QString& name,
+               bool disabled);
     virtual ~IrcChannel();
 
+    void onBacklogResponse(size_t firstId);
     size_t getFirstId() const;
     std::weak_ptr<IrcServer> getServer() const;
     QString getName() const;

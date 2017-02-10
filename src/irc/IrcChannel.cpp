@@ -3,6 +3,7 @@
 #include "IrcUser.hpp"
 #include "IrcServer.hpp"
 
+#include <limits>
 #include <QStackedWidget>
 #include <QGraphicsTextItem>
 #include <QTextBlockFormat>
@@ -10,12 +11,12 @@
 #include <QScrollBar>
 
 
-IrcChannel::IrcChannel(size_t firstId,
-                 const std::weak_ptr<IrcServer>& server,
-                 const QString& name,
-                 bool disabled)
+IrcChannel::IrcChannel(const std::weak_ptr<IrcServer>& server,
+                       const QString& name,
+                       bool disabled)
     : TreeEntry('c')
-    , backlogRequested{false}
+    , backlogRequested_{false}
+    , firstId_{std::numeric_limits<size_t>::max()}
     , server_{server}
     , name_{name}
     , disabled_{disabled}
@@ -37,10 +38,17 @@ IrcChannel::~IrcChannel() {
 void IrcChannel::activate() {
     QScrollBar* bar = backlogCanvas_.verticalScrollBar();
     if (bar && bar->sliderPosition() == 0) {
-        if (!backlogRequested) {
-            backlogRequested = true;
+        if (!backlogRequested_) {
+            backlogRequested_ = true;
             emit backlogRequest(this);
         }
+    }
+}
+
+void IrcChannel::onBacklogResponse(size_t firstId) {
+    if (firstId < firstId_) {
+        firstId_ = firstId;
+        backlogRequested_ = false; // in this case allow another request
     }
 }
 
